@@ -4,413 +4,425 @@
  * compiled neural network.
  */
 
-import * as gaiaRuntime from './gaia-runtime.js';
-import morphNetwork from '../../examples/morphsphere_game.js';
-import GaiaMorph from './gaia-morph.js';
-
-class GaiaMorphSphereGame {
-    constructor() {
-        this.container = document.getElementById('game-container');
-        this.canvas = document.getElementById('game-canvas');
+// GaiaMorph class - simplified version
+class GaiaMorph {
+    constructor(position, attributes = {}) {
+        // Generate a random name
+        this.name = this.generateName();
         
-        // UI Elements
-        this.statsElements = {
-            morphCount: document.getElementById('morph-count'),
-            perceptionLevel: document.getElementById('perception-level'),
-            healthBar: document.querySelector('.stat-bar-fill.health'),
-            energyBar: document.querySelector('.stat-bar-fill.energy')
-        };
+        // Position in 3D space
+        this.position = position || new THREE.Vector3(
+            (Math.random() - 0.5) * 30,
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 30
+        );
         
-        this.morphInfo = {
-            container: document.getElementById('morph-info'),
-            name: document.querySelector('.morph-name'),
-            personality: document.getElementById('morph-personality'),
-            ability: document.getElementById('morph-ability'),
-            stage: document.getElementById('morph-stage'),
-            hungerBar: document.getElementById('morph-hunger-bar'),
-            happinessBar: document.getElementById('morph-happiness-bar')
-        };
+        // Physical attributes
+        this.size = attributes.size || (0.5 + Math.random() * 1.5);
         
-        this.console = document.getElementById('console');
-        this.gaiaCode = document.getElementById('gaia-code');
+        // Neural attributes
+        this.color = attributes.color || new THREE.Color(
+            0.2 + Math.random() * 0.8,
+            0.2 + Math.random() * 0.8,
+            0.2 + Math.random() * 0.8
+        );
         
-        // Action buttons
-        this.buttons = {
-            feed: document.getElementById('feed-btn'),
-            pet: document.getElementById('pet-btn'),
-            play: document.getElementById('play-btn'),
-            speak: document.getElementById('speak-btn'),
-            heal: document.getElementById('heal-btn'),
-            ability: document.getElementById('ability-btn'),
-            merge: document.getElementById('merge-btn'),
-            create: document.getElementById('create-btn'),
-            attack: document.getElementById('attack-btn'),
-            run: document.getElementById('run-btn')
-        };
+        // State attributes
+        this.hunger = Math.floor(Math.random() * 70) + 30;
+        this.happiness = Math.floor(Math.random() * 70) + 30;
+        this.energy = Math.floor(Math.random() * 70) + 30;
+        this.health = Math.floor(Math.random() * 70) + 30;
+        this.age = 0;
+        this.isSick = false;
+        this.isSleeping = false;
+        this.isSelected = false;
+        this.decayRate = 0.01 + Math.random() * 0.02;
+        this.evolutionStage = attributes.evolution || 1;
+        this.effects = [];
         
-        // Game state
-        this.morphs = [];
-        this.playerPosition = new THREE.Vector3(0, 0, 15);
-        this.playerStats = {
-            health: 100,
-            energy: 80,
-            perception: 1,
-            capturedEssence: 0
-        };
-        this.selectedMorph = null;
-        this.nameIndicators = new Map(); // Store morph name tags
-        this.selectionRing = null; // Visual indicator for selected morph
-        this.deltaTime = 1; // Time factor for updates
-        this.lastFrameTime = 0;
-        this.lastStatsUpdate = 0;
+        // Personality traits
+        this.personalityType = attributes.personality !== undefined ? 
+            this.getPersonalityType(attributes.personality) : 
+            this.generatePersonality();
         
-        // Game configuration
-        this.config = {
-            maxMorphs: 25,
-            morphSpawnChance: 0.003,
-            energyDecayRate: 0.008,
-            initialMorphCount: 8
-        };
+        // Special abilities
+        this.specialAbility = attributes.ability !== undefined ? 
+            this.getSpecialAbility(attributes.ability) : 
+            this.generateAbility();
         
-        // Initialize GaiaScript neural network
-        this.initGaiaNetwork();
-        
-        // Initialize Three.js components
-        this.initScene();
-        this.initWorld();
-        this.initMorphs(this.config.initialMorphCount);
-        
-        // Set up controls and event listeners
-        this.setupControls();
-        
-        // Start game loop
-        this.animate(0);
-        
-        // Add initial console messages
-        this.addConsoleEntry("Welcome to GaiaScript MorphSphere, an AI-powered pet simulator.");
-        this.addConsoleEntry("This version uses the GaiaScript neural network for morph behaviors.", "system");
+        // Create visual representation
+        this.createMesh();
     }
     
-    // Initialize the neural network from GaiaScript
-    initGaiaNetwork() {
-        // Initialize the compiled network
-        this.network = morphNetwork();
+    // Generate a unique name for the morph
+    generateName() {
+        const syllables = ['zi', 'xa', 'qu', 'nu', 'mo', 'yx', 'pi', 'to', 'ga', 'ei',
+                         'va', 'ru', 'si', 'ka', 'op', 'le', 'wi', 'ny', 'ma', 'zo'];
         
-        // Visualize the network if requested
-        if (document.getElementById('network-visualization')) {
-            gaiaRuntime.visualizeNetwork('network-visualization');
+        const length = Math.floor(Math.random() * 2) + 2; // 2-3 syllables
+        let name = '';
+        
+        for (let i = 0; i < length; i++) {
+            name += syllables[Math.floor(Math.random() * syllables.length)];
         }
         
-        // Log network initialization
-        console.log('GaiaScript Network Summary:', gaiaRuntime.getNetworkSummary());
+        // Capitalize first letter
+        return name.charAt(0).toUpperCase() + name.slice(1);
     }
     
-    // Generate morph data using the neural network
-    generateMorphData(inputData) {
-        // Create an input tensor from the data
-        const input = {
-            shape: [3, 64, 64],
-            data: inputData || new Array(3 * 64 * 64).fill(0).map(() => Math.random())
-        };
+    // Get personality type based on neural network output
+    getPersonalityType(index) {
+        const types = [
+            'Curious', 'Playful', 'Shy', 'Aggressive', 'Friendly'
+        ];
+        return types[index % types.length];
+    }
+    
+    // Generate a random personality type
+    generatePersonality() {
+        const types = [
+            'Curious', 'Playful', 'Shy', 'Aggressive', 'Friendly'
+        ];
+        return types[Math.floor(Math.random() * types.length)];
+    }
+    
+    // Get special ability based on neural network output
+    getSpecialAbility(index) {
+        const abilities = [
+            'Glow', 'Teleport', 'Energize', 'Harmonize', 'Camouflage'
+        ];
+        return abilities[index % abilities.length];
+    }
+    
+    // Generate a random special ability
+    generateAbility() {
+        const abilities = [
+            'Glow', 'Teleport', 'Energize', 'Harmonize', 'Camouflage'
+        ];
+        return abilities[Math.floor(Math.random() * abilities.length)];
+    }
+    
+    createMesh() {
+        // Create geometry based on evolution stage
+        let geometry;
         
-        // Run the network forward pass
-        const result = gaiaRuntime.forward(input, this.network);
-        return result;
+        switch(this.evolutionStage) {
+            case 1:
+                // Stage 1: Simple sphere shape
+                geometry = new THREE.SphereGeometry(this.size, 16, 16);
+                break;
+            case 2:
+                // Stage 2: More complex shape
+                geometry = new THREE.IcosahedronGeometry(this.size, 1);
+                break;
+            case 3:
+                // Stage 3: Advanced shape
+                geometry = new THREE.TorusKnotGeometry(
+                    this.size * 0.7, 
+                    this.size * 0.3, 
+                    64, 
+                    8
+                );
+                break;
+            default:
+                geometry = new THREE.SphereGeometry(this.size, 16, 16);
+        }
+        
+        // Create material with glowing effects
+        const material = new THREE.MeshPhongMaterial({
+            color: this.color,
+            emissive: this.color.clone().multiplyScalar(0.3),
+            specular: new THREE.Color(0xffffff),
+            shininess: 30,
+            transparent: true,
+            opacity: 0.9
+        });
+        
+        // Create mesh
+        this.mesh = new THREE.Mesh(geometry, material);
+        this.mesh.position.copy(this.position);
+        this.mesh.castShadow = true;
+        this.mesh.receiveShadow = true;
+        
+        // Store reference to this morph in the mesh
+        this.mesh.userData.morph = this;
+        
+        // Add subtle animation
+        this.originalScale = this.size;
+        this.pulsePhase = Math.random() * Math.PI * 2;
     }
     
-    // The rest of the game code remains similar to the original implementation
-    // but we'll use our neural network for decision making
+    update(time, deltaTime) {
+        return true;
+    }
     
+    dispose() {
+        if (this.mesh) {
+            if (this.mesh.geometry) this.mesh.geometry.dispose();
+            if (this.mesh.material) this.mesh.material.dispose();
+            this.mesh = null;
+        }
+    }
+}
+
+// Main game class
+class GaiaMorphSphereGame {
+    constructor() {
+        try {
+            console.log("Starting GaiaMorphSphere Game");
+            
+            // Basic setup
+            this.container = document.getElementById('game-container');
+            this.canvas = document.getElementById('game-canvas');
+            
+            // Game state
+            this.morphs = [];
+            this.playerPosition = new THREE.Vector3(0, 0, 15);
+            this.nameIndicators = new Map();
+            
+            // Initialize GaiaScript neural network for generating morph data
+            this.initGaiaNetwork();
+            
+            // Initialize Three.js scene
+            this.initScene();
+            
+            // Initialize the world environment
+            if (typeof World !== 'undefined') {
+                this.world = new World(this.scene);
+            } else {
+                // Create a simple environment if World class is not available
+                console.log("World class not available, creating simple environment");
+                this.createSimpleEnvironment();
+            }
+            
+            // Create a few morphs
+            this.createSomeMorphs(3);
+            
+            // Set up basic controls
+            this.setupControls();
+            
+            // Start rendering
+            this.animate(0);
+            
+        } catch (error) {
+            console.error("Error initializing game:", error);
+        }
+    }
+    
+    // Initialize GaiaScript network for morph data generation
+    initGaiaNetwork() {
+        try {
+            // Display neural network if visualization element exists
+            if (document.getElementById('network-visualization')) {
+                if (typeof visualizeNetwork === 'function') {
+                    visualizeNetwork('network-visualization');
+                }
+            }
+            
+            // Log network initialization
+            if (typeof getNetworkSummary === 'function') {
+                console.log('GaiaScript Network Summary:', getNetworkSummary());
+            }
+        } catch (error) {
+            console.error("Error initializing GaiaScript network:", error);
+        }
+    }
+    
+    // Generate random morph data
+    generateMorphData() {
+        try {
+            // Use GaiaScript forward function if available
+            if (typeof forward === 'function') {
+                const input = {
+                    shape: [3, 64, 64],
+                    data: new Array(3 * 64 * 64).fill(0).map(() => Math.random())
+                };
+                return forward(input, {});
+            } else {
+                // Fallback random data
+                return {
+                    data: new Array(10).fill(0).map(() => Math.random())
+                };
+            }
+        } catch (error) {
+            console.error("Error generating morph data:", error);
+            return {
+                data: new Array(10).fill(0).map(() => Math.random())
+            };
+        }
+    }
+    
+    // Initialize ThreeJS scene
     initScene() {
-        // Initialize Three.js scene with trippy LCD-inspired look
+        // Scene setup
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x050520);
         this.scene.fog = new THREE.FogExp2(0x050520, 0.02);
         
-        // Set up camera with wider field of view for surreal feel
+        // Camera setup
         this.camera = new THREE.PerspectiveCamera(
-            85, // Wider FOV for trippy effect
+            85, 
             this.container.clientWidth / this.container.clientHeight, 
             0.1, 
             1000
         );
         this.camera.position.copy(this.playerPosition);
         
-        // Set up renderer with post-processing effects
+        // Renderer setup
         this.renderer = new THREE.WebGLRenderer({
             canvas: this.canvas,
-            antialias: true,
-            alpha: true
+            antialias: true
         });
         this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         
-        // Set up orbit controls for easy navigation
+        // Controls
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
-        this.controls.dampingFactor = 0.05;
         this.controls.minDistance = 3;
         this.controls.maxDistance = 30;
-        this.controls.rotateSpeed = 0.7;
-        this.controls.zoomSpeed = 1.2;
         
-        // Add ambient light for base illumination
-        const ambientLight = new THREE.AmbientLight(0x111122, 0.4);
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x222233, 0.5);
         this.scene.add(ambientLight);
         
-        // Add directional light for shadows
-        const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        mainLight.position.set(10, 20, 10);
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1);
+        mainLight.position.set(5, 10, 5);
         mainLight.castShadow = true;
         this.scene.add(mainLight);
         
-        // Setup shadow properties
-        mainLight.shadow.mapSize.width = 1024;
-        mainLight.shadow.mapSize.height = 1024;
-        mainLight.shadow.camera.near = 0.5;
-        mainLight.shadow.camera.far = 500;
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+        });
+    }
+    
+    // Create a simple environment if World class isn't available
+    createSimpleEnvironment() {
+        // Ground plane
+        const ground = new THREE.Mesh(
+            new THREE.PlaneGeometry(100, 100),
+            new THREE.MeshStandardMaterial({ 
+                color: 0x113322,
+                roughness: 0.8,
+                metalness: 0.2
+            })
+        );
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        this.scene.add(ground);
         
-        // Add point lights for atmosphere
-        const colors = [0x50e3c2, 0xff00ff, 0xffcc33];
-        
-        for (let i = 0; i < colors.length; i++) {
-            const pointLight = new THREE.PointLight(colors[i], 1.5, 15);
-            pointLight.position.set(
-                (Math.random() - 0.5) * 20,
-                Math.random() * 10 - 5,
-                (Math.random() - 0.5) * 20
-            );
-            this.scene.add(pointLight);
+        // Add some random objects
+        for (let i = 0; i < 20; i++) {
+            const size = 0.5 + Math.random() * 2;
+            const geometry = new THREE.BoxGeometry(size, size, size);
+            const material = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(Math.random(), Math.random(), Math.random()),
+                roughness: 0.7,
+                metalness: 0.2
+            });
             
-            // Add a small sphere to make the light visible
-            const lightSphere = new THREE.Mesh(
-                new THREE.SphereGeometry(0.2, 8, 8),
-                new THREE.MeshBasicMaterial({ color: colors[i] })
+            const cube = new THREE.Mesh(geometry, material);
+            cube.position.set(
+                (Math.random() - 0.5) * 30,
+                size / 2,
+                (Math.random() - 0.5) * 30
             );
-            lightSphere.position.copy(pointLight.position);
-            this.scene.add(lightSphere);
+            cube.castShadow = true;
+            cube.receiveShadow = true;
+            this.scene.add(cube);
         }
-        
-        // Handle window resize
-        window.addEventListener('resize', () => this.onWindowResize());
     }
     
-    initWorld() {
-        // Create the environment with LCD-inspired visuals
-        this.world = new World(this.scene);
-    }
-    
-    initMorphs(count) {
-        // Create initial morphs with varied traits
+    // Create some initial morphs
+    createSomeMorphs(count) {
         for (let i = 0; i < count; i++) {
             this.createNewMorph();
         }
-        
-        // Update stats display
-        this.updateStatsDisplay();
     }
     
+    // Create a new morph
     createNewMorph(position) {
-        // Use the GaiaScript network to influence morph creation
-        const networkResult = this.generateMorphData();
-        
-        // Extract morph attributes from network output
-        const attributes = {
-            personality: Math.floor(networkResult.data[0] * 5),  // 0-4 personality types
-            evolution: Math.floor(networkResult.data[1] * 3) + 1, // 1-3 evolution stage
-            ability: Math.floor(networkResult.data[2] * 5),      // 0-4 ability types
-            size: 0.5 + networkResult.data[3] * 1.5,             // 0.5-2.0 size
-            color: new THREE.Color(
-                networkResult.data[4], 
-                networkResult.data[5], 
-                networkResult.data[6]
-            )
-        };
-        
-        // Create a new morph at the specified position or random with neural attributes
-        // Using our GaiaMorph class powered by GaiaScript
-        const morph = new GaiaMorph(position, attributes);
-        this.morphs.push(morph);
-        this.scene.add(morph.mesh);
-        
-        // Create name indicator for the morph
-        this.createMorphNameTag(morph);
-        
-        // Log the birth
-        this.addConsoleEntry(`${morph.name} has appeared!`, "system");
-        
-        return morph;
-    }
-    
-    // The rest of the methods remain similar to the original implementation
-    // but we'll use our neural network for key decisions
-    
-    createMorphNameTag(morph) {
-        // Create a div element for the morph's name tag
-        const nameTag = document.createElement('div');
-        nameTag.className = 'morph-indicator';
-        
-        // Add name and status indicator
-        const nameElement = document.createElement('div');
-        nameElement.className = 'morph-name-tag';
-        nameElement.textContent = morph.name;
-        nameTag.appendChild(nameElement);
-        
-        // Add status dot
-        const statusDot = document.createElement('div');
-        statusDot.className = 'morph-status-dot';
-        nameTag.appendChild(statusDot);
-        
-        // Add to document and store in map
-        document.body.appendChild(nameTag);
-        this.nameIndicators.set(morph, nameTag);
-        
-        // Initially hide it (will be positioned in update)
-        nameTag.style.display = 'none';
-    }
-    
-    setupControls() {
-        // Button event listeners for Tamagotchi interactions
-        this.buttons.feed.addEventListener('click', () => this.feedMorph());
-        this.buttons.pet.addEventListener('click', () => this.petMorph());
-        this.buttons.play.addEventListener('click', () => this.playWithMorph());
-        this.buttons.speak.addEventListener('click', () => this.speakToMorph());
-        this.buttons.heal.addEventListener('click', () => this.healMorph());
-        this.buttons.ability.addEventListener('click', () => this.useMorphAbility());
-        this.buttons.merge.addEventListener('click', () => this.mergeMorphs());
-        this.buttons.create.addEventListener('click', () => this.createNewCreature());
-        this.buttons.attack.addEventListener('click', () => this.attackMorph());
-        this.buttons.run.addEventListener('click', () => this.runGaiaScript());
-        
-        // Set up raycasting for morph selection
-        this.raycaster = new THREE.Raycaster();
-        this.mouse = new THREE.Vector2();
-        
-        // Canvas click for selecting morphs
-        this.canvas.addEventListener('click', (event) => this.onCanvasClick(event));
-        
-        // Custom selection ring visual
-        this.createSelectionRing();
-    }
-    
-    runGaiaScript() {
-        const code = this.gaiaCode.value;
-        this.addConsoleEntry("Executing GaiaScript...", "system");
-        
         try {
-            // Try to parse the GaiaScript code
-            const parsedCode = code.trim();
+            // Get neural data for the morph
+            const networkResult = this.generateMorphData();
             
-            // Glitch effect on execution
-            document.body.classList.add('executing');
-            setTimeout(() => {
-                document.body.classList.remove('executing');
-            }, 1000);
+            // Extract attributes from network output
+            const attributes = {
+                personality: Math.floor(networkResult.data[0] * 5),
+                evolution: Math.floor(networkResult.data[1] * 3) + 1,
+                ability: Math.floor(networkResult.data[2] * 5),
+                size: 0.5 + networkResult.data[3] * 1.5,
+                color: new THREE.Color(
+                    networkResult.data[4] || Math.random(),
+                    networkResult.data[5] || Math.random(),
+                    networkResult.data[6] || Math.random()
+                )
+            };
             
-            // Create input data for the neural network
-            const inputData = new Array(3 * 64 * 64).fill(0).map(() => Math.random());
+            // Create the morph
+            const morph = new GaiaMorph(position, attributes);
+            this.morphs.push(morph);
+            this.scene.add(morph.mesh);
             
-            // Generate network result
-            const networkResult = this.generateMorphData(inputData);
+            console.log(`Created morph: ${morph.name}`);
+            return morph;
             
-            // Use network results to modify the game
-            setTimeout(() => {
-                // Create some new morphs
-                let newMorphCount = 0;
-                
-                if (this.morphs.length < this.config.maxMorphs) {
-                    newMorphCount = Math.min(
-                        this.config.maxMorphs - this.morphs.length,
-                        Math.floor(networkResult.data[0] * 5)
-                    );
-                    
-                    for (let i = 0; i < newMorphCount; i++) {
-                        // Create morphs influenced by the neural network
-                        const position = new THREE.Vector3(
-                            this.camera.position.x + (networkResult.data[i*3+1] - 0.5) * 20,
-                            this.camera.position.y + (networkResult.data[i*3+2] - 0.5) * 10,
-                            this.camera.position.z + (networkResult.data[i*3+3] - 0.5) * 20
-                        );
-                        this.createNewMorph(position);
-                    }
-                }
-                
-                // Update existing morphs based on neural network output
-                this.morphs.forEach((morph, index) => {
-                    // Use different parts of the output array for different morphs
-                    const outputIndex = (index * 3) % networkResult.data.length;
-                    const evolutionChance = networkResult.data[outputIndex];
-                    
-                    // Random chance of evolution based on network
-                    if (morph.evolutionStage < 3 && Math.random() < evolutionChance) {
-                        morph.evolve();
-                        this.addConsoleEntry(`${morph.name} has evolved to stage ${morph.evolutionStage}!`, "success");
-                    }
-                });
-                
-                // Modify environment based on neural output
-                this.world.noiseScale = 0.05 + networkResult.data[4] * 0.15;
-                this.world.distortion = 0.5 + networkResult.data[5] * 0.5;
-                
-                // Apply player effects
-                this.playerStats.perception += Math.round(networkResult.data[6]);
-                this.playerStats.health = Math.min(100, this.playerStats.health + Math.round(networkResult.data[7] * 30));
-                this.playerStats.energy = Math.min(100, this.playerStats.energy + Math.round(networkResult.data[7] * 30));
-                
-                this.addConsoleEntry(`GaiaScript execution complete. ${newMorphCount > 0 ? `Generated ${newMorphCount} new morphs.` : 'Environment transformed.'}`, "success");
-                this.updateStatsDisplay();
-                
-            }, 1500);
         } catch (error) {
-            this.addConsoleEntry(`GaiaScript execution error: ${error.message}`, "error");
+            console.error("Error creating morph:", error);
         }
     }
     
-    selectMorph(morph) {
-        // Deselect previously selected morph
-        this.deselectMorph();
+    // Set up basic controls
+    setupControls() {
+        // Raycasting for selection
+        this.raycaster = new THREE.Raycaster();
+        this.mouse = new THREE.Vector2();
         
-        // Select new morph
-        this.selectedMorph = morph;
-        morph.isSelected = true;
-        
-        // Update selection ring
-        this.selectionRing.visible = true;
-        this.selectionRing.scale.set(
-            morph.size * 1.2,
-            morph.size * 1.2,
-            morph.size * 1.2
-        );
-        
-        // Show morph info
-        this.updateMorphInfoDisplay(morph);
-        this.morphInfo.container.classList.add('visible');
-        
-        // Enable interaction buttons
-        this.enableMorphInteractionButtons(morph);
-        
-        // Show a selection emoji
-        this.showEmojiFeedback(morph, '👆');
-        
-        // Add to console
-        this.addConsoleEntry(`${morph.name} selected. A ${morph.personalityType} morph with ${morph.specialAbility} ability.`);
+        // Handle clicks for selecting morphs
+        this.canvas.addEventListener('click', (event) => {
+            const rect = this.canvas.getBoundingClientRect();
+            this.mouse.x = ((event.clientX - rect.left) / this.canvas.clientWidth) * 2 - 1;
+            this.mouse.y = -((event.clientY - rect.top) / this.canvas.clientHeight) * 2 + 1;
+            
+            this.raycaster.setFromCamera(this.mouse, this.camera);
+            
+            const intersects = this.raycaster.intersectObjects(
+                this.morphs.map(m => m.mesh)
+            );
+            
+            if (intersects.length > 0) {
+                const morph = intersects[0].object.userData.morph;
+                console.log(`Selected morph: ${morph.name}`);
+                console.log(`Personality: ${morph.personalityType}`);
+                console.log(`Ability: ${morph.specialAbility}`);
+            }
+        });
     }
     
+    // Animation loop
     animate(time) {
         requestAnimationFrame((t) => this.animate(t));
         
-        // Update game state
-        this.update(time);
+        // Update controls
+        if (this.controls) {
+            this.controls.update();
+        }
+        
+        // Update morphs (minimal)
+        for (const morph of this.morphs) {
+            if (morph.mesh) {
+                morph.mesh.rotation.y += 0.01;
+            }
+        }
         
         // Render scene
         this.renderer.render(this.scene, this.camera);
     }
-    
-    // ... Rest of the game implementation remains largely the same
-    // Only the neural network integration changes
 }
 
-// Export the game class
-export default GaiaMorphSphereGame;
+// Make the game class available globally
+window.GaiaMorphSphereGame = GaiaMorphSphereGame;

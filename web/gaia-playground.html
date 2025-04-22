@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GaiaScript Playground</title>
+    <style>
+        body {
+            font-family: 'Menlo', monospace;
+            background-color: #0a0a1e;
+            color: #e0e0ff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #50e3c2;
+        }
+        .editor-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .code-editor {
+            flex: 1;
+            background-color: #121230;
+            border: 1px solid #333366;
+            border-radius: 5px;
+            padding: 15px;
+            min-height: 300px;
+            font-family: 'Menlo', monospace;
+            color: #e0e0ff;
+            resize: none;
+        }
+        .control-panel {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #50e3c2;
+            border: none;
+            color: #121230;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #3bc0a0;
+        }
+        #output {
+            background-color: #121230;
+            border: 1px solid #333366;
+            border-radius: 5px;
+            padding: 15px;
+            min-height: 200px;
+            max-height: 300px;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            font-family: 'Menlo', monospace;
+        }
+        #visualization {
+            height: 400px;
+            background-color: #121230;
+            border: 1px solid #333366;
+            border-radius: 5px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        #gaia-container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GaiaScript Playground</h1>
+        
+        <div class="editor-container">
+            <textarea id="code-editor" class="code-editor" placeholder="Enter GaiaScript code...">N</textarea>
+        </div>
+        
+        <div class="control-panel">
+            <button id="run-btn">Run</button>
+            <button id="load-example-btn">Load Example</button>
+            <button id="compile-btn">Compile to JS</button>
+            <button id="visualize-btn">Visualize</button>
+        </div>
+        
+        <div id="output">// Output will appear here</div>
+        
+        <div id="visualization">
+            <div id="gaia-container"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Wait for DOM to load and attach event handlers
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded - initializing GaiaScript playground');
+            
+            // Get references to DOM elements
+            const codeEditor = document.getElementById('code-editor');
+            const runBtn = document.getElementById('run-btn');
+            const loadExampleBtn = document.getElementById('load-example-btn');
+            const compileBtn = document.getElementById('compile-btn');
+            const visualizeBtn = document.getElementById('visualize-btn');
+            const output = document.getElementById('output');
+            const visualizationContainer = document.getElementById('gaia-container');
+            
+            console.log('Run button:', runBtn);
+            console.log('Load Example button:', loadExampleBtn);
+            console.log('Compile button:', compileBtn);
+            console.log('Visualize button:', visualizeBtn);
+            
+            const examples = [
+                { name: 'Simple CNN', code: 'N I → C₁ 32 → D₁ 10' },
+                { name: 'Minimal', code: 'N' },
+                { name: 'CNN Image Classifier', code: 'N ⊻ I ⊸ μ σ → C₁ 32 5 ρ → R → P 2 → C₂ 64 3 ρ → R → P 2 → F → D₁ 128 R → D₀ 10 → S' },
+                { name: 'GAN Architecture', code: 'N〈G⊕D〉\nG: Z 100 → U 4×4×512 → [U 2× → C 256 ρ]×2 → C 3 τ\nD: I → [C 64 5 ρ → P 2]×3 → F → D₁ 1024 ρ → D₀ 1 σ\nL: G(Z)⊳D⟿BCE+λ‖∇D‖' },
+                { name: 'MorphSphere Game', code: 'N〈G⊕W⊕M⊕C〉\nG: I → C 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 7 → S\nW: Z 512 → U 16×16×32 → C 64 3 ρ → U 2× → C 32 3 ρ → R\nM: Z 128 → D₁ 64 ρ → D₁ 32 ρ → R 4×4×2 → U 2× → C 8 3 ρ\nC: M⊳G⟿MSE' }
+            ];
+            
+            let currentModel = null;
+            let renderer = null;
+            let animationId = null;
+            
+            // Load Example
+            loadExampleBtn.addEventListener('click', () => {
+                const randomExample = examples[Math.floor(Math.random() * examples.length)];
+                codeEditor.value = randomExample.code;
+                output.textContent = `// Loaded example: ${randomExample.name}`;
+            });
+            
+            // Run using the API or fallback to client-side parsing
+            runBtn.addEventListener('click', () => {
+                console.log('Run button clicked');
+                
+                const code = codeEditor.value;
+                
+                if (!code.trim()) {
+                    output.textContent = '// Error: Please enter GaiaScript code';
+                    return;
+                }
+                
+                // For now, just use the client-side parser
+                output.textContent = `// Parsed GaiaScript:\n${parseGaiaScript(code)}`;
+                
+                // Simple processing - count symbols and layers
+                const symbols = code.match(/[^\w\s]/g) || [];
+                const layers = (code.match(/→/g) || []).length + 1;
+                const components = code.includes('〈') ? 
+                    code.substring(code.indexOf('〈') + 1, code.indexOf('〉')).split('⊕').length : 0;
+                
+                output.textContent += `\n// Symbols: ${symbols.length}\n`;
+                output.textContent += `// Layers: ${layers}\n`;
+                output.textContent += `// Components: ${components}\n`;
+            });
+            
+            // Compile using the API
+            compileBtn.addEventListener('click', async () => {
+                const code = codeEditor.value;
+                
+                if (!code.trim()) {
+                    output.textContent = '// Error: Please enter GaiaScript code';
+                    return;
+                }
+                
+                output.textContent = '// Compiling GaiaScript code...';
+                
+                try {
+                    // Call the API
+                    const response = await fetch('/api/compile', {
+                        method: 'POST',
+                        body: code,
+                        headers: {
+                            'Content-Type': 'text/plain'
+                        }
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        output.textContent = `// Compiled to JavaScript:\n${result.javascript}`;
+                        
+                        // Execute the compiled code
+                        try {
+                            const scriptEl = document.createElement('script');
+                            scriptEl.textContent = result.javascript;
+                            document.body.appendChild(scriptEl);
+                            output.textContent += '\n\n// Successfully executed JavaScript';
+                            setTimeout(() => document.body.removeChild(scriptEl), 100);
+                        } catch (err) {
+                            output.textContent += `\n\n// Error executing JavaScript: ${err.message}`;
+                        }
+                    } else {
+                        output.textContent = `// Compilation error: ${result.error}`;
+                    }
+                } catch (err) {
+                    output.textContent = `// API error: ${err.message}\n\n// Falling back to client-side compilation`;
+                    
+                    // Fall back to client-side compilation
+                    const compiledCode = compileToJs(code);
+                    output.textContent = `// Compiled to JavaScript:\n${compiledCode}`;
+                }
+            });
+            
+            // Visualize
+            visualizeBtn.addEventListener('click', () => {
+                const code = codeEditor.value;
+                
+                if (!code.trim()) {
+                    output.textContent = '// Error: Please enter GaiaScript code';
+                    return;
+                }
+                
+                output.textContent = '// Visualizing...';
+                
+                // Clean up previous visualization
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+                
+                if (renderer) {
+                    renderer.dispose();
+                }
+                
+                visualizationContainer.innerHTML = '';
+                
+                // Create new visualization
+                visualize2D(code);
+            });
+            
+            // Simple parser for demonstration
+            function parseGaiaScript(code) {
+                try {
+                    // Very simplistic parser just for demonstration
+                    const lines = code.split('\n');
+                    let parsed = '';
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('N')) {
+                            parsed += 'Network Definition\n';
+                            
+                            if (line.includes('〈') && line.includes('〉')) {
+                                const components = line.substring(
+                                    line.indexOf('〈') + 1, 
+                                    line.indexOf('〉')
+                                ).split('⊕');
+                                
+                                parsed += `  Components: ${components.join(', ')}\n`;
+                            }
+                            
+                            if (line.includes('→')) {
+                                const layers = line.split('→').map(l => l.trim());
+                                parsed += `  Layers: ${layers.join(' → ')}\n`;
+                            }
+                        } else if (line.includes(':')) {
+                            const [component, def] = line.split(':').map(p => p.trim());
+                            parsed += `Component ${component}:\n`;
+                            
+                            if (def.includes('→')) {
+                                const layers = def.split('→').map(l => l.trim());
+                                parsed += `  Layers: ${layers.join(' → ')}\n`;
+                            }
+                        }
+                    }
+                    
+                    return parsed || 'Valid GaiaScript with no specific structure';
+                } catch (err) {
+                    return `Parse error: ${err.message}`;
+                }
+            }
+            
+            // Simple JS compilation
+            function compileToJs(code) {
+                // Parse the GaiaScript code
+                const model = parseGaiaModel(code);
+                
+                // Generate JavaScript
+                let js = '// Generated from GaiaScript\n\n';
+                js += 'const gaiaModel = {\n';
+                js += '  layers: [\n';
+                
+                model.layers.forEach((layer, i) => {
+                    js += `    { type: '${layer.type}', units: ${layer.units} }${i < model.layers.length - 1 ? ',' : ''}\n`;
+                });
+                
+                js += '  ],\n';
+                js += '  components: {\n';
+                
+                Object.entries(model.components).forEach(([name, comp], i) => {
+                    js += `    '${name}': {\n`;
+                    js += '      layers: [\n';
+                    
+                    comp.layers.forEach((layer, j) => {
+                        js += `        { type: '${layer.type}', units: ${layer.units} }${j < comp.layers.length - 1 ? ',' : ''}\n`;
+                    });
+                    
+                    js += '      ]\n';
+                    js += `    }${i < Object.keys(model.components).length - 1 ? ',' : ''}\n`;
+                });
+                
+                js += '  },\n';
+                js += '  execute: function(input) {\n';
+                js += '    console.log("Executing model with:", input);\n';
+                js += '    return { output: "Model result" };\n';
+                js += '  }\n';
+                js += '};\n\n';
+                
+                js += 'console.log("GaiaScript model loaded:", gaiaModel);\n';
+                
+                return js;
+            }
+            
+            // Simple model creation from GaiaScript
+            function parseGaiaModel(code) {
+                const model = {
+                    layers: [],
+                    components: {}
+                };
+                
+                // Count layers based on data flow arrows
+                const arrows = (code.match(/→/g) || []).length;
+                const layerCount = Math.max(1, arrows + 1);
+                
+                for (let i = 0; i < layerCount; i++) {
+                    const layer = {
+                        type: i === 0 ? 'input' : 
+                              i === layerCount - 1 ? 'output' : 'hidden',
+                        units: 16 + i * 8
+                    };
+                    
+                    // Check for specific layer types in the code
+                    if (code.includes('C₁') || code.includes('C₂') || code.includes('C ')) {
+                        layer.operation = 'convolution';
+                    } else if (code.includes('D₁') || code.includes('D₀')) {
+                        layer.operation = 'dense';
+                    } else if (code.includes('P ')) {
+                        layer.operation = 'pooling';
+                    }
+                    
+                    // Check for activation functions
+                    if (code.includes('ρ')) layer.activation = 'relu';
+                    else if (code.includes('σ')) layer.activation = 'sigmoid';
+                    else if (code.includes('τ')) layer.activation = 'tanh';
+                    else if (code.includes('S')) layer.activation = 'softmax';
+                    
+                    model.layers.push(layer);
+                }
+                
+                // Add components if present
+                if (code.includes('〈') && code.includes('〉')) {
+                    const componentsStr = code.substring(
+                        code.indexOf('〈') + 1, 
+                        code.indexOf('〉')
+                    );
+                    
+                    const components = componentsStr.split('⊕');
+                    
+                    components.forEach(comp => {
+                        model.components[comp] = {
+                            layers: [
+                                { type: 'input', units: 32 },
+                                { type: 'hidden', units: 64 },
+                                { type: 'output', units: 16 }
+                            ]
+                        };
+                    });
+                }
+                
+                return model;
+            }
+            
+            // 2D Canvas visualization (no Three.js dependency)
+            function visualize2D(code) {
+                const model = parseGaiaModel(code);
+                const container = document.getElementById('gaia-container');
+                
+                // Create canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = container.clientWidth || 800;
+                canvas.height = container.clientHeight || 400;
+                container.appendChild(canvas);
+                
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#121230';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw the layers
+                const layerCount = model.layers.length;
+                const layerWidth = 100;
+                const layerSpacing = Math.min(120, (canvas.width - 100) / layerCount);
+                let xStart = (canvas.width - (layerCount - 1) * layerSpacing) / 2;
+                
+                // Draw title
+                ctx.font = '20px Menlo, monospace';
+                ctx.fillStyle = '#50e3c2';
+                ctx.textAlign = 'center';
+                ctx.fillText('Neural Network Architecture', canvas.width / 2, 30);
+                
+                // Draw each layer
+                const layerPositions = [];
+                
+                model.layers.forEach((layer, i) => {
+                    const x = xStart + i * layerSpacing;
+                    const y = canvas.height / 2;
+                    
+                    // Save position for connections
+                    layerPositions.push({x, y});
+                    
+                    // Choose color based on layer type
+                    let color;
+                    switch(layer.type) {
+                        case 'input': color = '#50e3c2'; break;
+                        case 'output': color = '#ff00ff'; break;
+                        default: color = '#ffcc33';
+                    }
+                    
+                    // Draw layer
+                    const nodeCount = Math.min(Math.max(3, Math.floor(layer.units / 8)), 8);
+                    const nodeRadius = 10;
+                    const nodeSpacing = Math.min(30, (canvas.height - 100) / nodeCount);
+                    const yStart = (canvas.height - (nodeCount - 1) * nodeSpacing) / 2;
+                    
+                    // Draw nodes
+                    for (let j = 0; j < nodeCount; j++) {
+                        const nodeY = yStart + j * nodeSpacing;
+                        
+                        // Draw node
+                        ctx.beginPath();
+                        ctx.arc(x, nodeY, nodeRadius, 0, Math.PI * 2);
+                        ctx.fillStyle = color;
+                        ctx.fill();
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                    
+                    // Draw layer name
+                    ctx.font = '14px Menlo, monospace';
+                    ctx.fillStyle = '#ffffff';
+                    ctx.textAlign = 'center';
+                    
+                    let layerName = layer.type;
+                    if (layer.operation) layerName += ` (${layer.operation})`;
+                    if (layer.activation) layerName += ` - ${layer.activation}`;
+                    
+                    ctx.fillText(layerName, x, yStart + nodeCount * nodeSpacing + 25);
+                    ctx.fillText(`${layer.units} units`, x, yStart + nodeCount * nodeSpacing + 45);
+                });
+                
+                // Draw connections between layers
+                ctx.strokeStyle = 'rgba(80, 227, 194, 0.3)';
+                ctx.lineWidth = 1;
+                
+                for (let i = 0; i < layerPositions.length - 1; i++) {
+                    const current = layerPositions[i];
+                    const next = layerPositions[i + 1];
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(current.x + 10, current.y);
+                    ctx.lineTo(next.x - 10, next.y);
+                    ctx.stroke();
+                }
+                
+                // If there are components, list them
+                if (Object.keys(model.components).length > 0) {
+                    ctx.font = '16px Menlo, monospace';
+                    ctx.fillStyle = '#ffffff';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Components:', canvas.width / 2, canvas.height - 60);
+                    
+                    const components = Object.keys(model.components).join(', ');
+                    ctx.fillText(components, canvas.width / 2, canvas.height - 30);
+                }
+                
+                output.textContent = `// Visualized GaiaScript model with ${model.layers.length} layers\n` +
+                                 `// Components: ${Object.keys(model.components).join(', ') || 'None'}\n` +
+                                 `// Total Parameters: ${calculateModelParams(model).toLocaleString()}`;
+            }
+            
+            // Calculate approximate parameter count
+            function calculateModelParams(model) {
+                let totalParams = 0;
+                
+                for (let i = 0; i < model.layers.length - 1; i++) {
+                    const currentLayer = model.layers[i];
+                    const nextLayer = model.layers[i + 1];
+                    
+                    // For fully connected layers: inputs * outputs + bias
+                    const layerParams = currentLayer.units * nextLayer.units + nextLayer.units;
+                    totalParams += layerParams;
+                }
+                
+                return totalParams;
+            }
+            
+            // Initialize with a working example
+            codeEditor.value = 'N I → C₁ 32 → D₁ 10';
+            output.textContent = '// Click a button above to get started';
+            
+            // Log completion
+            console.log('Playground initialized successfully');
+        });
+    </script>
+</body>
+</html>

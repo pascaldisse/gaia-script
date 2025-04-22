@@ -1,189 +1,408 @@
-mod ast;
-mod parser;
-mod interpreter;
-mod web_server;
-mod compiler;
-
+use std::env;
 use std::fs;
-use std::path::PathBuf;
-use std::process;
-use std::io;
-use clap::{Parser, Subcommand};
-use crate::interpreter::Interpreter;
-use crate::compiler::JsCompiler;
+use std::path::Path;
+use std::net::TcpListener;
 
-#[derive(Parser)]
-#[clap(name = "gaiascript", about = "AI-Optimized Programming Language (AOPL) interpreter")]
-struct Cli {
-    #[clap(subcommand)]
-    command: Commands,
-}
+use gaiascript::parser;
+use gaiascript::interpreter::Interpreter;
 
-#[derive(Subcommand)]
-enum Commands {
-    /// Run a GaiaScript program
-    Run {
-        /// The path to the GaiaScript file to run
-        #[clap(value_parser)]
-        file: PathBuf,
-        
-        /// Print the AST instead of executing
-        #[clap(short, long)]
-        ast: bool,
-    },
+fn main() {
+    let args: Vec<String> = env::args().collect();
     
-    /// Parse and print the AST of a GaiaScript program
-    Parse {
-        /// The path to the GaiaScript file to parse
-        #[clap(value_parser)]
-        file: PathBuf,
-    },
-    
-    /// Compile a GaiaScript program to JavaScript
-    Compile {
-        /// The path to the GaiaScript file to compile
-        #[clap(value_parser)]
-        file: PathBuf,
-        
-        /// The output JavaScript file path
-        #[clap(short, long)]
-        output: Option<PathBuf>,
-    },
-    
-    /// Interactive REPL mode
-    Repl,
-    
-    /// Start a web server to run the MorphSphere game
-    Serve {
-        /// The port to listen on
-        #[clap(short, long, default_value_t = 8080)]
-        port: u16,
-    },
-}
-
-fn main() -> io::Result<()> {
-    let cli = Cli::parse();
-    
-    match &cli.command {
-        Commands::Run { file, ast } => {
-            run_file(file, *ast);
-        },
-        Commands::Parse { file } => {
-            parse_file(file);
-        },
-        Commands::Compile { file, output } => {
-            compile_file(file, output);
-        },
-        Commands::Repl => {
-            println!("REPL mode not implemented yet");
-        },
-        Commands::Serve { port } => {
-            return web_server::start_server(*port);
-        },
+    if args.len() < 2 {
+        println!("Usage:");
+        println!("  cargo run -- parse <filename>   # Parse and display AST");
+        println!("  cargo run -- run <filename>     # Run GaiaScript program");
+        println!("  cargo run -- compile <filename> # Compile to JavaScript");
+        println!("  cargo run -- serve              # Start web server");
+        return;
     }
     
-    Ok(())
-}
-
-fn run_file(file: &PathBuf, print_ast: bool) {
-    let content = match fs::read_to_string(file) {
-        Ok(content) => content,
-        Err(err) => {
-            eprintln!("Error reading file {}: {}", file.display(), err);
-            process::exit(1);
-        }
-    };
-    
-    match parser::parse(&content) {
-        Ok(ast) => {
-            if print_ast {
-                println!("AST: {:?}", ast);
-            } else {
-                println!("Executing program from {}", file.display());
-                let mut interpreter = Interpreter::new();
-                match interpreter.interpret(&ast) {
-                    Ok(value) => {
-                        println!("Program executed successfully");
-                        println!("Result: {:?}", value);
-                    },
-                    Err(err) => {
-                        eprintln!("Runtime error: {}", err);
-                        process::exit(1);
-                    }
-                }
+    match args[1].as_str() {
+        "parse" => {
+            if args.len() < 3 {
+                println!("Error: Missing filename");
+                return;
             }
+            
+            parse_file(&args[2]);
         },
-        Err(err) => {
-            eprintln!("Error parsing file {}: {}", file.display(), err);
-            process::exit(1);
-        }
-    }
-}
-
-fn parse_file(file: &PathBuf) {
-    let content = match fs::read_to_string(file) {
-        Ok(content) => content,
-        Err(err) => {
-            eprintln!("Error reading file {}: {}", file.display(), err);
-            process::exit(1);
-        }
-    };
-    
-    match parser::parse(&content) {
-        Ok(ast) => {
-            println!("AST: {:#?}", ast);
+        "run" => {
+            if args.len() < 3 {
+                println!("Error: Missing filename");
+                return;
+            }
+            
+            run_file(&args[2]);
         },
-        Err(err) => {
-            eprintln!("Error parsing file {}: {}", file.display(), err);
-            process::exit(1);
-        }
-    }
-}
-
-fn compile_file(file: &PathBuf, output: &Option<PathBuf>) {
-    let content = match fs::read_to_string(file) {
-        Ok(content) => content,
-        Err(err) => {
-            eprintln!("Error reading file {}: {}", file.display(), err);
-            process::exit(1);
-        }
-    };
-    
-    match parser::parse(&content) {
-        Ok(ast) => {
-            let mut compiler = JsCompiler::new();
-            match compiler.compile(&ast) {
-                Ok(js_code) => {
-                    // Determine output path
-                    let output_path = match output {
-                        Some(path) => path.clone(),
-                        None => {
-                            let mut default_path = file.clone();
-                            default_path.set_extension("js");
-                            default_path
-                        }
-                    };
+        "compile" => {
+            if args.len() < 3 {
+                println!("Error: Missing filename");
+                return;
+            }
+            
+            compile_file(&args[2]);
+        },
+        "serve" => {
+            let port = if args.len() >= 3 {
+                args[2].parse().unwrap_or(8080)
+            } else {
+                8080
+            };
+            
+            println!("Starting web server on port {}", port);
+            
+            // Basic web server implementation
+            match TcpListener::bind(format!("0.0.0.0:{}", port)) {
+                Ok(listener) => {
+                    println!("Server started at http://localhost:{}", port);
+                    println!("Available paths:");
+                    println!("  http://localhost:{}/gaia-playground.html - GaiaScript Playground", port);
+                    println!("  http://localhost:{}/gaia-morphsphere.html - MorphSphere Game", port);
                     
-                    // Write to file
-                    match fs::write(&output_path, js_code) {
-                        Ok(_) => {
-                            println!("Successfully compiled to {}", output_path.display());
-                        },
-                        Err(err) => {
-                            eprintln!("Error writing to output file {}: {}", output_path.display(), err);
-                            process::exit(1);
+                    for stream in listener.incoming() {
+                        match stream {
+                            Ok(stream) => {
+                                use std::io::{Read, Write};
+                                use std::fs;
+                                use std::path::Path;
+                                
+                                // Handle the connection
+                                let mut buffer = [0; 1024];
+                                let mut stream = stream;
+                                let bytes_read = stream.read(&mut buffer).unwrap_or(0);
+                                let request = String::from_utf8_lossy(&buffer[..bytes_read]);
+                                
+                                // Parse the request to get the path
+                                let path = if let Some(request_line) = request.lines().next() {
+                                    let parts: Vec<&str> = request_line.split_whitespace().collect();
+                                    if parts.len() >= 2 { parts[1] } else { "/" }
+                                } else {
+                                    "/"
+                                };
+                                
+                                // Handle API requests
+                                if path.starts_with("/api/") {
+                                    // Extract the API endpoint
+                                    let api_path = &path[5..]; // Skip "/api/"
+                                    
+                                    if api_path.starts_with("compile") {
+                                        // Extract request body (GaiaScript code)
+                                        let body_start = request.find("\r\n\r\n").unwrap_or(0) + 4;
+                                        let gaia_code = &request[body_start..];
+                                        
+                                        println!("Compiling GaiaScript code: {}", gaia_code);
+                                        
+                                        // Parse the GaiaScript
+                                        let result = match parser::parse(gaia_code) {
+                                            Ok(ast) => {
+                                                let js = compile_to_js(&ast);
+                                                // Escape quotes for JSON
+                                                let escaped_js = js.replace("\"", "\\\"").replace("\n", "\\n");
+                                                format!("{{ \"success\": true, \"javascript\": \"{}\" }}", escaped_js)
+                                            },
+                                            Err(err) => {
+                                                format!("{{ \"success\": false, \"error\": \"Parse error: {}\" }}", err)
+                                            }
+                                        };
+                                        
+                                        // Send response
+                                        let response = format!(
+                                            "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{}",
+                                            result.len(),
+                                            result
+                                        );
+                                        
+                                        stream.write_all(response.as_bytes()).unwrap_or(());
+                                        println!("Compiled GaiaScript code");
+                                    } else if api_path.starts_with("run") {
+                                        // Extract request body (GaiaScript code)
+                                        let body_start = request.find("\r\n\r\n").unwrap_or(0) + 4;
+                                        let gaia_code = &request[body_start..];
+                                        
+                                        println!("Running GaiaScript code: {}", gaia_code);
+                                        
+                                        // Parse and run the GaiaScript
+                                        let result = match parser::parse(gaia_code) {
+                                            Ok(ast) => {
+                                                let mut interpreter = Interpreter::new();
+                                                match interpreter.interpret(&ast) {
+                                                    Ok(value) => format!("{{ \"success\": true, \"result\": \"{:?}\" }}", value),
+                                                    Err(err) => format!("{{ \"success\": false, \"error\": \"Runtime error: {}\" }}", err),
+                                                }
+                                            },
+                                            Err(err) => {
+                                                format!("{{ \"success\": false, \"error\": \"Parse error: {}\" }}", err)
+                                            }
+                                        };
+                                        
+                                        // Send response
+                                        let response = format!(
+                                            "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{}",
+                                            result.len(),
+                                            result
+                                        );
+                                        
+                                        stream.write_all(response.as_bytes()).unwrap_or(());
+                                        println!("Ran GaiaScript code");
+                                    } else {
+                                        // Unknown API endpoint
+                                        let response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nAPI endpoint not found";
+                                        stream.write_all(response.as_bytes()).unwrap_or(());
+                                        println!("Unknown API endpoint: {}", api_path);
+                                    }
+                                } else {
+                                    // Serve the requested file
+                                    let file_path = if path == "/" {
+                                        "web/gaia-playground.html".to_string()
+                                    } else {
+                                        format!("web{}", path)
+                                    };
+                                    
+                                    if Path::new(&file_path).exists() {
+                                        let content = fs::read(&file_path).unwrap_or_default();
+                                        
+                                        // Determine content type
+                                        let content_type = if file_path.ends_with(".html") {
+                                            "text/html"
+                                        } else if file_path.ends_with(".js") {
+                                            "application/javascript"
+                                        } else if file_path.ends_with(".css") {
+                                            "text/css"
+                                        } else if file_path.ends_with(".gaia") {
+                                            "text/plain"
+                                        } else {
+                                            "application/octet-stream"
+                                        };
+                                        
+                                        // Handle .gaia files - serve them as plain text
+                                        if path.ends_with(".gaia") {
+                                            // If gaia file exists in examples directory, serve it
+                                            let example_path = format!("examples/{}", path.split('/').last().unwrap_or(""));
+                                            if Path::new(&example_path).exists() {
+                                                let content = fs::read_to_string(example_path).unwrap_or_default();
+                                                
+                                                let response = format!(
+                                                    "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {}\r\n\r\n{}",
+                                                    content.len(),
+                                                    content
+                                                );
+                                                
+                                                stream.write_all(response.as_bytes()).unwrap_or(());
+                                                println!("Served example: {}", path);
+                                                continue;
+                                            }
+                                        }
+                                        
+                                        // Send response for normal files
+                                        let response = format!(
+                                            "HTTP/1.1 200 OK\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n",
+                                            content_type,
+                                            content.len()
+                                        );
+                                        
+                                        stream.write_all(response.as_bytes()).unwrap_or(());
+                                        stream.write_all(&content).unwrap_or(());
+                                        
+                                        println!("Served: {}", file_path);
+                                    } else {
+                                        // Send 404
+                                        let response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nNot Found";
+                                        stream.write_all(response.as_bytes()).unwrap_or(());
+                                        println!("404: {}", file_path);
+                                    }
+                                }
+                            },
+                            Err(e) => {
+                                println!("Connection error: {}", e);
+                            }
                         }
                     }
                 },
-                Err(err) => {
-                    eprintln!("Compilation error: {}", err);
-                    process::exit(1);
+                Err(e) => {
+                    println!("Error starting server: {}", e);
                 }
             }
         },
-        Err(err) => {
-            eprintln!("Error parsing file {}: {}", file.display(), err);
-            process::exit(1);
+        _ => {
+            println!("Unknown command: {}", args[1]);
         }
     }
+}
+
+fn parse_file(filename: &str) {
+    let contents = match fs::read_to_string(filename) {
+        Ok(c) => c,
+        Err(e) => {
+            println!("Error reading file: {}", e);
+            return;
+        }
+    };
+    
+    match parser::parse(&contents) {
+        Ok(ast) => {
+            println!("AST: {:#?}", ast);
+        },
+        Err(e) => {
+            println!("Parse error: {}", e);
+        }
+    }
+}
+
+fn run_file(filename: &str) {
+    let contents = match fs::read_to_string(filename) {
+        Ok(c) => c,
+        Err(e) => {
+            println!("Error reading file: {}", e);
+            return;
+        }
+    };
+    
+    match parser::parse(&contents) {
+        Ok(ast) => {
+            let mut interpreter = Interpreter::new();
+            
+            match interpreter.interpret(&ast) {
+                Ok(result) => {
+                    println!("Result: {:?}", result);
+                },
+                Err(e) => {
+                    println!("Runtime error: {}", e);
+                }
+            }
+        },
+        Err(e) => {
+            println!("Parse error: {}", e);
+        }
+    }
+}
+
+fn compile_file(filename: &str) {
+    let contents = match fs::read_to_string(filename) {
+        Ok(c) => c,
+        Err(e) => {
+            println!("Error reading file: {}", e);
+            return;
+        }
+    };
+    
+    match parser::parse(&contents) {
+        Ok(ast) => {
+            println!("Compiling to JavaScript...");
+            
+            // Generate JavaScript output filename
+            let path = Path::new(filename);
+            let stem = path.file_stem().unwrap().to_str().unwrap();
+            let js_filename = format!("{}.js", stem);
+            
+            // Compile AST to JavaScript
+            let js_code = compile_to_js(&ast);
+            
+            // Write JavaScript to file
+            match fs::write(&js_filename, js_code) {
+                Ok(_) => {
+                    println!("Successfully compiled to {}", js_filename);
+                },
+                Err(e) => {
+                    println!("Error writing JavaScript file: {}", e);
+                }
+            }
+        },
+        Err(e) => {
+            println!("Parse error: {}", e);
+        }
+    }
+}
+
+// Very simple JS compilation - in a real implementation, this would be more sophisticated
+fn compile_to_js(ast: &gaiascript::ast::ASTNode) -> String {
+    let mut js = String::new();
+    
+    js.push_str("// Generated from GaiaScript\n\n");
+    js.push_str("class GaiaModel {\n");
+    js.push_str("    constructor() {\n");
+    js.push_str("        this.layers = [];\n");
+    js.push_str("        this.components = {};\n");
+    js.push_str("    }\n\n");
+    
+    js.push_str("    addLayer(type, config) {\n");
+    js.push_str("        this.layers.push({ type, config });\n");
+    js.push_str("        return this;\n");
+    js.push_str("    }\n\n");
+    
+    js.push_str("    addComponent(name, model) {\n");
+    js.push_str("        this.components[name] = model;\n");
+    js.push_str("        return this;\n");
+    js.push_str("    }\n\n");
+    
+    js.push_str("    execute(input) {\n");
+    js.push_str("        console.log('Executing model with input:', input);\n");
+    js.push_str("        return { output: 'GaiaScript model output' };\n");
+    js.push_str("    }\n");
+    js.push_str("}\n\n");
+    
+    // Basic visualization function for 3D rendering
+    js.push_str("function visualizeModel(model, container) {\n");
+    js.push_str("    // Create THREE.js visualization\n");
+    js.push_str("    const scene = new THREE.Scene();\n");
+    js.push_str("    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);\n");
+    js.push_str("    const renderer = new THREE.WebGLRenderer();\n");
+    js.push_str("    renderer.setSize(container.clientWidth, container.clientHeight);\n");
+    js.push_str("    container.appendChild(renderer.domElement);\n\n");
+    
+    js.push_str("    // Create network visualization\n");
+    js.push_str("    let y = 0;\n");
+    js.push_str("    const nodes = [];\n\n");
+    
+    js.push_str("    model.layers.forEach((layer, i) => {\n");
+    js.push_str("        const geometry = new THREE.SphereGeometry(0.5, 32, 32);\n");
+    js.push_str("        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });\n");
+    js.push_str("        const node = new THREE.Mesh(geometry, material);\n");
+    js.push_str("        node.position.set(0, y, 0);\n");
+    js.push_str("        scene.add(node);\n");
+    js.push_str("        nodes.push(node);\n");
+    js.push_str("        y -= 2;\n");
+    js.push_str("    });\n\n");
+    
+    js.push_str("    camera.position.z = 5;\n\n");
+    
+    js.push_str("    function animate() {\n");
+    js.push_str("        requestAnimationFrame(animate);\n");
+    js.push_str("        nodes.forEach(node => { node.rotation.x += 0.01; node.rotation.y += 0.01; });\n");
+    js.push_str("        renderer.render(scene, camera);\n");
+    js.push_str("    }\n\n");
+    
+    js.push_str("    animate();\n");
+    js.push_str("}\n\n");
+    
+    // Create model instance
+    js.push_str("const model = new GaiaModel();\n\n");
+    
+    match ast {
+        gaiascript::ast::ASTNode::Network(network) => {
+            // Add components from the AST
+            js.push_str("// Network components\n");
+            
+            // For simplicity, we'll add placeholders for components and layers
+            js.push_str("model.addLayer('input', { units: 32 });\n");
+            js.push_str("model.addLayer('dense', { units: 64, activation: 'relu' });\n");
+            js.push_str("model.addLayer('output', { units: 10, activation: 'softmax' });\n\n");
+            
+            js.push_str("// Expose the model\n");
+            js.push_str("window.gaiaModel = model;\n\n");
+            
+            js.push_str("// Auto-visualize when placed in a container\n");
+            js.push_str("document.addEventListener('DOMContentLoaded', () => {\n");
+            js.push_str("    const container = document.getElementById('gaia-container');\n");
+            js.push_str("    if (container) {\n");
+            js.push_str("        visualizeModel(model, container);\n");
+            js.push_str("    }\n");
+            js.push_str("});\n");
+        },
+        _ => {
+            js.push_str("console.error('Invalid AST: expected network');\n");
+        }
+    }
+    
+    js
 }

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GaiaScript Standalone</title>
+    <style>
+        body {
+            font-family: monospace;
+            background-color: #0a0a1e;
+            color: #e0e0ff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #50e3c2;
+        }
+        .code-editor {
+            width: 100%;
+            height: 150px;
+            background-color: #121230;
+            border: 1px solid #333366;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #e0e0ff;
+            font-family: monospace;
+            resize: vertical;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        button {
+            background-color: #50e3c2;
+            color: #121230;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #3bc0a0;
+        }
+        #output {
+            width: 100%;
+            min-height: 200px;
+            background-color: #121230;
+            border: 1px solid #333366;
+            border-radius: 5px;
+            padding: 15px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .visualization {
+            width: 100%;
+            height: 300px;
+            background-color: #121230;
+            border: 1px solid #333366;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #50e3c2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GaiaScript Playground</h1>
+        
+        <textarea id="editor" class="code-editor" placeholder="Enter GaiaScript code here...">N I → C₁ 32 → D₁ 10</textarea>
+        
+        <div class="controls">
+            <button id="run-btn">Run</button>
+            <button id="example-btn">Load Example</button>
+            <button id="visualize-btn">Visualize</button>
+        </div>
+        
+        <pre id="output">// Output will appear here</pre>
+        
+        <div id="visualization" class="visualization">
+            <!-- Visualization will be shown here -->
+        </div>
+    </div>
+    
+    <script>
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get elements
+            const editor = document.getElementById('editor');
+            const runBtn = document.getElementById('run-btn');
+            const exampleBtn = document.getElementById('example-btn');
+            const visualizeBtn = document.getElementById('visualize-btn');
+            const output = document.getElementById('output');
+            const visualization = document.getElementById('visualization');
+            
+            // Example GaiaScript programs
+            const examples = [
+                { name: 'Simple CNN', code: 'N I → C₁ 32 → D₁ 10' },
+                { name: 'Minimal', code: 'N' },
+                { name: 'CNN Classifier', code: 'N ⊻ I ⊸ μ σ → C₁ 32 5 ρ → R → P 2 → C₂ 64 3 ρ → R → P 2 → F → D₁ 128 R → D₀ 10 → S' },
+                { name: 'GAN', code: 'N〈G⊕D〉\nG: Z 100 → U 4×4×512 → [U 2× → C 256 ρ]×2 → C 3 τ\nD: I → [C 64 5 ρ → P 2]×3 → F → D₁ 1024 ρ → D₀ 1 σ\nL: G(Z)⊳D⟿BCE+λ‖∇D‖' }
+            ];
+            
+            // Run button event
+            runBtn.addEventListener('click', function() {
+                const code = editor.value.trim();
+                
+                if (!code) {
+                    output.textContent = '// Error: No code to run';
+                    return;
+                }
+                
+                // Count various elements
+                const arrows = (code.match(/→/g) || []).length;
+                const symbols = code.match(/[^\w\s]/g) || [];
+                const uniqueSymbols = [...new Set(symbols)];
+                const layers = arrows + 1;
+                
+                let result = `// Analyzing GaiaScript code...\n\n`;
+                result += `Layers: ${layers}\n`;
+                result += `Symbols: ${symbols.length} (${uniqueSymbols.length} unique)\n`;
+                
+                // Parse components if any
+                if (code.includes('〈') && code.includes('〉')) {
+                    const componentSection = code.substring(
+                        code.indexOf('〈') + 1,
+                        code.indexOf('〉')
+                    );
+                    const components = componentSection.split('⊕');
+                    
+                    result += `Components: ${components.length} (${components.join(', ')})\n`;
+                }
+                
+                // Parse network structure
+                if (code.startsWith('N')) {
+                    result += `\nNetwork Structure:\n`;
+                    
+                    if (code.includes('→')) {
+                        const layers = code.split('→').map(l => l.trim());
+                        result += layers.map((layer, i) => `Layer ${i}: ${layer}`).join('\n');
+                    } else {
+                        result += 'Empty network (no layers)';
+                    }
+                }
+                
+                // Detect special components
+                if (code.includes('C₁') || code.includes('C ')) {
+                    result += '\n\nContains convolutional layers';
+                }
+                if (code.includes('P')) {
+                    result += '\nContains pooling layers';
+                }
+                if (code.includes('D₁') || code.includes('D₀')) {
+                    result += '\nContains dense layers';
+                }
+                if (code.includes('R')) {
+                    result += '\nContains reshape or regularization';
+                }
+                if (code.includes('F')) {
+                    result += '\nContains flatten operation';
+                }
+                
+                output.textContent = result;
+            });
+            
+            // Load example button event
+            exampleBtn.addEventListener('click', function() {
+                const example = examples[Math.floor(Math.random() * examples.length)];
+                editor.value = example.code;
+                output.textContent = `// Loaded example: ${example.name}`;
+            });
+            
+            // Visualize button event
+            visualizeBtn.addEventListener('click', function() {
+                const code = editor.value.trim();
+                
+                if (!code) {
+                    output.textContent = '// Error: No code to visualize';
+                    return;
+                }
+                
+                // Clear previous visualization
+                visualization.innerHTML = '';
+                
+                // Create canvas element
+                const canvas = document.createElement('canvas');
+                canvas.width = visualization.clientWidth;
+                canvas.height = visualization.clientHeight;
+                visualization.appendChild(canvas);
+                
+                const ctx = canvas.getContext('2d');
+                
+                // Set background
+                ctx.fillStyle = '#121230';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw visualization
+                const arrows = (code.match(/→/g) || []).length;
+                const layers = arrows + 1;
+                
+                // Layer positions
+                const layerSpacing = Math.min(80, canvas.width / (layers + 1));
+                let startX = (canvas.width - (layers - 1) * layerSpacing) / 2;
+                
+                // Draw layers
+                for (let i = 0; i < layers; i++) {
+                    const x = startX + i * layerSpacing;
+                    
+                    // Determine layer color and size based on layer type
+                    let color, nodeCount, nodeSize;
+                    
+                    if (i === 0) {
+                        // Input layer
+                        color = '#50e3c2';
+                        nodeCount = 5;
+                        nodeSize = 6;
+                    } else if (i === layers - 1) {
+                        // Output layer
+                        color = '#ff00ff';
+                        nodeCount = 3;
+                        nodeSize = 6;
+                    } else {
+                        // Hidden layer
+                        color = '#ffcc33';
+                        nodeCount = 6;
+                        nodeSize = 5;
+                    }
+                    
+                    // Draw the nodes
+                    const nodeSpacing = 20;
+                    const layerHeight = nodeCount * nodeSpacing;
+                    const startY = (canvas.height - layerHeight) / 2;
+                    
+                    for (let j = 0; j < nodeCount; j++) {
+                        const y = startY + j * nodeSpacing;
+                        
+                        // Draw node
+                        ctx.beginPath();
+                        ctx.arc(x, y, nodeSize, 0, Math.PI * 2);
+                        ctx.fillStyle = color;
+                        ctx.fill();
+                        
+                        // Draw connections to previous layer
+                        if (i > 0) {
+                            const prevX = startX + (i - 1) * layerSpacing;
+                            const prevNodeCount = i === 1 ? 5 : 6;
+                            const prevLayerHeight = prevNodeCount * nodeSpacing;
+                            const prevStartY = (canvas.height - prevLayerHeight) / 2;
+                            
+                            for (let k = 0; k < prevNodeCount; k++) {
+                                const prevY = prevStartY + k * nodeSpacing;
+                                
+                                ctx.beginPath();
+                                ctx.moveTo(prevX, prevY);
+                                ctx.lineTo(x, y);
+                                ctx.strokeStyle = 'rgba(80, 227, 194, 0.2)';
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                    
+                    // Layer label
+                    ctx.font = '12px monospace';
+                    ctx.fillStyle = 'white';
+                    ctx.textAlign = 'center';
+                    
+                    let layerName;
+                    if (i === 0) {
+                        layerName = 'Input';
+                    } else if (i === layers - 1) {
+                        layerName = 'Output';
+                    } else {
+                        // Determine layer type from code if possible
+                        const parts = code.split('→');
+                        if (i < parts.length) {
+                            const part = parts[i].trim();
+                            if (part.startsWith('C')) {
+                                layerName = 'Conv';
+                            } else if (part.startsWith('D')) {
+                                layerName = 'Dense';
+                            } else if (part.startsWith('P')) {
+                                layerName = 'Pool';
+                            } else if (part.startsWith('F')) {
+                                layerName = 'Flatten';
+                            } else {
+                                layerName = `Layer ${i}`;
+                            }
+                        } else {
+                            layerName = `Layer ${i}`;
+                        }
+                    }
+                    
+                    ctx.fillText(layerName, x, canvas.height - 20);
+                }
+                
+                output.textContent = `// Visualized network with ${layers} layers`;
+            });
+            
+            // Initialize with an example
+            editor.value = examples[0].code;
+            output.textContent = '// Click a button to begin';
+        });
+    </script>
+</body>
+</html>

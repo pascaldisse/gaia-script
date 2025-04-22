@@ -162,15 +162,13 @@ function visualizeNetwork(container) {
   div.appendChild(connectionsDiv);
 }
 
-// Export the API for use in compiled code
-export {
-  createLayer,
-  createInput,
-  createLoss,
-  connectLayers,
-  lastCreated,
-  initializeLayer,
-  forward,
-  getNetworkSummary,
-  visualizeNetwork
-};
+// Make functions available globally for scripts
+window.createLayer = createLayer;
+window.createInput = createInput;
+window.createLoss = createLoss;
+window.connectLayers = connectLayers;
+window.lastCreated = lastCreated;
+window.initializeLayer = initializeLayer;
+window.forward = forward;
+window.getNetworkSummary = getNetworkSummary;
+window.visualizeNetwork = visualizeNetwork;

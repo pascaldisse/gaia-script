@@ -6,6 +6,7 @@
     <title>MorphSphere - Tamagotchi-Like Surreal AI Game</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
 </head>
@@ -144,12 +145,14 @@ P: I 128×128×3 → C₁ 64 5 ρ → P 2 → C₂ 128 3 ρ → P 2 → F → D�
         <canvas id="game-canvas"></canvas>
     </div>
     
-    <script src="js/morph.js" type="module"></script>
-    <script src="js/world.js" type="module"></script>
-    <script type="module">
-        import GaiaMorphSphereGame from './js/gaia-game.js';
-        
-        document.addEventListener('DOMContentLoaded', () => {
+    <script src="js/gaia-runtime.js"></script>
+    <script src="js/morphsphere_game.js"></script>
+    <script src="js/world.js"></script>
+    <script src="js/morph.js"></script>
+    <script src="js/gaia-game.js"></script>
+    <script>
+        // Wait for DOM to load
+        window.onload = function() {
             // Create network visualization section
             const vizContainer = document.createElement('div');
             vizContainer.id = 'network-visualization';
@@ -167,7 +170,7 @@ P: I 128×128×3 → C₁ 64 5 ρ → P 2 → C₂ 128 3 ρ → P 2 → F → D�
             
             // Store game instance for debugging
             window.game = game;
-        });
+        };
     </script>
 </body>
 </html>

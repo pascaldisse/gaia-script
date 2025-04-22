@@ -24,19 +24,26 @@ class World {
             this.terrainResolution, this.terrainResolution
         );
         
-        // Create material with custom shader
+        // Create material with custom shader for trippy LCD-inspired look
         const material = new THREE.ShaderMaterial({
             uniforms: {
                 time: { value: 0 },
                 colorA: { value: new THREE.Color(0x050520) },
                 colorB: { value: new THREE.Color(0x503080) },
-                colorC: { value: new THREE.Color(0x50e3c2) }
+                colorC: { value: new THREE.Color(0x50e3c2) },
+                colorD: { value: new THREE.Color(0xff00ff) },
+                colorE: { value: new THREE.Color(0x00ffff) },
+                gridSize: { value: 40.0 },
+                distortion: { value: 0.8 }
             },
             vertexShader: `
                 uniform float time;
+                uniform float distortion;
                 
                 varying vec2 vUv;
                 varying float vElevation;
+                varying vec3 vPosition;
+                varying vec3 vNormal;
                 
                 // Simplex noise functions
                 vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
@@ -68,8 +75,25 @@ class World {
                     return 130.0 * dot(m, g);
                 }
                 
+                // Rotate point around axis
+                vec3 rotate(vec3 p, vec3 axis, float angle) {
+                    float s = sin(angle);
+                    float c = cos(angle);
+                    float oc = 1.0 - c;
+                    
+                    mat3 rotMatrix = mat3(
+                        oc * axis.x * axis.x + c, oc * axis.x * axis.y - axis.z * s, oc * axis.z * axis.x + axis.y * s,
+                        oc * axis.x * axis.y + axis.z * s, oc * axis.y * axis.y + c, oc * axis.y * axis.z - axis.x * s,
+                        oc * axis.z * axis.x - axis.y * s, oc * axis.y * axis.z + axis.x * s, oc * axis.z * axis.z + c
+                    );
+                    
+                    return rotMatrix * p;
+                }
+                
                 void main() {
                     vUv = uv;
+                    vPosition = position;
+                    vNormal = normal;
                     
                     // Multiple octaves of noise for more interesting terrain
                     float elevation = 0.0;
@@ -77,22 +101,41 @@ class World {
                     float amplitude = 1.0;
                     float maxValue = 0.0;
                     
-                    for(int i = 0; i < 4; i++) {
-                        // Animate each octave differently
-                        float noiseValue = snoise(vUv * frequency + vec2(time * 0.1 * float(i), time * 0.05));
+                    // Add 3D wavelike distortion to UV coordinates
+                    vec2 distortedUv = vUv;
+                    distortedUv.x += sin(vUv.y * 10.0 + time * 0.3) * 0.1 * distortion;
+                    distortedUv.y += cos(vUv.x * 8.0 + time * 0.2) * 0.1 * distortion;
+                    
+                    for(int i = 0; i < 5; i++) {
+                        // Animate each octave differently with more extreme motion
+                        float noiseValue = snoise(distortedUv * frequency + vec2(time * 0.15 * float(i), time * 0.1 * sin(time * 0.05)));
+                        
+                        // Add some chaos at higher frequencies
+                        if (i > 2) {
+                            noiseValue *= sin(time * 0.2 + vUv.x * 5.0) * 0.5 + 0.5;
+                        }
+                        
                         elevation += noiseValue * amplitude;
                         maxValue += amplitude;
-                        amplitude *= 0.5;
-                        frequency *= 2.0;
+                        amplitude *= 0.65;
+                        frequency *= 2.2;
                     }
                     
                     elevation /= maxValue; // Normalize
-                    elevation = pow(abs(elevation), 0.8) * sign(elevation) * 5.0;
+                    
+                    // More extreme terrain shaping for trippy effect
+                    elevation = pow(abs(elevation), 0.7) * sign(elevation) * 6.0;
+                    elevation += sin(vUv.x * 20.0 + time) * cos(vUv.y * 20.0 + time * 0.7) * 0.5 * distortion;
                     
                     vElevation = elevation;
                     
+                    // Create new position with dynamic waves
                     vec3 newPosition = position;
                     newPosition.z = elevation;
+                    
+                    // Add subtle wobble to entire mesh
+                    float wobble = sin(time * 0.2) * 0.05;
+                    newPosition = rotate(newPosition, vec3(0.0, 0.0, 1.0), wobble);
                     
                     gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
                 }
@@ -102,24 +145,75 @@ class World {
                 uniform vec3 colorA;
                 uniform vec3 colorB;
                 uniform vec3 colorC;
+                uniform vec3 colorD;
+                uniform vec3 colorE;
+                uniform float gridSize;
                 
                 varying vec2 vUv;
                 varying float vElevation;
+                varying vec3 vPosition;
+                varying vec3 vNormal;
+                
+                // GLSL utils
+                float map(float value, float min1, float max1, float min2, float max2) {
+                    return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+                }
+                
+                // LCD pixel effect
+                float lcdPixel(vec2 p) {
+                    vec2 grid = fract(p * gridSize);
+                    return smoothstep(0.1, 0.2, grid.x) * smoothstep(0.1, 0.2, grid.y) *
+                           smoothstep(grid.x, 0.9, grid.x) * smoothstep(grid.y, 0.9, grid.y);
+                }
                 
                 void main() {
-                    // Color based on elevation
-                    float colorMix = (vElevation + 5.0) / 10.0;
-                    vec3 color = mix(colorA, colorB, colorMix);
+                    // Color based on elevation with more extreme color shifts
+                    float colorMix = (vElevation + 6.0) / 12.0;
+                    colorMix = pow(colorMix, 1.5); // Make color transitions more extreme
                     
-                    // Add highlights to peaks
+                    // Oscillate between multiple colors based on time and position
+                    float timeFactor = sin(time * 0.3) * 0.5 + 0.5;
+                    vec3 baseColorA = mix(colorA, colorD, timeFactor);
+                    vec3 baseColorB = mix(colorB, colorE, 1.0-timeFactor);
+                    
+                    vec3 color = mix(baseColorA, baseColorB, colorMix);
+                    
+                    // Add highlights to peaks with more intensity
                     if (vElevation > 3.0) {
-                        float peakMix = (vElevation - 3.0) / 2.0;
+                        float peakMix = pow((vElevation - 3.0) / 3.0, 1.2);
                         color = mix(color, colorC, peakMix);
+                        
+                        // Add glowing effect to peaks
+                        float glow = sin(time * 3.0 + vUv.x * 10.0) * 0.5 + 0.5;
+                        color += colorE * 0.3 * glow * peakMix;
                     }
                     
-                    // Add subtle pulsing glow
-                    float pulse = sin(time * 0.5) * 0.5 + 0.5;
-                    color += colorC * 0.1 * pulse;
+                    // Add trippy wave patterns
+                    float waves = sin((vUv.x * 20.0 + time) * 2.0) * sin((vUv.y * 15.0 - time * 0.7) * 2.0) * 0.5 + 0.5;
+                    color = mix(color, colorD, waves * 0.15);
+                    
+                    // Add LCD-like screen effect
+                    float lcd = lcdPixel(vUv);
+                    color *= 0.8 + lcd * 0.4;
+                    
+                    // Add scan lines effect
+                    float scanline = sin(vUv.y * 100.0 + time * 5.0) * 0.5 + 0.5;
+                    color *= 0.8 + scanline * 0.2;
+                    
+                    // Add RGB split effect (chromatic aberration)
+                    float rgbSplit = sin(time * 0.2) * 0.01;
+                    float r = sin(vUv.x * 10.0 + time + rgbSplit) * 0.5 + 0.5;
+                    float g = sin(vUv.y * 10.0 + time) * 0.5 + 0.5;
+                    float b = sin((vUv.x + vUv.y) * 10.0 + time - rgbSplit) * 0.5 + 0.5;
+                    
+                    color.r *= 1.0 + r * 0.2;
+                    color.g *= 1.0 + g * 0.2;
+                    color.b *= 1.0 + b * 0.2;
+                    
+                    // Add edge highlight for LCD screen look
+                    float edge = 1.0 - max(abs(vUv.x - 0.5) * 2.0, abs(vUv.y - 0.5) * 2.0);
+                    edge = pow(edge, 3.0);
+                    color = mix(color, vec3(0.9, 1.0, 1.0), edge * 0.1);
                     
                     gl_FragColor = vec4(color, 1.0);
                 }

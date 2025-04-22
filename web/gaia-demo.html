@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GaiaScript Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #network-visualization {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 20px 0;
+        }
+        h1 {
+            color: #009688;
+        }
+        .network-layer {
+            margin: 5px 0;
+            padding: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>GaiaScript AI Language Demo</h1>
+    
+    <p>This is a simple demo of the GaiaScript AI language compiler and runtime.</p>
+    
+    <div id="network-visualization"></div>
+    
+    <button id="run-demo">Run GaiaScript Network</button>
+    
+    <pre id="output"></pre>
+    
+    <script src="./js/gaia-runtime.js" type="module"></script>
+    <script type="module">
+        import * as gaiaRuntime from './js/gaia-runtime.js';
+        import networkInit from './js/morphsphere_game.js';
+        
+        // Initialize the GAIA runtime
+        window.createLayer = gaiaRuntime.createLayer;
+        window.createInput = gaiaRuntime.createInput;
+        window.createLoss = gaiaRuntime.createLoss;
+        window.connectLayers = gaiaRuntime.connectLayers;
+        window.lastCreated = gaiaRuntime.lastCreated;
+        window.initializeLayer = gaiaRuntime.initializeLayer;
+        window.forward = gaiaRuntime.forward;
+        window.getNetworkSummary = gaiaRuntime.getNetworkSummary;
+        window.visualizeNetwork = gaiaRuntime.visualizeNetwork;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                // Initialize the network
+                const network = networkInit().initialize();
+                
+                // Visualize the network
+                gaiaRuntime.visualizeNetwork('network-visualization');
+                
+                // Display network summary
+                document.getElementById('output').textContent = 
+                    'Network Summary: ' + JSON.stringify(gaiaRuntime.getNetworkSummary(), null, 2);
+                
+                // Add run event
+                document.getElementById('run-demo').addEventListener('click', () => {
+                    try {
+                        // Create random input data
+                        const input = {
+                            shape: [3, 64, 64],
+                            data: new Array(3 * 64 * 64).fill(0).map(() => Math.random())
+                        };
+                        
+                        // Run forward pass
+                        const result = gaiaRuntime.forward(input, network);
+                        
+                        // Display result
+                        document.getElementById('output').textContent += 
+                            '\n\nForward Pass Result: ' + JSON.stringify(result, null, 2);
+                    } catch (e) {
+                        document.getElementById('output').textContent += 
+                            '\n\nError running network: ' + e.message;
+                        console.error('Error running network:', e);
+                    }
+                });
+            } catch (e) {
+                document.getElementById('output').textContent = 
+                    'Error initializing network: ' + e.message;
+                console.error('Error initializing network:', e);
+            }
+        });
+    </script>
+</body>
+</html>

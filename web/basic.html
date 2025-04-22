@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Basic GaiaScript Demo</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #0a0a1e;
+            color: #e0e0ff;
+            margin: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: #121230;
+            color: #e0e0ff;
+            border: 1px solid #333366;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            background: #50e3c2;
+            color: #121230;
+            border: none;
+            padding: 10px 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        pre {
+            background: #121230;
+            border: 1px solid #333366;
+            padding: 10px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Basic GaiaScript Demo</h1>
+    
+    <textarea id="code">N I → C₁ 32 → D₁ 10</textarea>
+    
+    <div>
+        <button onclick="runCode()">Run</button>
+        <button onclick="loadExample()">Load Example</button>
+    </div>
+    
+    <pre id="output">// Output will appear here</pre>
+    
+    <script>
+        // Examples
+        const examples = [
+            'N',
+            'N I → C₁ 32 → D₁ 10',
+            'N〈G⊕D〉\nG: Z 100 → C 3 τ\nD: I → F → D₁ 1024 ρ → D₀ 1 σ'
+        ];
+        
+        // Run the GaiaScript code
+        function runCode() {
+            const code = document.getElementById('code').value;
+            const output = document.getElementById('output');
+            
+            // Count arrows and components
+            const arrows = (code.match(/→/g) || []).length;
+            const components = code.includes('〈') ? 
+                code.substring(code.indexOf('〈') + 1, code.indexOf('〉')).split('⊕').length : 0;
+            
+            let result = '// GaiaScript Analysis\n\n';
+            
+            if (code.startsWith('N')) {
+                result += 'Network with ' + (arrows + 1) + ' layers\n';
+                
+                if (components > 0) {
+                    result += 'Contains ' + components + ' components\n';
+                }
+                
+                // Extract parts of the network
+                if (code.includes('→')) {
+                    const parts = code.split('→').map(part => part.trim());
+                    result += '\nLayers:\n';
+                    parts.forEach((part, i) => {
+                        result += `${i+1}. ${part}\n`;
+                    });
+                }
+            } else {
+                result += 'Invalid GaiaScript: Must start with N';
+            }
+            
+            output.textContent = result;
+        }
+        
+        // Load a random example
+        function loadExample() {
+            const codeEditor = document.getElementById('code');
+            const example = examples[Math.floor(Math.random() * examples.length)];
+            codeEditor.value = example;
+            document.getElementById('output').textContent = '// Loaded example';
+        }
+    </script>
+</body>
+</html>

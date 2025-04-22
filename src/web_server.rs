@@ -10,7 +10,7 @@ use crate::parser;
 use crate::interpreter::Interpreter;
 
 pub fn start_server(port: u16) -> io::Result<()> {
-    let listener = TcpListener::bind(format!("127.0.0.1:{}", port))?;
+    let listener = TcpListener::bind(format!("0.0.0.0:{}", port))?;
     println!("Server started at http://localhost:{}", port);
     
     for stream in listener.incoming() {
