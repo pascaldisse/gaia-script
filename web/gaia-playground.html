@@ -18,6 +18,46 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+        .main-container {
+            display: flex;
+            gap: 20px;
+        }
+        .editor-output-container {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #121230;
+            border: 1px solid #333366;
+            border-radius: 5px;
+            padding: 15px;
+            height: 100%;
+            min-height: 400px;
+        }
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 85%;
+        }
+        .user-message {
+            align-self: flex-end;
+            background-color: #333366;
+            margin-left: auto;
+        }
+        .assistant-message {
+            align-self: flex-start;
+            background-color: #1a1a40;
+            border-left: 3px solid #50e3c2;
+        }
+        #chat-messages {
+            display: flex;
+            flex-direction: column;
+        }
         h1 {
             text-align: center;
             margin-bottom: 30px;
@@ -85,18 +125,31 @@
     <div class="container">
         <h1>GaiaScript Playground</h1>
         
-        <div class="editor-container">
-            <textarea id="code-editor" class="code-editor" placeholder="Enter GaiaScript code...">N</textarea>
+        <div class="main-container">
+            <div class="editor-output-container">
+                <div class="editor-container">
+                    <textarea id="code-editor" class="code-editor" placeholder="Enter GaiaScript code...">N</textarea>
+                </div>
+                
+                <div class="control-panel">
+                    <button id="run-btn">Run</button>
+                    <button id="load-example-btn">Load Example</button>
+                    <button id="compile-btn">Compile to JS</button>
+                    <button id="visualize-btn">Visualize</button>
+                </div>
+                
+                <div id="output">// Output will appear here</div>
+            </div>
+            
+            <div class="chat-container">
+                <h2 style="color: #50e3c2; margin-bottom: 15px;">GaiaScript Assistant</h2>
+                <div id="chat-messages" style="flex: 1; overflow-y: auto; margin-bottom: 15px;"></div>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" id="chat-input" placeholder="Ask about GaiaScript or request code..." style="flex: 1; background-color: #1a1a40; color: #e0e0ff; border: 1px solid #333366; border-radius: 5px; padding: 10px; font-family: 'Menlo', monospace;">
+                    <button id="chat-send-btn" style="background-color: #50e3c2; border: none; color: #121230; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">Send</button>
+                </div>
+            </div>
         </div>
-        
-        <div class="control-panel">
-            <button id="run-btn">Run</button>
-            <button id="load-example-btn">Load Example</button>
-            <button id="compile-btn">Compile to JS</button>
-            <button id="visualize-btn">Visualize</button>
-        </div>
-        
-        <div id="output">// Output will appear here</div>
         
         <div id="visualization">
             <div id="gaia-container"></div>
@@ -117,10 +170,16 @@
             const output = document.getElementById('output');
             const visualizationContainer = document.getElementById('gaia-container');
             
+            // Chat elements
+            const chatMessages = document.getElementById('chat-messages');
+            const chatInput = document.getElementById('chat-input');
+            const chatSendBtn = document.getElementById('chat-send-btn');
+            
             console.log('Run button:', runBtn);
             console.log('Load Example button:', loadExampleBtn);
             console.log('Compile button:', compileBtn);
             console.log('Visualize button:', visualizeBtn);
+            console.log('Chat elements:', chatMessages, chatInput, chatSendBtn);
             
             const examples = [
                 { name: 'Simple CNN', code: 'N I → C₁ 32 → D₁ 10' },
@@ -509,6 +568,214 @@
             // Initialize with a working example
             codeEditor.value = 'N I → C₁ 32 → D₁ 10';
             output.textContent = '// Click a button above to get started';
+            
+            // Initialize chat functionality
+            initializeChat();
+            
+            // Chat functionality
+            function initializeChat() {
+                // Add welcome message
+                addAssistantMessage("👋 Welcome to GaiaScript Assistant! Ask me about GaiaScript or request code examples like \"Write a CNN\" or \"Generate a GAN architecture\".");
+                
+                // Send button click
+                chatSendBtn.addEventListener('click', sendChatMessage);
+                
+                // Enter key in input field
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        sendChatMessage();
+                    }
+                });
+                
+                // Function to send messages
+                function sendChatMessage() {
+                    const message = chatInput.value.trim();
+                    if (!message) return;
+                    
+                    // Add user message to chat
+                    addUserMessage(message);
+                    
+                    // Clear input
+                    chatInput.value = '';
+                    
+                    // Process message and respond
+                    processUserMessage(message);
+                }
+                
+                // Add user message to chat
+                function addUserMessage(text) {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'chat-message user-message';
+                    messageElement.textContent = text;
+                    chatMessages.appendChild(messageElement);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+                
+                // Add assistant message to chat
+                function addAssistantMessage(text) {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'chat-message assistant-message';
+                    messageElement.innerHTML = text;
+                    chatMessages.appendChild(messageElement);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+                
+                // Process user message and generate response
+                function processUserMessage(message) {
+                    // Simulate thinking
+                    setTimeout(() => {
+                        // Call API to get response (mocked for now)
+                        processWithLLM(message);
+                    }, 500);
+                }
+                
+                // Call LLM API to process user message
+                async function processWithLLM(message) {
+                    // Show typing indicator
+                    const typingIndicator = document.createElement('div');
+                    typingIndicator.className = 'chat-message assistant-message';
+                    typingIndicator.innerHTML = '<em>Thinking...</em>';
+                    typingIndicator.id = 'typing-indicator';
+                    chatMessages.appendChild(typingIndicator);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    
+                    try {
+                        // Try to call LLM API
+                        const response = await fetch('/api/chat', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                message: message,
+                                context: 'GaiaScript assistant helping with neural network architecture'
+                            })
+                        }).catch(error => null); // Catch network errors
+                        
+                        // Remove typing indicator
+                        const indicator = document.getElementById('typing-indicator');
+                        if (indicator) chatMessages.removeChild(indicator);
+                        
+                        // If API call successful, use response
+                        if (response && response.ok) {
+                            const result = await response.json();
+                            handleLLMResponse(result.response, message);
+                            return;
+                        }
+                        
+                        // If API call failed, fall back to local handling
+                        handleLocalResponse(message);
+                        
+                    } catch (error) {
+                        console.error("Error calling LLM API:", error);
+                        
+                        // Remove typing indicator
+                        const indicator = document.getElementById('typing-indicator');
+                        if (indicator) chatMessages.removeChild(indicator);
+                        
+                        // Fall back to local handling
+                        handleLocalResponse(message);
+                    }
+                }
+                
+                // Handle successful LLM API response
+                function handleLLMResponse(response, originalMessage) {
+                    // Check if response contains code blocks
+                    if (response.includes('```')) {
+                        // Extract code from markdown code blocks
+                        const codeRegex = /```(?:gaiascript)?\n([\s\S]*?)```/g;
+                        let match;
+                        let code = '';
+                        
+                        if ((match = codeRegex.exec(response)) !== null) {
+                            code = match[1].trim();
+                            
+                            // Format response with code and insert button
+                            const formattedResponse = response.replace(
+                                codeRegex,
+                                `<pre><code>$1</code></pre><button class="insert-code-btn" data-code="${code.replace(/"/g, '&quot;')}">Insert into editor</button>`
+                            );
+                            
+                            addAssistantMessage(formattedResponse);
+                        } else {
+                            addAssistantMessage(response);
+                        }
+                    } else {
+                        addAssistantMessage(response);
+                    }
+                    
+                    // Add click handlers for code insert buttons
+                    setTimeout(() => {
+                        document.querySelectorAll('.insert-code-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const code = this.getAttribute('data-code');
+                                codeEditor.value = code;
+                                addAssistantMessage("Code inserted into the editor. Click the Run button to execute it!");
+                            });
+                        });
+                    }, 10);
+                }
+                
+                // Handle case when LLM API is unavailable
+                function handleLocalResponse(message) {
+                    // Check if it's a code request
+                    if (message.toLowerCase().includes('write') && 
+                        (message.toLowerCase().includes('code') || message.toLowerCase().includes('network') || 
+                         message.toLowerCase().includes('cnn') || message.toLowerCase().includes('gan'))) {
+                        
+                        // Code generation logic
+                        let generatedCode = '';
+                        
+                        if (message.toLowerCase().includes('cnn')) {
+                            generatedCode = 'N ⊻ I ⊸ μ σ → C₁ 32 5 ρ → R → P 2 → C₂ 64 3 ρ → R → P 2 → F → D₁ 128 R → D₀ 10 → S';
+                            addAssistantMessage(`Here's a CNN architecture for image classification:<br><code>${generatedCode}</code><br><button class="insert-code-btn" data-code="${generatedCode}">Insert into editor</button>`);
+                        } else if (message.toLowerCase().includes('gan')) {
+                            generatedCode = 'N〈G⊕D〉\nG: Z 100 → U 4×4×512 → [U 2× → C 256 ρ]×2 → C 3 τ\nD: I → [C 64 5 ρ → P 2]×3 → F → D₁ 1024 ρ → D₀ 1 σ\nL: G(Z)⊳D⟿BCE+λ‖∇D‖';
+                            addAssistantMessage(`Here's a GAN architecture:<br><code>${generatedCode}</code><br><button class="insert-code-btn" data-code="${generatedCode}">Insert into editor</button>`);
+                        } else if (message.toLowerCase().includes('simple')) {
+                            generatedCode = 'N I → C₁ 32 → D₁ 10';
+                            addAssistantMessage(`Here's a simple neural network:<br><code>${generatedCode}</code><br><button class="insert-code-btn" data-code="${generatedCode}">Insert into editor</button>`);
+                        } else {
+                            generatedCode = 'N I → [C₁ 32 3 ρ → P 2]×2 → F → D₁ 128 ρ → D₀ 10 → S';
+                            addAssistantMessage(`Here's a neural network based on your request:<br><code>${generatedCode}</code><br><button class="insert-code-btn" data-code="${generatedCode}">Insert into editor</button>`);
+                        }
+                        
+                        // Add click handlers for code insert buttons (after adding to DOM)
+                        setTimeout(() => {
+                            document.querySelectorAll('.insert-code-btn').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    const code = this.getAttribute('data-code');
+                                    codeEditor.value = code;
+                                    addAssistantMessage("Code inserted into the editor. Click the Run button to execute it!");
+                                });
+                            });
+                        }, 10);
+                        
+                    } else if (message.toLowerCase().includes('explain') || message.toLowerCase().includes('what is')) {
+                        // Explanation logic
+                        if (message.toLowerCase().includes('gaiascript')) {
+                            addAssistantMessage("GaiaScript is a compact symbolic language designed for neural network architecture description. It uses Unicode symbols to express complex AI structures concisely. The notation allows for quick definition of layers, connections, and training processes with minimal syntax.");
+                        } else if (message.toLowerCase().includes('cnn')) {
+                            addAssistantMessage("A CNN (Convolutional Neural Network) is a deep learning architecture commonly used for image processing. In GaiaScript, a CNN can be written as:<br><code>N I → C₁ 32 → P 2 → C₂ 64 → F → D₁ 128 → D₀ 10</code><br>Where C represents convolutional layers, P pooling layers, F flattening, and D dense layers.");
+                        } else if (message.toLowerCase().includes('gan')) {
+                            addAssistantMessage("A GAN (Generative Adversarial Network) consists of two networks - a Generator and Discriminator - trained together. In GaiaScript:<br><code>N〈G⊕D〉<br>G: Z 100 → U → C 3 τ<br>D: I → C → D₀ 1 σ</code><br>This represents the generator G creating images from noise Z, and discriminator D distinguishing real from fake.");
+                        } else if (message.toLowerCase().includes('symbol') || message.toLowerCase().includes('notation')) {
+                            addAssistantMessage("GaiaScript symbols include:<br>→ (data flow)<br>C (convolution)<br>D (dense layer)<br>P (pooling)<br>F (flatten)<br>R (ReLU)<br>σ (sigmoid)<br>τ (tanh)<br>S (softmax)<br>〈〉 (component grouping)<br>⊕ (component separation)");
+                        } else {
+                            addAssistantMessage("I'm here to help with GaiaScript! You can ask about neural network architectures, syntax, or request code examples. What would you like to know more about?");
+                        }
+                    } else if (message.toLowerCase().includes('run') || message.toLowerCase().includes('execute')) {
+                        // Run code suggestion
+                        addAssistantMessage("To run GaiaScript code, enter it in the editor and click the Run button. You can also visualize the network structure with the Visualize button or compile to JavaScript with the Compile button.");
+                    } else if (message.toLowerCase().includes('hello') || message.toLowerCase().includes('hi')) {
+                        // Greeting
+                        addAssistantMessage("Hello! I'm your GaiaScript assistant. How can I help you today?");
+                    } else {
+                        // Default response
+                        addAssistantMessage("I'm here to help with GaiaScript. Would you like me to explain something about neural networks, provide code examples, or help you write a specific architecture?");
+                    }
+                }
+            }
             
             // Log completion
             console.log('Playground initialized successfully');

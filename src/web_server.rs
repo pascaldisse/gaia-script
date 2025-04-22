@@ -5,6 +5,7 @@ use std::net::{TcpListener, TcpStream};
 use std::io::{Read, Write};
 use std::thread;
 use std::sync::Arc;
+use std::time::{Duration, SystemTime};
 
 use crate::parser;
 use crate::interpreter::Interpreter;
@@ -57,6 +58,13 @@ fn handle_connection(mut stream: TcpStream) -> io::Result<()> {
         
         // Run the GaiaScript code and return the result
         handle_gaiascript_run(stream, body)
+    } else if path.starts_with("/api/chat") {
+        // Extract the chat message from the request body
+        let body_start = request.find("\r\n\r\n").unwrap_or(0) + 4;
+        let body = &request[body_start..];
+        
+        // Process the chat message
+        handle_chat_request(stream, body)
     } else {
         // Serve static files
         let file_path = path.trim_start_matches('/');
@@ -142,4 +150,73 @@ fn handle_gaiascript_run(mut stream: TcpStream, code: &str) -> io::Result<()> {
     stream.write_all(response.as_bytes())?;
     
     Ok(())
+}
+
+fn handle_chat_request(mut stream: TcpStream, body: &str) -> io::Result<()> {
+    // Parse the JSON request body
+    // In a real application, use a proper JSON parser like serde_json
+    let message = if body.contains("\"message\"") {
+        body.split("\"message\"")
+            .nth(1)
+            .and_then(|s| s.split("\"").nth(2))
+            .unwrap_or("No message provided")
+    } else {
+        "No message provided"
+    };
+    
+    // Generate response based on the message content
+    // This is a simplified implementation - in a real application,
+    // you would call an actual LLM API
+    let response_text = generate_gaiascript_response(message);
+    
+    // Wrap the response in JSON
+    let result = format!("{{ \"response\": {:?} }}", response_text);
+    
+    // Send response with CORS headers
+    let response = format!(
+        "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {}\r\n\r\n{}",
+        result.len(),
+        result
+    );
+    
+    stream.write_all(response.as_bytes())?;
+    
+    Ok(())
+}
+
+fn generate_gaiascript_response(message: &str) -> String {
+    // Add a small delay to simulate thinking time
+    thread::sleep(Duration::from_millis(300));
+    
+    let message_lower = message.to_lowercase();
+    
+    // Helper function to create code blocks in markdown format
+    let code_block = |code: &str| {
+        format!("```gaiascript\n{}\n```", code)
+    };
+    
+    if message_lower.contains("cnn") || message_lower.contains("convolutional") {
+        if message_lower.contains("simple") || message_lower.contains("basic") {
+            let code = "N I → C₁ 32 3 ρ → P 2 → C₂ 64 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S";
+            format!("Here's a simple CNN for image classification:\n\n{}\n\nThis network has two convolutional layers with ReLU activation (ρ), each followed by pooling. The output goes through two dense layers and ends with a softmax classifier.", code_block(code))
+        } else {
+            let code = "N ⊻ I ⊸ μ σ → C₁ 32 5 ρ → R → P 2 → C₂ 64 3 ρ → R → P 2 → C₃ 128 3 ρ → R → P 2 → F → D₁ 256 R → D₀ 10 → S";
+            format!("Here's a more complex CNN architecture:\n\n{}\n\nThis network has three convolutional layers with normalization and regularization. It's well-suited for detailed image classification tasks.", code_block(code))
+        }
+    } else if message_lower.contains("gan") || message_lower.contains("generative") {
+        let code = "N〈G⊕D〉\nG: Z 100 → U 4×4×512 → [U 2× → C 256 ρ]×2 → C 3 τ\nD: I → [C 64 5 ρ → P 2]×3 → F → D₁ 1024 ρ → D₀ 1 σ\nL: G(Z)⊳D⟿BCE+λ‖∇D‖";
+        format!("Here's a GAN architecture for image generation:\n\n{}\n\nThis GAN has a generator (G) that creates images from random noise, and a discriminator (D) that tries to distinguish real from generated images. The loss function trains both networks adversarially.", code_block(code))
+    } else if message_lower.contains("transformer") || message_lower.contains("attention") {
+        let code = "N〈E⊕D〉\nE: I → [E → A{h:8} → N]×6\nD: I → [E → A{h:8} → N]×6 → D₀ V S\nA{h}: [L QKV h → ⊗ → ⊕]‖";
+        format!("Here's a transformer architecture with attention mechanism:\n\n{}\n\nThis implementation has an encoder-decoder structure with multi-head attention. The attention mechanism is defined with 8 heads that operate in parallel.", code_block(code))
+    } else if message_lower.contains("write") && message_lower.contains("simple") {
+        let code = "N I → [D₁ 64 ρ]×2 → D₀ 10 → S";
+        format!("Here's a simple GaiaScript neural network:\n\n{}\n\nThis is a basic feedforward network with two hidden layers of 64 neurons each using ReLU activation, followed by a 10-neuron output layer with softmax activation.", code_block(code))
+    } else if message_lower.contains("explain") && message_lower.contains("symbol") {
+        "GaiaScript uses these symbols for concise neural network notation:\n\n- N: Network definition\n- I: Input layer\n- C: Convolutional layer (C₁, C₂, etc. for different channels)\n- D: Dense/Fully connected layer (D₁ for hidden, D₀ for output)\n- P: Pooling layer\n- F: Flatten operation\n- →: Data flow direction\n- ρ: ReLU activation\n- σ: Sigmoid activation\n- τ: Tanh activation\n- S: Softmax activation\n- R: Regularization\n- [ ]×n: Repeat block n times\n- 〈〉: Component grouping\n- ⊕: Component separation\n\nThis symbolic notation allows complex networks to be expressed in minimal space."
+    } else if message_lower.contains("explain") && message_lower.contains("gaiascript") {
+        "GaiaScript is a symbolic language designed for concise representation of neural networks and other AI architectures. It uses Unicode symbols to express complex structures in a minimal, mathematically-inspired notation.\n\nKey benefits:\n1. Density: Express complex networks in a fraction of the space\n2. Readability: Once familiar with the symbols, networks can be understood at a glance\n3. Mathematical clarity: Captures the essence of neural computation\n\nGaiaScript can represent everything from simple feedforward networks to complex architectures like CNNs, RNNs, GANs, and Transformers."
+    } else {
+        "I'm the GaiaScript Assistant. I can help you write neural network architectures using GaiaScript notation, explain symbols, or generate example code for different network types like CNNs, GANs, or Transformers.\n\nTry asking me to:\n- Write a CNN for image classification\n- Explain GaiaScript symbols\n- Generate a GAN architecture\n- Write a simple neural network"
+    }
 }
