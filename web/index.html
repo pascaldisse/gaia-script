@@ -3,39 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MorphSphere - Surreal AI Game</title>
+    <title>MorphSphere - Tamagotchi-Like Surreal AI Game</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
+    <!-- LCD screen effects -->
+    <div class="scan-lines"></div>
+    <div class="lcd-glow"></div>
+    
     <div id="game-container">
+        <!-- Tamagotchi-style UI -->
         <div id="ui-overlay">
             <h1>MorphSphere</h1>
+            
+            <!-- Player stats -->
             <div id="stats">
-                <div class="stat">Morphs: <span id="morph-count">0</span></div>
-                <div class="stat">Energy: <span id="energy-level">100</span></div>
-                <div class="stat">Perception: <span id="perception-level">1</span></div>
+                <div class="stat">
+                    <div class="stat-label">HEALTH</div>
+                    <div class="stat-bar">
+                        <div class="stat-bar-fill health" style="width: 80%;"></div>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">ENERGY</div>
+                    <div class="stat-bar">
+                        <div class="stat-bar-fill energy" style="width: 60%;"></div>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">MORPHS</div>
+                    <div class="stat-value"><span id="morph-count">0</span></div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">PERCEPTION</div>
+                    <div class="stat-value"><span id="perception-level">1</span></div>
+                </div>
             </div>
+            
+            <!-- Selected morph info -->
+            <div id="morph-info">
+                <div class="morph-name">No morph selected</div>
+                <div class="morph-traits">
+                    <div class="morph-stat">
+                        <span>Personality:</span>
+                        <span id="morph-personality">-</span>
+                    </div>
+                    <div class="morph-stat">
+                        <span>Ability:</span>
+                        <span id="morph-ability">-</span>
+                    </div>
+                    <div class="morph-stat">
+                        <span>Stage:</span>
+                        <span id="morph-stage">-</span>
+                    </div>
+                </div>
+                <div class="morph-stats">
+                    <div class="stat">
+                        <div class="stat-label">HUNGER</div>
+                        <div class="stat-bar">
+                            <div id="morph-hunger-bar" class="stat-bar-fill hunger" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-label">HAPPINESS</div>
+                        <div class="stat-bar">
+                            <div id="morph-happiness-bar" class="stat-bar-fill happiness" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main controls -->
             <div id="controls">
-                <button id="capture-btn">Capture Essence</button>
-                <button id="merge-btn">Merge</button>
-                <button id="create-btn">Create Sound</button>
+                <button id="feed-btn" class="btn-feed" disabled>
+                    <i class="fas fa-utensils"></i>
+                    Feed
+                </button>
+                <button id="pet-btn" class="btn-pet" disabled>
+                    <i class="fas fa-hand-sparkles"></i>
+                    Pet
+                </button>
+                <button id="play-btn" class="btn-play" disabled>
+                    <i class="fas fa-gamepad"></i>
+                    Play
+                </button>
+                <button id="speak-btn" class="btn-speak" disabled>
+                    <i class="fas fa-comment-dots"></i>
+                    Speak
+                </button>
             </div>
-            <div id="console">
-                <div class="console-entry">Welcome to MorphSphere, a surreal 3D experience...</div>
+            
+            <!-- Advanced actions -->
+            <div id="action-buttons">
+                <button id="heal-btn" class="btn-heal" disabled>
+                    <i class="fas fa-heart"></i>
+                    Heal
+                </button>
+                <button id="ability-btn" class="btn-ability" disabled>
+                    <i class="fas fa-magic"></i>
+                    Ability
+                </button>
+                <button id="merge-btn" class="btn-evolve" disabled>
+                    <i class="fas fa-code-merge"></i>
+                    Merge
+                </button>
+            </div>
+            
+            <!-- Game management -->
+            <div id="game-buttons">
+                <button id="create-btn">
+                    <i class="fas fa-plus-circle"></i>
+                    Create
+                </button>
+                <button id="attack-btn" class="btn-attack" disabled>
+                    <i class="fas fa-bolt"></i>
+                    Attack
+                </button>
             </div>
         </div>
-        <canvas id="game-canvas"></canvas>
-    </div>
-    <div id="gaia-editor">
-        <h2>GaiaScript Code</h2>
-        <textarea id="gaia-code">N〈W⊕A⊕P〉
+        
+        <!-- Console for game messages -->
+        <div id="console">
+            <div class="console-entry">Welcome to MorphSphere, a surreal LCD pet simulator...</div>
+            <div class="console-entry">Click on a Morph to interact with it.</div>
+        </div>
+        
+        <!-- GaiaScript editor -->
+        <div id="gaia-editor">
+            <h2>GaiaScript Code</h2>
+            <textarea id="gaia-code">N〈W⊕A⊕P〉
 W: I 64×64×3 → [C₁ 32 3 ρ → P 2]×2 → F → D₁ 512 → R 4×4×32 → U 2× → C 16 τ
 A: Z 100 → D₁ 256 ρ → D₁ 512 ρ → R 4×4×32
 P: I 128×128×3 → C₁ 64 5 ρ → P 2 → C₂ 128 3 ρ → P 2 → F → D₁ 512 → D₀ 3 σ</textarea>
-        <button id="run-btn">Run Script</button>
+            <button id="run-btn">Execute</button>
+        </div>
+        
+        <canvas id="game-canvas"></canvas>
     </div>
+    
     <script src="js/morph.js"></script>
     <script src="js/world.js"></script>
     <script src="js/game.js"></script>
