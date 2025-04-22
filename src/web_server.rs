@@ -207,13 +207,19 @@ fn handle_chat_request(mut stream: TcpStream, body: &str) -> io::Result<()> {
 }
 
 fn call_gaia_llm_api(message: &str, context: &str) -> Result<String, String> {
-    // Gaia LLM API endpoint
-    let api_url = "http://localhost:5000/api/llm/chat";
+    // Production API endpoint
+    let api_url = "https://api.anthropic.com/v1/messages";
     
     // Set up a temporary directory for curl output
     let temp_dir = std::env::temp_dir();
     let output_file = temp_dir.join("gaia_api_response.json");
     let output_path = output_file.to_string_lossy();
+    
+    // Get API key from environment variable or use default for development
+    let api_key = std::env::var("ANTHROPIC_API_KEY").unwrap_or_else(|_| {
+        println!("Warning: ANTHROPIC_API_KEY environment variable not set. Using default key for development.");
+        "dummy-key-for-development-environment-only".to_string()
+    });
     
     // Prepare messages array with system prompt based on context
     let system_prompt = if !context.is_empty() {
@@ -225,13 +231,13 @@ fn call_gaia_llm_api(message: &str, context: &str) -> Result<String, String> {
     // Build request body with proper JSON structure
     let request_body = format!(
         r#"{{
-            "model": "meta-llama/Meta-Llama-3-70B-Instruct",
+            "model": "claude-3-opus-20240229",
             "messages": [
                 {{"role": "system", "content": "{}"}},
                 {{"role": "user", "content": "{}"}}
             ],
             "temperature": 0.7,
-            "max_tokens": 800
+            "max_tokens": 1000
         }}"#,
         system_prompt.replace("\"", "\\\""),
         message.replace("\"", "\\\"")
@@ -242,7 +248,7 @@ fn call_gaia_llm_api(message: &str, context: &str) -> Result<String, String> {
     fs::write(&request_file, &request_body)
         .map_err(|e| format!("Failed to write request body: {}", e))?;
     
-    // Prepare curl command
+    // Prepare curl command with Anthropic API format
     let status = std::process::Command::new("curl")
         .arg("-s")
         .arg("-X")
@@ -251,7 +257,9 @@ fn call_gaia_llm_api(message: &str, context: &str) -> Result<String, String> {
         .arg("-H")
         .arg("Content-Type: application/json")
         .arg("-H")
-        .arg("Authorization: Bearer gaia-dev-key")
+        .arg(format!("x-api-key: {}", api_key))
+        .arg("-H")
+        .arg("anthropic-version: 2023-06-01")
         .arg("-d")
         .arg(format!("@{}", request_file.to_string_lossy()))
         .arg("-o")
@@ -273,16 +281,16 @@ fn call_gaia_llm_api(message: &str, context: &str) -> Result<String, String> {
     // Clean up output file
     let _ = fs::remove_file(output_file);
     
-    // Parse response to extract message content
-    if response_content.contains("\"message\"") {
+    // Parse response to extract message content from Anthropic API format
+    if response_content.contains("\"content\"") {
         // Extract the message content from the response JSON
-        let message = response_content.split("\"message\"")
+        // Format: {"content":[{"type":"text","text":"response text"}]}
+        let message = response_content.split("\"text\":")
             .nth(1)
             .and_then(|s| {
-                let start = s.find(':').map(|i| i + 1).unwrap_or(0);
+                let start = s.find('\"').map(|i| i + 1).unwrap_or(0);
                 let content = &s[start..];
-                let content = content.trim_start().trim_start_matches('\"');
-                let end = content.rfind("\",").or_else(|| content.rfind("\"}")).unwrap_or(content.len());
+                let end = content.find('\"').unwrap_or(content.len());
                 Some(content[..end].trim().to_string())
             })
             .unwrap_or_else(|| "API returned an invalid response format".to_string());
@@ -295,7 +303,7 @@ fn call_gaia_llm_api(message: &str, context: &str) -> Result<String, String> {
             .and_then(|s| {
                 let start = s.find(':').map(|i| i + 1).unwrap_or(0);
                 let content = &s[start..];
-                let content = content.trim_start().trim_start_matches('\"');
+                let content = content.trim_start().trim_start_matches('{').trim_start_matches('\"');
                 let end = content.rfind("\",").or_else(|| content.rfind("\"}")).unwrap_or(content.len());
                 Some(content[..end].trim().to_string())
             })
