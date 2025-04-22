@@ -423,6 +423,90 @@ button.btn-speak:hover { box-shadow: 0 0 10px rgba(255, 204, 51, 0.8); }
     animation: float-up 2s ease-out forwards;
 }
 
+/* Network Visualization */
+.network-visualization {
+    position: absolute;
+    top: 120px;
+    left: 10px;
+    width: 300px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    border: 2px solid #50e3c2;
+    padding: 10px;
+    box-shadow: 0 0 15px rgba(80, 227, 194, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.5);
+    font-size: 0.7em;
+    color: #d0d0d0;
+}
+
+.network-visualization h3 {
+    color: #50e3c2;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    letter-spacing: 1px;
+}
+
+.network-layers {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.network-layer {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(80, 227, 194, 0.3);
+    border-radius: 4px;
+}
+
+.layer-label {
+    font-weight: bold;
+    color: #50e3c2;
+}
+
+.layer-details {
+    font-size: 0.8em;
+    opacity: 0.8;
+    font-family: 'Courier New', monospace;
+}
+
+.network-layer.conv {
+    border-color: #ff66ff;
+}
+
+.network-layer.dense {
+    border-color: #ffcc33;
+}
+
+.network-layer.pooling {
+    border-color: #33ccff;
+}
+
+.network-layer.flatten {
+    border-color: #9966ff;
+}
+
+/* GaiaScript Label */
+.gaia-label {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #50e3c2;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 0.7em;
+    border: 1px solid #50e3c2;
+    text-align: center;
+    letter-spacing: 1px;
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: 0 0 10px rgba(80, 227, 194, 0.5);
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
     #ui-overlay {
@@ -437,5 +521,14 @@ button.btn-speak:hover { box-shadow: 0 0 10px rgba(255, 204, 51, 0.8); }
     button {
         font-size: 0.6em;
         min-height: 40px;
+    }
+    
+    .network-visualization {
+        width: 250px;
+        font-size: 0.6em;
+    }
+    
+    .gaia-label {
+        font-size: 0.5em;
     }
 }

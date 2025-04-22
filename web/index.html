@@ -144,8 +144,30 @@ P: I 128×128×3 → C₁ 64 5 ρ → P 2 → C₂ 128 3 ρ → P 2 → F → D�
         <canvas id="game-canvas"></canvas>
     </div>
     
-    <script src="js/morph.js"></script>
-    <script src="js/world.js"></script>
-    <script src="js/game.js"></script>
+    <script src="js/morph.js" type="module"></script>
+    <script src="js/world.js" type="module"></script>
+    <script type="module">
+        import GaiaMorphSphereGame from './js/gaia-game.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Create network visualization section
+            const vizContainer = document.createElement('div');
+            vizContainer.id = 'network-visualization';
+            vizContainer.className = 'network-visualization';
+            document.getElementById('game-container').appendChild(vizContainer);
+            
+            // Add GaiaScript identification
+            const gaiaLabel = document.createElement('div');
+            gaiaLabel.className = 'gaia-label';
+            gaiaLabel.textContent = 'Powered by GaiaScript AI-Optimized Language';
+            document.getElementById('game-container').appendChild(gaiaLabel);
+            
+            // Create the GaiaScript powered game
+            const game = new GaiaMorphSphereGame();
+            
+            // Store game instance for debugging
+            window.game = game;
+        });
+    </script>
 </body>
 </html>

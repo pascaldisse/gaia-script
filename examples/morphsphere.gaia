@@ -1,0 +1,5 @@
+// MorphSphere GaiaScript - Neural Network for Morphs
+
+N
+
+I 3 128 128 -> C 32 3 -> P -> C 64 3 -> P -> F -> D 128

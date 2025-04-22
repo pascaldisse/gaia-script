@@ -2,6 +2,7 @@ mod ast;
 mod parser;
 mod interpreter;
 mod web_server;
+mod compiler;
 
 use std::fs;
 use std::path::PathBuf;
@@ -9,6 +10,7 @@ use std::process;
 use std::io;
 use clap::{Parser, Subcommand};
 use crate::interpreter::Interpreter;
+use crate::compiler::JsCompiler;
 
 #[derive(Parser)]
 #[clap(name = "gaiascript", about = "AI-Optimized Programming Language (AOPL) interpreter")]
@@ -37,6 +39,17 @@ enum Commands {
         file: PathBuf,
     },
     
+    /// Compile a GaiaScript program to JavaScript
+    Compile {
+        /// The path to the GaiaScript file to compile
+        #[clap(value_parser)]
+        file: PathBuf,
+        
+        /// The output JavaScript file path
+        #[clap(short, long)]
+        output: Option<PathBuf>,
+    },
+    
     /// Interactive REPL mode
     Repl,
     
@@ -57,6 +70,9 @@ fn main() -> io::Result<()> {
         },
         Commands::Parse { file } => {
             parse_file(file);
+        },
+        Commands::Compile { file, output } => {
+            compile_file(file, output);
         },
         Commands::Repl => {
             println!("REPL mode not implemented yet");
@@ -116,6 +132,54 @@ fn parse_file(file: &PathBuf) {
     match parser::parse(&content) {
         Ok(ast) => {
             println!("AST: {:#?}", ast);
+        },
+        Err(err) => {
+            eprintln!("Error parsing file {}: {}", file.display(), err);
+            process::exit(1);
+        }
+    }
+}
+
+fn compile_file(file: &PathBuf, output: &Option<PathBuf>) {
+    let content = match fs::read_to_string(file) {
+        Ok(content) => content,
+        Err(err) => {
+            eprintln!("Error reading file {}: {}", file.display(), err);
+            process::exit(1);
+        }
+    };
+    
+    match parser::parse(&content) {
+        Ok(ast) => {
+            let mut compiler = JsCompiler::new();
+            match compiler.compile(&ast) {
+                Ok(js_code) => {
+                    // Determine output path
+                    let output_path = match output {
+                        Some(path) => path.clone(),
+                        None => {
+                            let mut default_path = file.clone();
+                            default_path.set_extension("js");
+                            default_path
+                        }
+                    };
+                    
+                    // Write to file
+                    match fs::write(&output_path, js_code) {
+                        Ok(_) => {
+                            println!("Successfully compiled to {}", output_path.display());
+                        },
+                        Err(err) => {
+                            eprintln!("Error writing to output file {}: {}", output_path.display(), err);
+                            process::exit(1);
+                        }
+                    }
+                },
+                Err(err) => {
+                    eprintln!("Compilation error: {}", err);
+                    process::exit(1);
+                }
+            }
         },
         Err(err) => {
             eprintln!("Error parsing file {}: {}", file.display(), err);

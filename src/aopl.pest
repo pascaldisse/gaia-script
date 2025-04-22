@@ -21,13 +21,13 @@ latent_input = { "Z" }
 output_marker = { "↵" }
 
 // Data Flow
-data_flow = { "→" }
+data_flow = { "→" | "->" }
 feed_output = { "⊳" }
 loss_function = { "⟿" }
 
 // Layers and Operations
-conv_layer = { "C" ~ subscript? }
-dense_layer = { "D" ~ subscript? }
+conv_layer = { "C" ~ subscript? | "C" ~ ASCII_DIGIT }
+dense_layer = { "D" ~ subscript? | "D" ~ ASCII_DIGIT }
 pooling = { "P" }
 flatten = { "F" }
 upsampling = { "U" }
