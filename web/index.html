@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MorphSphere - Surreal AI Game</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <div id="game-container">
+        <div id="ui-overlay">
+            <h1>MorphSphere</h1>
+            <div id="stats">
+                <div class="stat">Morphs: <span id="morph-count">0</span></div>
+                <div class="stat">Energy: <span id="energy-level">100</span></div>
+                <div class="stat">Perception: <span id="perception-level">1</span></div>
+            </div>
+            <div id="controls">
+                <button id="capture-btn">Capture Essence</button>
+                <button id="merge-btn">Merge</button>
+                <button id="create-btn">Create Sound</button>
+            </div>
+            <div id="console">
+                <div class="console-entry">Welcome to MorphSphere, a surreal 3D experience...</div>
+            </div>
+        </div>
+        <canvas id="game-canvas"></canvas>
+    </div>
+    <div id="gaia-editor">
+        <h2>GaiaScript Code</h2>
+        <textarea id="gaia-code">N〈W⊕A⊕P〉
+W: I 64×64×3 → [C₁ 32 3 ρ → P 2]×2 → F → D₁ 512 → R 4×4×32 → U 2× → C 16 τ
+A: Z 100 → D₁ 256 ρ → D₁ 512 ρ → R 4×4×32
+P: I 128×128×3 → C₁ 64 5 ρ → P 2 → C₂ 128 3 ρ → P 2 → F → D₁ 512 → D₀ 3 σ</textarea>
+        <button id="run-btn">Run Script</button>
+    </div>
+    <script src="js/morph.js"></script>
+    <script src="js/world.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>

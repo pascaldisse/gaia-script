@@ -1,10 +1,12 @@
 mod ast;
 mod parser;
 mod interpreter;
+mod web_server;
 
 use std::fs;
 use std::path::PathBuf;
 use std::process;
+use std::io;
 use clap::{Parser, Subcommand};
 use crate::interpreter::Interpreter;
 
@@ -37,9 +39,16 @@ enum Commands {
     
     /// Interactive REPL mode
     Repl,
+    
+    /// Start a web server to run the MorphSphere game
+    Serve {
+        /// The port to listen on
+        #[clap(short, long, default_value_t = 8080)]
+        port: u16,
+    },
 }
 
-fn main() {
+fn main() -> io::Result<()> {
     let cli = Cli::parse();
     
     match &cli.command {
@@ -52,7 +61,12 @@ fn main() {
         Commands::Repl => {
             println!("REPL mode not implemented yet");
         },
+        Commands::Serve { port } => {
+            return web_server::start_server(*port);
+        },
     }
+    
+    Ok(())
 }
 
 fn run_file(file: &PathBuf, print_ast: bool) {
