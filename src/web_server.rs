@@ -6,6 +6,7 @@ use std::io::{Read, Write};
 use std::thread;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime};
+use std::collections::HashMap;
 
 use crate::parser;
 use crate::interpreter::Interpreter;
@@ -154,7 +155,6 @@ fn handle_gaiascript_run(mut stream: TcpStream, code: &str) -> io::Result<()> {
 
 fn handle_chat_request(mut stream: TcpStream, body: &str) -> io::Result<()> {
     // Parse the JSON request body
-    // In a real application, use a proper JSON parser like serde_json
     let message = if body.contains("\"message\"") {
         body.split("\"message\"")
             .nth(1)
@@ -164,24 +164,147 @@ fn handle_chat_request(mut stream: TcpStream, body: &str) -> io::Result<()> {
         "No message provided"
     };
     
-    // Generate response based on the message content
-    // This is a simplified implementation - in a real application,
-    // you would call an actual LLM API
-    let response_text = generate_gaiascript_response(message);
+    // Extract context if provided
+    let context = if body.contains("\"context\"") {
+        body.split("\"context\"")
+            .nth(1)
+            .and_then(|s| s.split("\"").nth(2))
+            .unwrap_or("")
+    } else {
+        ""
+    };
     
-    // Wrap the response in JSON
-    let result = format!("{{ \"response\": {:?} }}", response_text);
-    
-    // Send response with CORS headers
-    let response = format!(
-        "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {}\r\n\r\n{}",
-        result.len(),
-        result
-    );
-    
-    stream.write_all(response.as_bytes())?;
+    // Try to use the Gaia LLM API first
+    match call_gaia_llm_api(message, context) {
+        Ok(api_response) => {
+            // Successfully received response from Gaia API
+            // Send the response
+            let result = format!("{{ \"response\": {:?} }}", api_response);
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {}\r\n\r\n{}",
+                result.len(),
+                result
+            );
+            stream.write_all(response.as_bytes())?;
+        },
+        Err(error) => {
+            // If API call fails, fall back to local response generation
+            println!("LLM API call failed: {}", error);
+            
+            // Generate local response
+            let fallback_response = generate_gaiascript_response(message);
+            let result = format!("{{ \"response\": {:?}, \"source\": \"local\" }}", fallback_response);
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: {}\r\n\r\n{}",
+                result.len(),
+                result
+            );
+            stream.write_all(response.as_bytes())?;
+        }
+    }
     
     Ok(())
+}
+
+fn call_gaia_llm_api(message: &str, context: &str) -> Result<String, String> {
+    // Gaia LLM API endpoint
+    let api_url = "http://localhost:5000/api/llm/chat";
+    
+    // Set up a temporary directory for curl output
+    let temp_dir = std::env::temp_dir();
+    let output_file = temp_dir.join("gaia_api_response.json");
+    let output_path = output_file.to_string_lossy();
+    
+    // Prepare messages array with system prompt based on context
+    let system_prompt = if !context.is_empty() {
+        format!("You are a GaiaScript assistant. GaiaScript is a symbolic language for concisely describing neural network architectures. {}", context)
+    } else {
+        "You are a GaiaScript assistant. GaiaScript is a symbolic language for concisely describing neural network architectures. Your goal is to help users learn and use GaiaScript.".to_string()
+    };
+    
+    // Build request body with proper JSON structure
+    let request_body = format!(
+        r#"{{
+            "model": "meta-llama/Meta-Llama-3-70B-Instruct",
+            "messages": [
+                {{"role": "system", "content": "{}"}},
+                {{"role": "user", "content": "{}"}}
+            ],
+            "temperature": 0.7,
+            "max_tokens": 800
+        }}"#,
+        system_prompt.replace("\"", "\\\""),
+        message.replace("\"", "\\\"")
+    );
+    
+    // Create a temporary file to store the request body
+    let request_file = temp_dir.join("gaia_api_request.json");
+    fs::write(&request_file, &request_body)
+        .map_err(|e| format!("Failed to write request body: {}", e))?;
+    
+    // Prepare curl command
+    let status = std::process::Command::new("curl")
+        .arg("-s")
+        .arg("-X")
+        .arg("POST")
+        .arg(api_url)
+        .arg("-H")
+        .arg("Content-Type: application/json")
+        .arg("-H")
+        .arg("Authorization: Bearer gaia-dev-key")
+        .arg("-d")
+        .arg(format!("@{}", request_file.to_string_lossy()))
+        .arg("-o")
+        .arg(&output_path)
+        .status()
+        .map_err(|e| format!("Failed to execute curl command: {}", e))?;
+    
+    // Clean up request file
+    let _ = fs::remove_file(request_file);
+    
+    if !status.success() {
+        return Err(format!("API request failed with status: {}", status));
+    }
+    
+    // Read response from file
+    let response_content = fs::read_to_string(&output_file)
+        .map_err(|e| format!("Failed to read API response: {}", e))?;
+    
+    // Clean up output file
+    let _ = fs::remove_file(output_file);
+    
+    // Parse response to extract message content
+    if response_content.contains("\"message\"") {
+        // Extract the message content from the response JSON
+        let message = response_content.split("\"message\"")
+            .nth(1)
+            .and_then(|s| {
+                let start = s.find(':').map(|i| i + 1).unwrap_or(0);
+                let content = &s[start..];
+                let content = content.trim_start().trim_start_matches('\"');
+                let end = content.rfind("\",").or_else(|| content.rfind("\"}")).unwrap_or(content.len());
+                Some(content[..end].trim().to_string())
+            })
+            .unwrap_or_else(|| "API returned an invalid response format".to_string());
+        
+        Ok(message)
+    } else if response_content.contains("\"error\"") {
+        // Extract error message
+        let error = response_content.split("\"error\"")
+            .nth(1)
+            .and_then(|s| {
+                let start = s.find(':').map(|i| i + 1).unwrap_or(0);
+                let content = &s[start..];
+                let content = content.trim_start().trim_start_matches('\"');
+                let end = content.rfind("\",").or_else(|| content.rfind("\"}")).unwrap_or(content.len());
+                Some(content[..end].trim().to_string())
+            })
+            .unwrap_or_else(|| "Unknown API error".to_string());
+        
+        Err(format!("API error: {}", error))
+    } else {
+        Err("Invalid API response format".to_string())
+    }
 }
 
 fn generate_gaiascript_response(message: &str) -> String {

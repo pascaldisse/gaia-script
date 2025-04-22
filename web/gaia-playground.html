@@ -575,7 +575,7 @@
             // Chat functionality
             function initializeChat() {
                 // Add welcome message
-                addAssistantMessage("👋 Welcome to GaiaScript Assistant! Ask me about GaiaScript or request code examples like \"Write a CNN\" or \"Generate a GAN architecture\".");
+                addAssistantMessage("👋 Welcome to GaiaScript Assistant! I'm powered by a powerful LLM API. Ask me about GaiaScript or request code examples like \"Write a CNN\" or \"Generate a GAN architecture\".");
                 
                 // Send button click
                 chatSendBtn.addEventListener('click', sendChatMessage);
@@ -622,15 +622,6 @@
                 
                 // Process user message and generate response
                 function processUserMessage(message) {
-                    // Simulate thinking
-                    setTimeout(() => {
-                        // Call API to get response (mocked for now)
-                        processWithLLM(message);
-                    }, 500);
-                }
-                
-                // Call LLM API to process user message
-                async function processWithLLM(message) {
                     // Show typing indicator
                     const typingIndicator = document.createElement('div');
                     typingIndicator.className = 'chat-message assistant-message';
@@ -639,8 +630,16 @@
                     chatMessages.appendChild(typingIndicator);
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                     
+                    // Call the LLM API
+                    processWithLLM(message);
+                }
+                
+                // Call LLM API to process user message
+                async function processWithLLM(message) {
                     try {
-                        // Try to call LLM API
+                        console.log("Calling chat API with message:", message);
+                        
+                        // Call the API to get an AI-generated response
                         const response = await fetch('/api/chat', {
                             method: 'POST',
                             headers: {
@@ -648,9 +647,12 @@
                             },
                             body: JSON.stringify({
                                 message: message,
-                                context: 'GaiaScript assistant helping with neural network architecture'
+                                context: 'You specialize in GaiaScript, a symbolic language for neural network architecture. Your responses should be concise and helpful, with code examples when appropriate. When showing code examples, use markdown code blocks with the language specified as "gaiascript". Always explain what the symbols mean when providing GaiaScript code.'
                             })
-                        }).catch(error => null); // Catch network errors
+                        }).catch(error => {
+                            console.error("Network error when calling API:", error);
+                            return null;
+                        });
                         
                         // Remove typing indicator
                         const indicator = document.getElementById('typing-indicator');
@@ -659,15 +661,28 @@
                         // If API call successful, use response
                         if (response && response.ok) {
                             const result = await response.json();
-                            handleLLMResponse(result.response, message);
-                            return;
+                            console.log("API response received:", result);
+                            
+                            // Handle API response
+                            if (result.response) {
+                                handleLLMResponse(result.response, message);
+                                
+                                // Log if this is from local fallback
+                                if (result.source === 'local') {
+                                    console.log("Using local fallback response (API unavailable)");
+                                } else {
+                                    console.log("Using LLM API response");
+                                }
+                                return;
+                            }
                         }
                         
-                        // If API call failed, fall back to local handling
+                        // If response parsing failed or API call failed, fall back to local handling
+                        console.warn("API call unsuccessful, falling back to local processing");
                         handleLocalResponse(message);
                         
                     } catch (error) {
-                        console.error("Error calling LLM API:", error);
+                        console.error("Error processing LLM response:", error);
                         
                         // Remove typing indicator
                         const indicator = document.getElementById('typing-indicator');
