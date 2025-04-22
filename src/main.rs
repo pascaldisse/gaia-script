@@ -11,10 +11,11 @@ fn main() {
     
     if args.len() < 2 {
         println!("Usage:");
-        println!("  cargo run -- parse <filename>   # Parse and display AST");
-        println!("  cargo run -- run <filename>     # Run GaiaScript program");
-        println!("  cargo run -- compile <filename> # Compile to JavaScript");
-        println!("  cargo run -- serve              # Start web server");
+        println!("  cargo run -- parse <filename>       # Parse and display AST");
+        println!("  cargo run -- run <filename>         # Run GaiaScript program");
+        println!("  cargo run -- compile <filename>     # Compile to JavaScript");
+        println!("  cargo run -- asm <filename> [arch]  # Compile to assembly (x86_64, arm64, wasm)");
+        println!("  cargo run -- serve                  # Start web server");
         return;
     }
     
@@ -42,6 +43,30 @@ fn main() {
             }
             
             compile_file(&args[2]);
+        },
+        "asm" => {
+            if args.len() < 3 {
+                println!("Error: Missing filename");
+                return;
+            }
+            
+            // Default to x86_64 if no architecture specified
+            let target = if args.len() >= 4 {
+                match args[3].as_str() {
+                    "x86_64" => gaiascript::asm_compiler::AsmTarget::X86_64,
+                    "arm64" => gaiascript::asm_compiler::AsmTarget::ARM64,
+                    "wasm" => gaiascript::asm_compiler::AsmTarget::WASM,
+                    _ => {
+                        println!("Error: Unknown architecture '{}'. Using x86_64.", args[3]);
+                        gaiascript::asm_compiler::AsmTarget::X86_64
+                    }
+                }
+            } else {
+                println!("No architecture specified, using x86_64");
+                gaiascript::asm_compiler::AsmTarget::X86_64
+            };
+            
+            compile_to_assembly(&args[2], target);
         },
         "serve" => {
             let port = if args.len() >= 3 {
@@ -305,6 +330,70 @@ fn compile_file(filename: &str) {
                 },
                 Err(e) => {
                     println!("Error writing JavaScript file: {}", e);
+                }
+            }
+        },
+        Err(e) => {
+            println!("Parse error: {}", e);
+        }
+    }
+}
+
+fn compile_to_assembly(filename: &str, target: gaiascript::asm_compiler::AsmTarget) {
+    let contents = match fs::read_to_string(filename) {
+        Ok(c) => c,
+        Err(e) => {
+            println!("Error reading file: {}", e);
+            return;
+        }
+    };
+    
+    match parser::parse(&contents) {
+        Ok(ast) => {
+            let target_name = match target {
+                gaiascript::asm_compiler::AsmTarget::X86_64 => "x86_64",
+                gaiascript::asm_compiler::AsmTarget::ARM64 => "arm64",
+                gaiascript::asm_compiler::AsmTarget::WASM => "wasm",
+            };
+            
+            println!("Compiling to {} assembly...", target_name);
+            
+            // Generate assembly output filename
+            let path = Path::new(filename);
+            let stem = path.file_stem().unwrap().to_str().unwrap();
+            let asm_extension = match target {
+                gaiascript::asm_compiler::AsmTarget::X86_64 => "s",
+                gaiascript::asm_compiler::AsmTarget::ARM64 => "s",
+                gaiascript::asm_compiler::AsmTarget::WASM => "wat",
+            };
+            let asm_filename = format!("{}_{}.{}", stem, target_name, asm_extension);
+            
+            // Compile AST to assembly
+            let asm_code = gaiascript::asm_compiler::compile_to_asm(&ast, target);
+            
+            // Write assembly to file
+            match fs::write(&asm_filename, asm_code) {
+                Ok(_) => {
+                    println!("Successfully compiled to {}", asm_filename);
+                    println!("Assembly code is ready to be assembled with appropriate tools.");
+                    
+                    match target {
+                        gaiascript::asm_compiler::AsmTarget::X86_64 => {
+                            println!("To assemble: nasm -f elf64 {} -o {}.o", asm_filename, stem);
+                            println!("To link: ld {}.o -o {}", stem, stem);
+                        },
+                        gaiascript::asm_compiler::AsmTarget::ARM64 => {
+                            println!("To assemble: as {} -o {}.o", asm_filename, stem);
+                            println!("To link: ld {}.o -o {}", stem, stem);
+                        },
+                        gaiascript::asm_compiler::AsmTarget::WASM => {
+                            println!("To convert to binary WebAssembly:");
+                            println!("wat2wasm {} -o {}.wasm", asm_filename, stem);
+                        },
+                    }
+                },
+                Err(e) => {
+                    println!("Error writing assembly file: {}", e);
                 }
             }
         },
