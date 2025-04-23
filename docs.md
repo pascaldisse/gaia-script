@@ -1,7 +1,4 @@
-D⟨O⟨
-w₅₀:T⟨DOCS⟩,
-ξ:N⟨1⟩
-⟩⟩
+D⟨O⟨w₅₀:T⟨DOCS⟩,ξ:N⟨1⟩⟩⟩
 
 N〈φ⊕γ⊕ψ⊕Λ⊕Ω〉
 φ:ℱ⟨D⊗w₂₉⊕L⟨w₀:w₁,w₂:w₃⟩⟩
@@ -46,22 +43,22 @@ L: G(Z)⊳D⟿BCE+λ‖∇D‖⟩
     special:O⟨ε:ε,Ω:Ω,δ:δ,Σ:Σ,μ:μ,σ:σ,∇:∇,∫:∫,ℱ:ℱ⟩
   ⟩,
   w₃₉:O⟨
-    lynx:O⟨
-      feat:L⟨↺×n,css,w₄₄,ρ⟩,
-      ex:T⟨
-import { Component } from '@lynx-ui/react';
-export default class App extends Component {
-  render() { return (<view><text>Hello, Lynx!</text></view>); }
+    λ₁:O⟨
+      feat:L⟨↺×n,η₁,w₄₄,ρ⟩,
+      ex:ω₁⟨
+Ψ{w₄₄}⊗'@λ₁-ui/r';
+Ψ.Δw₃₅ π₁⊗w₄₄{
+  ρ₂(){π₂(<ξ₁><ξ₂>ω₂, λ₁!</ξ₂></ξ₁>);}
 }⟩
     ⟩,
-    llvm:O⟨
+    λ₂:O⟨
       pipe:L⟨§→φ→⟦→≡→ρ→α⟩,
       key:O⟨β:α₁β₁,gen:≡,opt:ρ₁,out:α₂⟩,
       tools:O⟨α₃:σ₁,β₁:α₄⟩
     ⟩,
     api:O⟨
-      url:T⟨http://localhost:5000/api⟩,
-      auth:T⟨Bearer TOKEN⟩,
+      url:ω₁⟨http://localhost:5000/api⟩,
+      auth:ω₁⟨Bearer TOKEN⟩,
       endpoints:L⟨
         GET /llm/health,
         GET /llm/models,
@@ -86,3 +83,16 @@ export default class App extends Component {
     s₁₀⊗w₃₀₁
   ⟩
 ⟩
+
+D⟨O⟨
+  Ψ:w₂₆.w₃₆,
+  π₁:w₃₆.w₃₂,
+  π₂:π₁,
+  ω₁:T,
+  ω₂:ω₁⟨Hello⟩,
+  ξ₁:ω₁⟨view⟩,
+  ξ₂:ω₁⟨text⟩,
+  η₁:ω₁⟨css⟩,
+  λ₁:ω₁⟨lynx⟩,
+  ρ₂:ω₁⟨render⟩
+⟩⟩
