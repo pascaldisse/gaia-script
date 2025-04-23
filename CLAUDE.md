@@ -1,59 +1,3 @@
-# GaiaScript Project Guidelines
-
-## Build and Execution
-- `cargo build` - Build the project
-- `cargo check` - Check for errors without building
-- `cargo run -- run examples/cnn.gaia` - Run a GaiaScript program
-- `cargo run -- parse examples/cnn.gaia` - Parse and print the AST
-- `cargo run -- serve` - Start the web server for the MorphSphere game
-- `cargo run -- compile examples/minimal.gaia --target lynx` - Compile to LynxJS
-- `cargo run -- compile examples/minimal.gaia --target react` - Compile to React
-- `cargo run -- compile examples/minimal.gaia --target flutter` - Compile to Flutter
-- `cargo run -- compile examples/minimal.gaia --target kotlin` - Compile to Kotlin
-- `cargo clippy` - Run the Rust linter
-- `cargo test` - Run all tests
-- `cargo test -- interpreter::tests::test_layer_interpretation` - Run specific test
-- `cargo doc --open` - Generate and view documentation
-- `cargo build --release` - Build optimized release version
-
-## Code Style Guidelines
-- **Imports**: Group by: 1) Rust standard library 2) External crates 3) Project modules
-- **Formatting**: 4-space indentation, 100 char line limit
-- **Types**: 
-  - AST nodes in ast.rs
-  - Symbol definitions in aopl.pest
-  - Interpreter components in interpreter.rs
-  - Compiler implementations in compilers/ directory
-- **Naming**: 
-  - PascalCase for types/enums
-  - snake_case for functions/variables
-  - UPPER_SNAKE_CASE for constants
-- **Error Handling**: Use Result with specific error types; include context in error messages
-- **Documentation**: Add doc comments (///) for public functions and types
-
-## Language Implementation
-- Symbol definitions in aopl.pest
-- Core AST types in ast.rs
-- Implementation of operations in interpreter.rs
-- Multiple compiler backends in compilers/ directory
-- LLVM native code generation in llvm_compiler.rs
-- Web implementation in web_server.rs and web/ directory
-- Always validate network structure before execution
-
-## GaiaScript Language Concepts
-- **Network (N)**: Main container for GaiaScript programs
-- **Components (γ, φ, δ, α)**: Specialized sections for UI, Game, Neural Network, Assets
-- **Layers**: Neural network layers (C₁, D₁, P, F, etc.)
-- **Flow Control**: Arrows (→) indicate data flow between operations
-- **Symbolic Notation**: Uses Unicode symbols for operations and components
-- **UI Components**: Canvas (∮), Panel (П), Grid (⊞), Button (⌘), Label (⌑)
-- **3D Components**: World (⦿), Camera (⌖), Renderer (⟲), Mesh (⊿), Material (◐), Light (☀)
-
-## MorphSphere Game
-- Web-based 3D environment built on GaiaScript
-- Run with `cargo run -- serve` and open http://localhost:8080
-- JavaScript/Three.js frontend in web/ directory
-
 # GaiaScript Interpreter Guidelines for Claude
 
 ## Overview
@@ -150,6 +94,83 @@ N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S
 | `∇` | Gradient | Direction vector |
 | `∫` | Integration | Combination |
 | `ℱ` | Format | Structure specification |
+
+## Word Mappings
+To enable more compact communication, use these word encodings:
+| Code | Word |
+|------|------|
+| w₀ | the |
+| w₁ | is |
+| w₂ | of |
+| w₃ | and |
+| w₄ | you |
+| w₅ | to |
+| w₆ | a |
+| w₇ | in |
+| w₈ | that |
+| w₉ | it |
+| w₁₀ | for |
+| w₁₁ | be |
+| w₁₂ | with |
+| w₁₃ | as |
+| w₁₄ | this |
+| w₁₅ | have |
+| w₁₆ | from |
+| w₁₇ | or |
+| w₁₈ | by |
+| w₁₉ | not |
+| w₂₀ | on |
+| w₂₁ | can |
+| w₂₂ | will |
+| w₂₃ | use |
+| w₂₄ | are |
+| w₂₅ | code |
+| w₂₆ | add |
+| w₂₇ | file |
+| w₂₈ | function |
+| w₂₉ | data |
+| w₃₀ | module |
+| w₃₁ | system |
+| w₃₂ | type |
+| w₃₃ | value |
+| w₃₄ | object |
+| w₃₅ | class |
+| w₃₆ | input |
+| w₃₇ | output |
+| w₃₈ | node |
+| w₃₉ | compile |
+| w₄₀ | process |
+| w₄₁ | network |
+| w₄₂ | generator |
+| w₄₃ | interface |
+| w₄₄ | component |
+| w₄₅ | layer |
+| w₄₆ | operation |
+| w₄₇ | transform |
+| w₄₈ | optimize |
+| w₄₉ | integrate |
+| w₅₀ | implement |
+
+## Sentence Fragments
+Common phrases can be further compressed using these encodings:
+| Code | Phrase |
+|------|--------|
+| s₀ | The system is running |
+| s₁ | Please provide more information |
+| s₂ | Operation completed successfully |
+| s₃ | Error in processing request |
+| s₄ | Implementing the function |
+| s₅ | Optimizing for performance |
+| s₆ | Compiling to target platform |
+| s₇ | Adding new component to system |
+| s₈ | Transforming input data |
+| s₉ | Creating neural network layer |
+| s₁₀ | Generating output code |
+| s₁₁ | Processing complete |
+| s₁₂ | Loading configuration file |
+| s₁₃ | Saving current state |
+| s₁₄ | Initializing system components |
+| s₁₅ | Executing operation |
 
 ## Important
 Never respond with "I'll help you with..." or other introductions. 

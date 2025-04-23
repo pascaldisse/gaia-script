@@ -1,30 +1,29 @@
 D⟨O⟨
-T⟨DOCS⟩:N⟨1⟩,
-G:N⟨2⟩,
-S:N⟨3⟩
+w₅₀:T⟨DOCS⟩,
+ξ:N⟨1⟩
 ⟩⟩
 
 N〈φ⊕γ⊕ψ⊕Λ⊕Ω〉
-φ:ℱ⟨D⊗docs⊕L⟨w₀:w₁,w₂:w₃⟩⟩
+φ:ℱ⟨D⊗w₂₉⊕L⟨w₀:w₁,w₂:w₃⟩⟩
 γ:O⟨
-  intro:T⟨Ultra-compact symbolic language→neural nets+UI+3D⟩,
+  intro:T⟨w₅₀-w₄₀⊗σ→w₄₁+UI+3D⟩,
   core:L⟨
-    Extreme Terseness→symbolic notation,
-    Single File→compact application,
-    Symbolic Representation→math+special symbols,
-    Cross-Domain→UI+3D+neural
+    σ→w₄₇,
+    1⊗w₂₇→w₄₄,
+    σ↔⟨w₃₈,w₃₂⟩,
+    Δ→⟨w₄₃,w₃₁⟩
   ⟩
 ⟩
 ψ:O⟨
   syntax:T⟨N〈γ⊕φ⊕δ⊕α〉γ:H→∮800×600→П→⊞3×3→[(⌘"▶"⌘click→φ.①),(⌘"↺"⌘click→φ.⓪),(⌑"§"⇄φ.ς)]⟩,
-  net:O⟨N:network,〈...〉:grouping,⊕:composition⟩,
-  input:O⟨T:text,I:image,S:sequence,Z:latent/random⟩,
-  layers:O⟨
-    C₁:conv,D₁:dense,P:pool,F:flatten,
-    U:upsample,L:lstm,H:attention,R:reshape,A:attn-mech
+  w₄₁:O⟨N:w₄₁,〈...〉:w₃₈₁,⊕:∫⟩,
+  w₃₆:O⟨T:w₂₉₁,I:w₃₁₁,S:w₃₂₂,Z:w₃₄₂⟩,
+  w₄₅:O⟨
+    C₁:C₁,D₁:D₁,P:P,F:F,
+    U:U,L:L,H:H,R:R,A:A
   ⟩,
-  activ:O⟨ρ:relu,σ:sigmoid,τ:tanh,S:softmax⟩,
-  flow:O⟨→:dataflow,⊳:output,⟿:loss,[...]:block,×n:repeat⟩
+  activ:O⟨ρ:ρ,σ:σ,τ:τ,S:S⟩,
+  w₄₆:O⟨→:→,⊳:⊳,⟿:⟿,[...]:[ ],×n:×n⟩
 ⟩
 Λ:O⟨
   nn:O⟨
@@ -34,21 +33,21 @@ G: Z 100 → U 4×4×512 → [U 2× → C 256 ρ]×2 → C 3 τ
 D: I → [C 64 5 ρ → P 2]×3 → F → D₁ 1024 ρ → D₀ 1 σ
 L: G(Z)⊳D⟿BCE+λ‖∇D‖⟩
   ⟩,
-  ui:O⟨∮:canvas,П:panel,⊞:layout,⌘:button,⌑:label⟩,
-  3d:O⟨⦿:world,⌖:camera,⟲:renderer,☀:light,⊿:mesh,⍉:texture,◐:material,⌼:shader,⊛:scene,⊠:skybox⟩,
-  event:O⟨⌘click→:handler,⇄:binding⟩
+  ui:O⟨∮:∮,П:П,⊞:⊞,⌘:⌘,⌑:⌑⟩,
+  3d:O⟨⦿:⦿,⌖:⌖,⟲:⟲,☀:☀,⊿:⊿,⍉:⍉,◐:◐,⌼:⌼,⊛:⊛,⊠:⊠⟩,
+  event:O⟨⌘click→:⌘.c→,⇄:⇄⟩
 ⟩
 Ω:O⟨
   ext:O⟨
-    query:O⟨Q⟨...⟩:question,R⟨...⟩:request,D⟨...⟩:definition⟩,
-    data:O⟨T⟨...⟩:text,N⟨...⟩:number,B⟨...⟩:boolean,L⟨...⟩:list,O⟨...⟩:object⟩,
-    ops:O⟨⊕:concat,⊗:transform,→:flow,λ:function,∀:universal,∃:existential,∈:member,⊆:subset,⊂:proper⟩,
-    ctrl:O⟨[...]×n:repeat,(...)|...:condition,{...}:block⟩,
-    special:O⟨ε:empty,Ω:complete,δ:diff,Σ:sum,μ:mean,σ:stddev,∇:gradient,∫:integrate,ℱ:format⟩
+    query:O⟨Q⟨...⟩:Q,R⟨...⟩:R,D⟨...⟩:D⟩,
+    w₂₉:O⟨T⟨...⟩:T,N⟨...⟩:N,B⟨...⟩:B,L⟨...⟩:L,O⟨...⟩:O⟩,
+    ops:O⟨⊕:⊕,⊗:⊗,→:→,λ:λ,∀:∀,∃:∃,∈:∈,⊆:⊆,⊂:⊂⟩,
+    ctrl:O⟨[...]×n:[×n],(...)|...:|,{...}:{}⟩,
+    special:O⟨ε:ε,Ω:Ω,δ:δ,Σ:Σ,μ:μ,σ:σ,∇:∇,∫:∫,ℱ:ℱ⟩
   ⟩,
-  comp:O⟨
+  w₃₉:O⟨
     lynx:O⟨
-      feat:L⟨multi-thread,css,components,native-perf⟩,
+      feat:L⟨↺×n,css,w₄₄,ρ⟩,
       ex:T⟨
 import { Component } from '@lynx-ui/react';
 export default class App extends Component {
@@ -56,9 +55,9 @@ export default class App extends Component {
 }⟩
     ⟩,
     llvm:O⟨
-      pipe:L⟨src→Parser→AST→IR→opt→native⟩,
-      key:O⟨triple:aarch64-darwin,gen:IR,opt:passes,out:machine⟩,
-      tools:O⟨inkwell:safe-wrapper,target:arm64⟩
+      pipe:L⟨§→φ→⟦→≡→ρ→α⟩,
+      key:O⟨β:α₁β₁,gen:≡,opt:ρ₁,out:α₂⟩,
+      tools:O⟨α₃:σ₁,β₁:α₄⟩
     ⟩,
     api:O⟨
       url:T⟨http://localhost:5000/api⟩,
@@ -73,17 +72,17 @@ export default class App extends Component {
     ⟩
   ⟩,
   run:L⟨
-    cargo build,
-    cargo run -- run examples/cnn.gaia,
-    cargo run -- parse examples/cnn.gaia,
-    cargo run -- serve,
-    cargo run -- target examples/minimal.gaia lynx,
-    cargo run -- llvm examples/minimal.gaia output
+    s₁₄⊗λ,
+    s₁₅⊗Λ₁,
+    s₁₅⊗Λ₂,
+    s₁₅⊗Λ₃,
+    s₆⊗λ→Λ₄,
+    s₆⊗λ→Λ₅
   ⟩,
   ext:L⟨
-    Add symbols (aopl.pest),
-    Implement AST nodes (ast.rs),
-    Support operations (interpreter.rs),
-    Add code generation (compiler modules)
+    s₇⊗w₄₅₁,
+    s₄⊗w₃₈₂,
+    s₈⊗w₄₆₁,
+    s₁₀⊗w₃₀₁
   ⟩
 ⟩
