@@ -5,17 +5,24 @@ use std::net::TcpListener;
 
 use gaiascript::parser;
 use gaiascript::interpreter::Interpreter;
+use gaiascript::compiler::JsCompiler;
+use gaiascript::compilers::kotlin_compiler::KotlinCompiler;
+use gaiascript::compilers::react_compiler::ReactCompiler;
+use gaiascript::compilers::flutter_compiler::FlutterCompiler;
+use gaiascript::compilers::lynx_compiler::LynxCompiler;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
     
     if args.len() < 2 {
         println!("Usage:");
-        println!("  cargo run -- parse <filename>       # Parse and display AST");
-        println!("  cargo run -- run <filename>         # Run GaiaScript program");
-        println!("  cargo run -- compile <filename>     # Compile to JavaScript");
-        println!("  cargo run -- asm <filename> [arch]  # Compile to assembly (x86_64, arm64, wasm)");
-        println!("  cargo run -- serve                  # Start web server");
+        println!("  cargo run -- parse <filename>          # Parse and display AST");
+        println!("  cargo run -- run <filename>            # Run GaiaScript program");
+        println!("  cargo run -- compile <filename>        # Compile to JavaScript");
+        println!("  cargo run -- target <filename> <plat>  # Compile to target platform");
+        println!("    Platforms: js, kotlin, react, flutter, lynx, wasm, x86_64, arm64");
+        println!("  cargo run -- asm <filename> [arch]     # Compile to assembly (x86_64, arm64, wasm)");
+        println!("  cargo run -- serve                     # Start web server");
         return;
     }
     
@@ -43,6 +50,18 @@ fn main() {
             }
             
             compile_file(&args[2]);
+        },
+        "target" => {
+            if args.len() < 4 {
+                println!("Error: Usage: target <filename> <platform>");
+                println!("Platforms: js, kotlin, react, flutter, lynx, wasm, x86_64, arm64");
+                return;
+            }
+            
+            let filename = &args[2];
+            let platform = &args[3];
+            
+            compile_to_target(filename, platform);
         },
         "asm" => {
             if args.len() < 3 {
@@ -405,93 +424,111 @@ fn compile_to_assembly(filename: &str, target: gaiascript::asm_compiler::AsmTarg
 
 // Very simple JS compilation - in a real implementation, this would be more sophisticated
 fn compile_to_js(ast: &gaiascript::ast::ASTNode) -> String {
-    let mut js = String::new();
+    let mut compiler = JsCompiler::new();
+    match compiler.compile(ast) {
+        Ok(js) => js,
+        Err(e) => format!("// Compilation error: {}\nconsole.error('Compilation error: {}');", e, e)
+    }
+}
+
+fn compile_to_target(filename: &str, platform: &str) {
+    let contents = match fs::read_to_string(filename) {
+        Ok(c) => c,
+        Err(e) => {
+            println!("Error reading file: {}", e);
+            return;
+        }
+    };
     
-    js.push_str("// Generated from GaiaScript\n\n");
-    js.push_str("class GaiaModel {\n");
-    js.push_str("    constructor() {\n");
-    js.push_str("        this.layers = [];\n");
-    js.push_str("        this.components = {};\n");
-    js.push_str("    }\n\n");
-    
-    js.push_str("    addLayer(type, config) {\n");
-    js.push_str("        this.layers.push({ type, config });\n");
-    js.push_str("        return this;\n");
-    js.push_str("    }\n\n");
-    
-    js.push_str("    addComponent(name, model) {\n");
-    js.push_str("        this.components[name] = model;\n");
-    js.push_str("        return this;\n");
-    js.push_str("    }\n\n");
-    
-    js.push_str("    execute(input) {\n");
-    js.push_str("        console.log('Executing model with input:', input);\n");
-    js.push_str("        return { output: 'GaiaScript model output' };\n");
-    js.push_str("    }\n");
-    js.push_str("}\n\n");
-    
-    // Basic visualization function for 3D rendering
-    js.push_str("function visualizeModel(model, container) {\n");
-    js.push_str("    // Create THREE.js visualization\n");
-    js.push_str("    const scene = new THREE.Scene();\n");
-    js.push_str("    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);\n");
-    js.push_str("    const renderer = new THREE.WebGLRenderer();\n");
-    js.push_str("    renderer.setSize(container.clientWidth, container.clientHeight);\n");
-    js.push_str("    container.appendChild(renderer.domElement);\n\n");
-    
-    js.push_str("    // Create network visualization\n");
-    js.push_str("    let y = 0;\n");
-    js.push_str("    const nodes = [];\n\n");
-    
-    js.push_str("    model.layers.forEach((layer, i) => {\n");
-    js.push_str("        const geometry = new THREE.SphereGeometry(0.5, 32, 32);\n");
-    js.push_str("        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });\n");
-    js.push_str("        const node = new THREE.Mesh(geometry, material);\n");
-    js.push_str("        node.position.set(0, y, 0);\n");
-    js.push_str("        scene.add(node);\n");
-    js.push_str("        nodes.push(node);\n");
-    js.push_str("        y -= 2;\n");
-    js.push_str("    });\n\n");
-    
-    js.push_str("    camera.position.z = 5;\n\n");
-    
-    js.push_str("    function animate() {\n");
-    js.push_str("        requestAnimationFrame(animate);\n");
-    js.push_str("        nodes.forEach(node => { node.rotation.x += 0.01; node.rotation.y += 0.01; });\n");
-    js.push_str("        renderer.render(scene, camera);\n");
-    js.push_str("    }\n\n");
-    
-    js.push_str("    animate();\n");
-    js.push_str("}\n\n");
-    
-    // Create model instance
-    js.push_str("const model = new GaiaModel();\n\n");
-    
-    match ast {
-        gaiascript::ast::ASTNode::Network(network) => {
-            // Add components from the AST
-            js.push_str("// Network components\n");
+    match parser::parse(&contents) {
+        Ok(ast) => {
+            println!("Compiling to {} ...", platform);
             
-            // For simplicity, we'll add placeholders for components and layers
-            js.push_str("model.addLayer('input', { units: 32 });\n");
-            js.push_str("model.addLayer('dense', { units: 64, activation: 'relu' });\n");
-            js.push_str("model.addLayer('output', { units: 10, activation: 'softmax' });\n\n");
+            // Generate output filename
+            let path = Path::new(filename);
+            let stem = path.file_stem().unwrap().to_str().unwrap();
             
-            js.push_str("// Expose the model\n");
-            js.push_str("window.gaiaModel = model;\n\n");
+            let (output_code, extension) = match platform {
+                "js" => {
+                    let mut compiler = JsCompiler::new();
+                    match compiler.compile(&ast) {
+                        Ok(code) => (code, "js".to_string()),
+                        Err(e) => {
+                            println!("Compilation error: {}", e);
+                            return;
+                        }
+                    }
+                },
+                "kotlin" => {
+                    let mut compiler = KotlinCompiler::new();
+                    match compiler.compile(&ast) {
+                        Ok(code) => (code, "kt".to_string()),
+                        Err(e) => {
+                            println!("Compilation error: {}", e);
+                            return;
+                        }
+                    }
+                },
+                "react" => {
+                    let mut compiler = ReactCompiler::new();
+                    match compiler.compile(&ast) {
+                        Ok(code) => (code, "jsx".to_string()),
+                        Err(e) => {
+                            println!("Compilation error: {}", e);
+                            return;
+                        }
+                    }
+                },
+                "flutter" => {
+                    let mut compiler = FlutterCompiler::new();
+                    match compiler.compile(&ast) {
+                        Ok(code) => (code, "dart".to_string()),
+                        Err(e) => {
+                            println!("Compilation error: {}", e);
+                            return;
+                        }
+                    }
+                },
+                "lynx" => {
+                    let mut compiler = LynxCompiler::new();
+                    match compiler.compile(&ast) {
+                        Ok(code) => (code, "tsx".to_string()),
+                        Err(e) => {
+                            println!("Compilation error: {}", e);
+                            return;
+                        }
+                    }
+                },
+                "wasm" => {
+                    (gaiascript::asm_compiler::compile_to_asm(&ast, gaiascript::asm_compiler::AsmTarget::WASM), "wat".to_string())
+                },
+                "x86_64" => {
+                    (gaiascript::asm_compiler::compile_to_asm(&ast, gaiascript::asm_compiler::AsmTarget::X86_64), "s".to_string())
+                },
+                "arm64" => {
+                    (gaiascript::asm_compiler::compile_to_asm(&ast, gaiascript::asm_compiler::AsmTarget::ARM64), "s".to_string())
+                },
+                _ => {
+                    println!("Unknown platform: {}", platform);
+                    println!("Supported platforms: js, kotlin, react, flutter, lynx, wasm, x86_64, arm64");
+                    return;
+                }
+            };
             
-            js.push_str("// Auto-visualize when placed in a container\n");
-            js.push_str("document.addEventListener('DOMContentLoaded', () => {\n");
-            js.push_str("    const container = document.getElementById('gaia-container');\n");
-            js.push_str("    if (container) {\n");
-            js.push_str("        visualizeModel(model, container);\n");
-            js.push_str("    }\n");
-            js.push_str("});\n");
+            let output_filename = format!("{}_{}.{}", stem, platform, extension);
+            
+            // Write to file
+            match fs::write(&output_filename, output_code) {
+                Ok(_) => {
+                    println!("Successfully compiled to {}", output_filename);
+                },
+                Err(e) => {
+                    println!("Error writing file: {}", e);
+                }
+            }
         },
-        _ => {
-            js.push_str("console.error('Invalid AST: expected network');\n");
+        Err(e) => {
+            println!("Parse error: {}", e);
         }
     }
-    
-    js
 }

@@ -8,6 +8,12 @@ pub mod extensions {
     pub mod ui_extensions;
     pub mod three_extensions;
 }
+pub mod compilers {
+    pub mod kotlin_compiler;
+    pub mod react_compiler;
+    pub mod flutter_compiler;
+    pub mod lynx_compiler;
+}
 
 #[cfg(test)]
 mod tests {
