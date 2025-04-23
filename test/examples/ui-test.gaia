@@ -1,0 +1,40 @@
+R⟨λ⟨test⟩⟨
+  D⟨O⟨name:T⟨ui_button_render⟩,
+     type:T⟨ui_test⟩,
+     input:T⟨υ〈§⊕γ⊕δ⊕α〉 
+          γ:⟨{ϖ,ϖł,ϱ}⟩→∮⌗≡×⊧≡→П→⊞⋰×⋰→[
+            (⌘"▶"⌘ω→φ.①),
+            (⌘"↺"⌘ω→φ.⓪),
+            (⌑"§"⇄φ.ς)
+          ]⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨ui_button_click⟩,
+     type:T⟨ui_test⟩,
+     input:T⟨υ〈§⊕γ⊕δ⊕α〉 
+          γ:⟨{ϖ,ϖł,ϱ}⟩→∮⌗≡×⊧≡→П→⊞⋰×⋰→[
+            (⌘"▶"⌘ω→φ.①),
+            (⌘"↺"⌘ω→φ.⓪),
+            (⌑"§"⇄φ.ς)
+          ]⟩,
+     element:T⟨button.play⟩,
+     action:T⟨click⟩,
+     expect:T⟨s₂⟩⟩⟩
+
+  D⟨O⟨name:T⟨ui_text_input⟩,
+     type:T⟨ui_test⟩,
+     input:T⟨υ〈§⊕γ⊕δ⊕α〉 
+          δ:⟨{ϖ:⟨ℵ:⊹⟩,
+             ϖł:⟨ϕ:⟨ρ:⋮⊹ξ,λ:ς,δ:φ,φΔ:ϕ⟩,
+                ξ:⟨χ:#fff,β:#336,μ:⌓ξ,ω:⋱⊹ξ,ζ:⋱ξ,ξς:⊿⌗ξ⟩,
+                ϑ:⟨ξς:⋮⋱ξ,χ:#222,μ:⊿⊹ξ,ξβ:β⟩⟩,
+             ϱ:⟨П→⊞⋰×⊿→[
+               (⌘"Ⅰ"⌘ω→ℵ⊝),
+               (⌑"ℵ:${ℵ}"⇄ℵ),
+               (⌘"⊿"⌘ω→ℵ⊕)
+             ]⟩}⟩⟩,
+     element:T⟨input⟩,
+     action:T⟨input⟩,
+     text:T⟨Test input⟩,
+     expect:T⟨Test input⟩⟩⟩
+⟩⟩

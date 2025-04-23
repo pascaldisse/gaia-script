@@ -1,73 +1,82 @@
-# GaiaScript: Ultra-Compact Symbolic Programming
+# GaiaScript
 
-GaiaScript is an ultra-compact symbolic programming language designed for maximum density and expressiveness. The entire application is contained in a single file with no whitespace or comments.
+GaiaScript is an ultra-compact symbolic language designed for minimal token usage in AI-to-AI communication.
 
-## Core Philosophy
+## Project Structure
 
-- **Extreme Terseness**: Uses symbolic notation for maximum information density
-- **Single File**: Entire application (UI, 3D, neural networks) in one file
-- **Symbolic Representation**: Uses mathematical and special symbols for all operations
-- **Cross-Domain**: Unifies UI, 3D graphics, and neural networks in one language
+The project is organized into main directories:
 
-## The File
+- **docs/** - Documentation and examples
+- **comp/** - Compiler components
+- **build/** - Build artifacts
+- **test/** - Testing environment
 
-Everything is contained in `main.gaia`:
+## Features
+
+- Symbolic notation for neural networks
+- Compact representation of complex architectures
+- Support for CNNs, GANs, Transformers, and more
+- Multiple compiler targets:
+  - JavaScript/Web
+  - React and Flutter for mobile/web
+  - Native macOS applications
+  - WebAssembly (WASM)
+  - Native code via LLVM
+  - Assembly (x86_64, arm64)
+
+## Getting Started
+
+See the [documentation](docs/README.md) for more details on using GaiaScript.
+
+## Example
+
+Here's a simple CNN in GaiaScript notation:
 
 ```
-N〈γ⊕φ⊕δ⊕α〉γ:H→∮800×600→П→⊞3×3→[(⌘"▶"⌘click→φ.①),(⌘"↺"⌘click→φ.⓪),(⌑"§"⇄φ.ς)]φ:⦿→⌖→[T10→L20→P→D32→τ]×3→⟲60δ:I224×224×3→C₁32→P→C₂64→P→F→D₁128→D₂64→D₀10→Sα:⊿→⍉→◐→⌼→☀→⊠→⊛
+N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S
 ```
 
-This 89-character file implements:
+## Building
 
-- UI Components (γ): Panel, Buttons, Layout, Canvas, Labels
-- Game Engine (φ): 3D World, Camera, Neural Network Controller
-- Neural Network (δ): Convolutional layers, Dense layers, Softmax
-- Assets (α): 3D models, textures, materials, shaders
+To compile GaiaScript:
 
-## Running the App
+```
+node comp/build.js
+```
 
-1. Start the GaiaScript compiler: `cargo run -- serve`
-2. Open a browser to http://localhost:8080/unified/
-3. The symbolic language is compiled and executed at runtime
+## Testing Environment
 
-## Working with Symbols
+GaiaScript includes a comprehensive testing environment optimized for:
 
-| Component | Symbol |
-|-----------|--------|
-| UI        | γ      |
-| Game      | φ      |
-| Data      | δ      |
-| Assets    | α      |
-| Canvas    | ∮      |
-| Panel     | П      |
-| Grid      | ⊞      |
-| Button    | ⌘      |
-| Label     | ⌑      |
-| 3D World  | ⦿      |
-| Camera    | ⌖      |
-| Renderer  | ⟲      |
-| Event     | ⌘click→|
-| Binding   | ⇄      |
+- AI-to-AI communication
+- Evolutionary development
+- UI interaction and testing
+- Test-driven development (TDD)
+- Automated error correction
 
-## Prerequisites
+The testing environment provides:
 
-- Rust (latest stable version)
-- Web browser with JavaScript enabled
+- Fast parsing and execution of GaiaScript code
+- AI-driven code mutation strategies
+- UI rendering and interaction testing
+- Evolution through genetic algorithms
+- Comprehensive test suite for all GaiaScript features
 
-## Installation
+See the [test environment documentation](docs/test-environment.md) for details.
+
+### Running Tests
 
 ```bash
-git clone https://github.com/yourusername/gaiascript.git
-cd gaiascript
-cargo build --release
+cd test
+npm install
+node run.js test --file=examples/basic-tests.gaia
 ```
 
-## Extending the Language
+### Visualizing Results
 
-The compiler can be extended with new symbols by modifying:
-- `src/aopl.pest` - Grammar definitions
-- `src/extensions/` - Implementation of new components
+A web-based dashboard is available to visualize test results:
 
-## License
-
-MIT
+```bash
+cd test/dashboard
+# Open index.html in your browser
+```

@@ -1,0 +1,39 @@
+R⟨λ⟨test⟩⟨
+  D⟨O⟨name:T⟨parameter_mutation⟩,
+     type:T⟨mutation_test⟩,
+     input:T⟨N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S⟩,
+     mutation_type:T⟨parameter⟩,
+     iterations:N⟨⊿⊹⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨layer_mutation⟩,
+     type:T⟨mutation_test⟩,
+     input:T⟨N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S⟩,
+     mutation_type:T⟨layer⟩,
+     iterations:N⟨⊿⊹⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨operator_mutation⟩,
+     type:T⟨mutation_test⟩,
+     input:T⟨N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S⟩,
+     mutation_type:T⟨operator⟩,
+     iterations:N⟨⋮⊹⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨structure_mutation⟩,
+     type:T⟨mutation_test⟩,
+     input:T⟨N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S⟩,
+     mutation_type:T⟨structure⟩,
+     iterations:N⟨⋮⊹⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨gan_mutation⟩,
+     type:T⟨mutation_test⟩,
+     input:T⟨Ğ〈G⊕D⊕L〉 
+           G:Z⊿≡→U⋰×⋰×⌓⊿⋮→[U⋮×→C⋮⌓⊧ρ]×⋮→C⋰τ 
+           D:I→[C⊧⋱⌓ρ→P⋮]×⋰→F→D₁⊿⊹⋮⋱ρ→D₀⊿σ 
+           L:G(Z)⊳D⟿BCE+λ‖∇D‖⟩,
+     mutation_type:T⟨operator⟩,
+     iterations:N⟨⊿⊹⟩,
+     expect:B⟨1⟩⟩⟩
+⟩⟩

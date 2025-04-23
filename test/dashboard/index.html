@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GaiaScript Test Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto px-4 py-8">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-800">GaiaScript Test Dashboard</h1>
+      <p class="text-gray-600">Visualize test results, evolution progress, and UI interactions</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <!-- Test Summary Card -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">Test Summary</h2>
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div class="bg-green-100 p-4 rounded-lg">
+            <div class="text-2xl font-bold text-green-600" id="passed-count">0</div>
+            <div class="text-sm text-gray-600">Passed</div>
+          </div>
+          <div class="bg-red-100 p-4 rounded-lg">
+            <div class="text-2xl font-bold text-red-600" id="failed-count">0</div>
+            <div class="text-sm text-gray-600">Failed</div>
+          </div>
+          <div class="bg-gray-100 p-4 rounded-lg">
+            <div class="text-2xl font-bold text-gray-600" id="skipped-count">0</div>
+            <div class="text-sm text-gray-600">Skipped</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evolution Progress Card -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">Evolution Progress</h2>
+        <div class="h-40">
+          <canvas id="evolution-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Performance Metrics Card -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">Performance Metrics</h2>
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-sm font-medium text-gray-700">Parse Time</span>
+              <span class="text-sm font-medium text-gray-700" id="parse-time">0 ms</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-blue-600 h-2 rounded-full" style="width: 0%" id="parse-bar"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-sm font-medium text-gray-700">Execution Time</span>
+              <span class="text-sm font-medium text-gray-700" id="exec-time">0 ms</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-purple-600 h-2 rounded-full" style="width: 0%" id="exec-bar"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="text-sm font-medium text-gray-700">UI Render Time</span>
+              <span class="text-sm font-medium text-gray-700" id="ui-time">0 ms</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-green-600 h-2 rounded-full" style="width: 0%" id="ui-bar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <!-- Test Details Table -->
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-xl font-semibold">Test Details</h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200" id="test-table-body">
+              <!-- Test results will be inserted here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Logs Panel -->
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-xl font-semibold">Logs</h2>
+        </div>
+        <div class="p-6 bg-gray-800 text-gray-200 font-mono text-sm h-80 overflow-y-auto" id="logs-container">
+          <!-- Logs will be inserted here -->
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-xl font-semibold">UI Preview</h2>
+      </div>
+      <div class="p-6">
+        <div class="border border-gray-300 rounded-lg p-4 bg-white min-h-40" id="ui-preview">
+          <!-- UI preview will be inserted here -->
+          <div class="flex items-center justify-center h-40 text-gray-400">
+            No UI rendered yet
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-xl font-semibold">Mutation & Evolution</h2>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Original Code -->
+          <div>
+            <h3 class="text-lg font-medium mb-2">Original Code</h3>
+            <pre class="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto" id="original-code">N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S</pre>
+          </div>
+          
+          <!-- Evolved Code -->
+          <div>
+            <h3 class="text-lg font-medium mb-2">Evolved Code</h3>
+            <pre class="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto" id="evolved-code">N I → C₁ 64 5 ρ → P 2 → F → D₁ 256 ρ → D₀ 10 → S</pre>
+          </div>
+        </div>
+
+        <!-- Evolution Controls -->
+        <div class="mt-6 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
+          <div class="flex items-center space-x-4">
+            <button id="run-evolution" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              Run Evolution
+            </button>
+            <div class="flex items-center space-x-2">
+              <label for="generations" class="text-sm font-medium text-gray-700">Generations:</label>
+              <input type="number" id="generations" class="w-16 border border-gray-300 rounded-md px-2 py-1" value="10">
+            </div>
+          </div>
+          <div>
+            <span class="text-sm font-medium text-gray-700">Current Generation: <span id="current-gen">0</span>/<span id="total-gen">0</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample data for demonstration
+    const testResults = {
+      total: 10,
+      passed: 7,
+      failed: 2,
+      skipped: 1,
+      tests: [
+        { name: 'parse_basic_network', type: 'parser_test', status: 'passed', duration: 0.5 },
+        { name: 'parse_gan_network', type: 'parser_test', status: 'passed', duration: 0.8 },
+        { name: 'parse_query', type: 'parser_test', status: 'passed', duration: 0.3 },
+        { name: 'runtime_basic_calculation', type: 'runtime_test', status: 'passed', duration: 1.2 },
+        { name: 'compile_network_to_js', type: 'compiler_test', status: 'passed', duration: 5.7 },
+        { name: 'ui_button_click', type: 'ui_test', status: 'failed', duration: 2.3, error: 'Element not found: button.play' },
+        { name: 'parameter_mutation', type: 'mutation_test', status: 'passed', duration: 1.5 },
+        { name: 'layer_mutation', type: 'mutation_test', status: 'passed', duration: 1.8 },
+        { name: 'operator_mutation', type: 'mutation_test', status: 'failed', duration: 2.1, error: 'Invalid operator: ⊗' },
+        { name: 'cnn_evolution', type: 'evolution_test', status: 'skipped', duration: 0 }
+      ]
+    };
+
+    const evolutionData = {
+      generations: [
+        { generation: 1, bestFitness: 0.3, avgFitness: 0.2 },
+        { generation: 2, bestFitness: 0.4, avgFitness: 0.25 },
+        { generation: 3, bestFitness: 0.45, avgFitness: 0.3 },
+        { generation: 4, bestFitness: 0.5, avgFitness: 0.35 },
+        { generation: 5, bestFitness: 0.6, avgFitness: 0.4 },
+        { generation: 6, bestFitness: 0.65, avgFitness: 0.45 },
+        { generation: 7, bestFitness: 0.7, avgFitness: 0.5 },
+        { generation: 8, bestFitness: 0.75, avgFitness: 0.55 },
+        { generation: 9, bestFitness: 0.8, avgFitness: 0.6 },
+        { generation: 10, bestFitness: 0.85, avgFitness: 0.65 }
+      ]
+    };
+
+    // Performance metrics
+    const performanceData = {
+      parseTime: 0.8,
+      execTime: 45.3,
+      uiTime: 12.6
+    };
+
+    // Sample logs
+    const logs = [
+      'D⟨O⟨type:T⟨log⟩,msg:T⟨Starting test: parse_basic_network⟩⟩⟩',
+      'D⟨O⟨type:T⟨log⟩,msg:T⟨Parsed input successfully⟩⟩⟩',
+      'D⟨O⟨type:T⟨log⟩,msg:T⟨Test completed in 0.50ms⟩⟩⟩',
+      'D⟨O⟨type:T⟨log⟩,msg:T⟨Starting test: ui_button_click⟩⟩⟩',
+      'D⟨O⟨type:T⟨ui⟩,action:T⟨render⟩,target:T⟨div#gaia-container⟩⟩⟩',
+      'D⟨O⟨type:T⟨error⟩,msg:T⟨Element not found: button.play⟩⟩⟩',
+      'D⟨O⟨type:T⟨log⟩,msg:T⟨Starting test: parameter_mutation⟩⟩⟩',
+      'D⟨O⟨type:T⟨log⟩,msg:T⟨Mutation applied: C₁ 32 3 ρ → C₁ 64 3 ρ⟩⟩⟩',
+      'D⟨O⟨type:T⟨log⟩,msg:T⟨Test completed in 1.50ms⟩⟩⟩'
+    ];
+
+    // Update test summary
+    document.getElementById('passed-count').textContent = testResults.passed;
+    document.getElementById('failed-count').textContent = testResults.failed;
+    document.getElementById('skipped-count').textContent = testResults.skipped;
+
+    // Update test table
+    const tableBody = document.getElementById('test-table-body');
+    testResults.tests.forEach(test => {
+      const row = document.createElement('tr');
+      
+      // Status color
+      let statusClass = '';
+      switch (test.status) {
+        case 'passed': statusClass = 'text-green-600'; break;
+        case 'failed': statusClass = 'text-red-600'; break;
+        case 'skipped': statusClass = 'text-gray-400'; break;
+      }
+      
+      row.innerHTML = `
+        <td class="px-6 py-4 whitespace-nowrap">${test.name}</td>
+        <td class="px-6 py-4 whitespace-nowrap">${test.type}</td>
+        <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-opacity-10 ${statusClass} bg-current">${test.status}</span></td>
+        <td class="px-6 py-4 whitespace-nowrap">${test.duration.toFixed(2)} ms</td>
+      `;
+      
+      tableBody.appendChild(row);
+    });
+
+    // Update logs
+    const logsContainer = document.getElementById('logs-container');
+    logs.forEach(log => {
+      const logElement = document.createElement('div');
+      
+      // Style based on log type
+      if (log.includes('type:T⟨error⟩')) {
+        logElement.className = 'text-red-400';
+      } else if (log.includes('type:T⟨ui⟩')) {
+        logElement.className = 'text-blue-400';
+      }
+      
+      logElement.textContent = log;
+      logsContainer.appendChild(logElement);
+    });
+
+    // Update performance metrics
+    document.getElementById('parse-time').textContent = `${performanceData.parseTime.toFixed(2)} ms`;
+    document.getElementById('exec-time').textContent = `${performanceData.execTime.toFixed(2)} ms`;
+    document.getElementById('ui-time').textContent = `${performanceData.uiTime.toFixed(2)} ms`;
+    
+    // Update progress bars
+    const parseBar = document.getElementById('parse-bar');
+    const execBar = document.getElementById('exec-bar');
+    const uiBar = document.getElementById('ui-bar');
+    
+    // Set widths based on percentages (max 100%)
+    parseBar.style.width = `${Math.min(performanceData.parseTime / 5 * 100, 100)}%`;
+    execBar.style.width = `${Math.min(performanceData.execTime / 100 * 100, 100)}%`;
+    uiBar.style.width = `${Math.min(performanceData.uiTime / 30 * 100, 100)}%`;
+
+    // Create evolution chart
+    const evolutionCtx = document.getElementById('evolution-chart').getContext('2d');
+    const evolutionChart = new Chart(evolutionCtx, {
+      type: 'line',
+      data: {
+        labels: evolutionData.generations.map(gen => `Gen ${gen.generation}`),
+        datasets: [
+          {
+            label: 'Best Fitness',
+            data: evolutionData.generations.map(gen => gen.bestFitness),
+            borderColor: 'rgb(34, 197, 94)',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            tension: 0.1
+          },
+          {
+            label: 'Average Fitness',
+            data: evolutionData.generations.map(gen => gen.avgFitness),
+            borderColor: 'rgb(59, 130, 246)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 1
+          }
+        }
+      }
+    });
+
+    // Set up evolution UI
+    document.getElementById('current-gen').textContent = evolutionData.generations.length;
+    document.getElementById('total-gen').textContent = evolutionData.generations.length;
+
+    // Run evolution button
+    document.getElementById('run-evolution').addEventListener('click', function() {
+      const generations = parseInt(document.getElementById('generations').value);
+      alert(`Starting evolution for ${generations} generations...`);
+      // In a real implementation, this would trigger the evolution process
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+R⟨λ⟨test⟩⟨
+  D⟨O⟨name:T⟨cnn_evolution⟩,
+     type:T⟨evolution_test⟩,
+     input:T⟨N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S⟩,
+     generations:N⟨⊿⊹⟩,
+     population:N⟨⋮⊹⟩,
+     fitness_target:N⟨⊹ᴧ⌗⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨gan_evolution⟩,
+     type:T⟨evolution_test⟩,
+     input:T⟨Ğ〈G⊕D⊕L〉 
+           G:Z⊿≡→U⋰×⋰×⌓⊿⋮→[U⋮×→C⋮⌓⊧ρ]×⋮→C⋰τ 
+           D:I→[C⊧⋱⌓ρ→P⋮]×⋰→F→D₁⊿⊹⋮⋱ρ→D₀⊿σ 
+           L:G(Z)⊳D⟿BCE+λ‖∇D‖⟩,
+     generations:N⟨⋰⊹⟩,
+     population:N⟨⋱⊹⟩,
+     fitness_target:N⟨⊹ᴧ⊧⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨transformer_evolution⟩,
+     type:T⟨evolution_test⟩,
+     input:T⟨Ŧ:T⇀E⌓⊿⋮+P→[H⌗A→N→F⋮⊹⋱⌗→D⊹ᴧ¹]×⊧→D₁⊿⊹⋮⋱R→D₀V→S⟩,
+     generations:N⟨⋱⊹⟩,
+     population:N⟨⋱⊹⟩,
+     fitness_target:N⟨⊹ᴧ⊧⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨ui_evolution⟩,
+     type:T⟨evolution_test⟩,
+     input:T⟨υ〈§⊕γ⊕δ⊕α〉 
+          γ:⟨{ϖ,ϖł,ϱ}⟩→∮⌗≡×⊧≡→П→⊞⋰×⋰→[
+            (⌘"▶"⌘ω→φ.①),
+            (⌘"↺"⌘ω→φ.⓪),
+            (⌑"§"⇄φ.ς)
+          ]⟩,
+     ui_tests:T⟨test/examples/ui-test.gaia⟩,
+     generations:N⟨⋮⊹⟩,
+     population:N⟨⋮⊹⟩,
+     fitness_target:N⟨⊹ᴧ⊧⟩,
+     expect:B⟨1⟩⟩⟩
+⟩⟩

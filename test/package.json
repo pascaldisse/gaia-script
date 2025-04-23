@@ -1,0 +1,34 @@
+{
+  "name": "gaiascript-test-environment",
+  "version": "1.0.0",
+  "description": "Testing environment for GaiaScript, optimized for AI-to-AI communication",
+  "main": "index.js",
+  "bin": {
+    "gaia-test": "./run.js"
+  },
+  "scripts": {
+    "test": "node run.js test --file=examples/basic-tests.gaia",
+    "parse": "node run.js parse",
+    "compile": "node run.js compile",
+    "execute": "node run.js execute",
+    "mutate": "node run.js mutate",
+    "evolve": "node run.js evolve",
+    "ui": "node run.js ui"
+  },
+  "keywords": [
+    "gaiascript",
+    "testing",
+    "AI",
+    "evolution",
+    "genetic",
+    "UI"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^20.5.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

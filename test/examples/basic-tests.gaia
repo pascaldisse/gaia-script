@@ -1,0 +1,48 @@
+R⟨λ⟨test⟩⟨
+  D⟨O⟨name:T⟨parse_basic_network⟩,
+     type:T⟨parser_test⟩,
+     input:T⟨N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨parse_gan_network⟩,
+     type:T⟨parser_test⟩,
+     input:T⟨Ğ〈G⊕D⊕L〉 G:Z⊿≡→U⋰×⋰×⌓⊿⋮→[U⋮×→C⋮⌓⊧ρ]×⋮→C⋰τ D:I→[C⊧⋱⌓ρ→P⋮]×⋰→F→D₁⊿⊹⋮⋱ρ→D₀⊿σ L:G(Z)⊳D⟿BCE+λ‖∇D‖⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨parse_query⟩,
+     type:T⟨parser_test⟩,
+     input:T⟨Q⟨T⟨w₄ w₂₁ w₂₃ ML w₁₀ N⟨⋱⟩ w₂₅ domains?⟩⟩⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨runtime_basic_calculation⟩,
+     type:T⟨runtime_test⟩,
+     input:T⟨R⟨λ⟨add⟩⟨N⟨⋮⟩+N⟨⋰⟩⟩⟩⟩,
+     output:T⟨N⟨⋱⟩⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨compile_network_to_js⟩,
+     type:T⟨compiler_test⟩,
+     input:T⟨N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S⟩,
+     target:T⟨js⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨ui_button_click⟩,
+     type:T⟨ui_test⟩,
+     input:T⟨υ〈§⊕γ⊕δ⊕α〉 γ:⟨{ϖ,ϖł,ϱ}⟩→∮⌗≡×⊧≡→П→⊞⋰×⋰→[(⌘"▶"⌘ω→φ.①),(⌘"↺"⌘ω→φ.⓪),(⌑"§"⇄φ.ς)]⟩,
+     element:T⟨button.play⟩,
+     action:T⟨click⟩,
+     expect:T⟨s₂⟩⟩⟩
+
+  D⟨O⟨name:T⟨mutation_test⟩,
+     type:T⟨mutation_test⟩,
+     input:T⟨N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S⟩,
+     mutation_type:T⟨parameter⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨evolution_test⟩,
+     type:T⟨evolution_test⟩,
+     input:T⟨N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S⟩,
+     generations:N⟨⊿⊹⟩,
+     fitness_target:N⟨⊹ᴧ⌗⟩,
+     expect:B⟨1⟩⟩⟩
+⟩⟩

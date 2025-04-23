@@ -1,0 +1,61 @@
+R⟨λ⟨test⟩⟨
+  D⟨O⟨name:T⟨full_pipeline_cnn⟩,
+     type:T⟨integration_test⟩,
+     input:T⟨N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S⟩,
+     steps:L⟨
+       O⟨type:T⟨parse⟩,expect:B⟨1⟩⟩,
+       O⟨type:T⟨execute⟩,expect:B⟨1⟩⟩,
+       O⟨type:T⟨compile⟩,target:T⟨js⟩,expect:B⟨1⟩⟩,
+       O⟨type:T⟨mutate⟩,mutation_type:T⟨parameter⟩,expect:B⟨1⟩⟩
+     ⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨full_pipeline_ui⟩,
+     type:T⟨integration_test⟩,
+     input:T⟨υ〈§⊕γ⊕δ⊕α〉 
+          γ:⟨{ϖ,ϖł,ϱ}⟩→∮⌗≡×⊧≡→П→⊞⋰×⋰→[
+            (⌘"▶"⌘ω→φ.①),
+            (⌘"↺"⌘ω→φ.⓪),
+            (⌑"§"⇄φ.ς)
+          ]⟩,
+     steps:L⟨
+       O⟨type:T⟨parse⟩,expect:B⟨1⟩⟩,
+       O⟨type:T⟨compile⟩,target:T⟨js⟩,expect:B⟨1⟩⟩,
+       O⟨type:T⟨ui_render⟩,expect:B⟨1⟩⟩,
+       O⟨type:T⟨ui_interact⟩,element:T⟨button.play⟩,action:T⟨click⟩,expect:T⟨s₂⟩⟩
+     ⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨full_pipeline_evolution⟩,
+     type:T⟨integration_test⟩,
+     input:T⟨N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S⟩,
+     steps:L⟨
+       O⟨type:T⟨parse⟩,expect:B⟨1⟩⟩,
+       O⟨type:T⟨execute⟩,expect:B⟨1⟩⟩,
+       O⟨type:T⟨mutate⟩,mutation_type:T⟨parameter⟩,expect:B⟨1⟩⟩,
+       O⟨type:T⟨evolve⟩,generations:N⟨⋮⊹⟩,population:N⟨⊿⊹⟩,fitness_target:N⟨⊹ᴧ⌗⟩,expect:B⟨1⟩⟩
+     ⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨recursive_error_correction⟩,
+     type:T⟨integration_test⟩,
+     input:T⟨N I → C₁ -1 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S⟩,
+     steps:L⟨
+       O⟨type:T⟨parse⟩,expect:B⟨0⟩⟩,
+       O⟨type:T⟨error_correct⟩,iterations:N⟨⋮⊹⟩,expect:B⟨1⟩⟩,
+       O⟨type:T⟨parse⟩,expect:B⟨1⟩⟩,
+       O⟨type:T⟨execute⟩,expect:B⟨1⟩⟩
+     ⟩,
+     expect:B⟨1⟩⟩⟩
+
+  D⟨O⟨name:T⟨token_efficiency⟩,
+     type:T⟨integration_test⟩,
+     input:T⟨N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S⟩,
+     steps:L⟨
+       O⟨type:T⟨tokenize⟩,expect:B⟨1⟩⟩,
+       O⟨type:T⟨compress⟩,expect:B⟨1⟩⟩,
+       O⟨type:T⟨decompress⟩,expect:B⟨1⟩⟩,
+       O⟨type:T⟨validate⟩,expect:B⟨1⟩⟩
+     ⟩,
+     expect:B⟨1⟩⟩⟩
+⟩⟩
