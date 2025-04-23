@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GaiaScript Unified App</title>
+  <style>
+    body { 
+      margin: 0; 
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+    .gaia-panel {
+      padding: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      border-radius: 5px;
+    }
+    .gaia-layout {
+      position: absolute;
+      z-index: 100;
+    }
+    .gaia-button {
+      border: none;
+      background: #2a59aa;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .gaia-button:hover {
+      background: #3a69ba;
+    }
+    .gaia-label {
+      padding: 8px;
+      color: white;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <script src="gaia-runtime.js"></script>
+  <script>
+    // Load and run the GaiaScript app
+    fetch('/main.gaia')
+      .then(response => response.text())
+      .then(code => {
+        // Compile the GaiaScript code
+        const compiledCode = compileGaiaScript(code);
+        
+        // Execute the compiled code
+        eval(compiledCode);
+      })
+      .catch(error => {
+        console.error('Error loading GaiaScript app:', error);
+      });
+    
+    // Simple compiler function (actual compilation would be done on the server)
+    function compileGaiaScript(code) {
+      // This is a placeholder for the actual compiler
+      // In a real implementation, the server would compile this
+      
+      return `
+        // Compiled from GaiaScript
+        
+        // Create UI components
+        const canvas = GaiaUnified.createCanvas(800, 600, { style: 'display: block; margin: 0 auto;' });
+        const panel = GaiaUnified.createPanel(null, null, { 'style.position': 'absolute', 'style.top': '10px', 'style.left': '10px', 'style.zIndex': '100' });
+        const layout = GaiaUnified.createLayout(null, null, { grid: '3×3' });
+        
+        // Add UI elements
+        const startButton = GaiaUnified.createButton(null, null, { text: 'Start' });
+        const resetButton = GaiaUnified.createButton(null, null, { text: 'Reset' });
+        const scoreLabel = GaiaUnified.createLabel(null, null, { text: 'Score: 0' });
+        
+        // Create 3D world
+        const world = GaiaUnified.createWorld3D({ width: 800, height: 600 });
+        const camera = GaiaUnified.createCamera({ position: '0,0,5' });
+        GaiaUnified.createLight({ type: 'ambient', intensity: 0.5 });
+        GaiaUnified.createLight({ type: 'directional', position: '1,1,1' });
+        
+        // Create 3D objects
+        const mesh = GaiaUnified.createMesh({ geometry: 'box', color: 0x00ff00 });
+        
+        // Create neural network components
+        const input = GaiaUnified.createInput('image', [1, 224, 224, 3]);
+        const conv1 = GaiaUnified.createLayer('conv', { filters: 32, kernelSize: 3 }, 'relu');
+        const pool1 = GaiaUnified.createLayer('pooling', { size: 2 }, 'none');
+        const conv2 = GaiaUnified.createLayer('conv', { filters: 64, kernelSize: 3 }, 'relu');
+        const pool2 = GaiaUnified.createLayer('pooling', { size: 2 }, 'none');
+        const flatten = GaiaUnified.createLayer('flatten', {}, 'none');
+        const dense1 = GaiaUnified.createLayer('dense', { units: 128 }, 'relu');
+        const dense2 = GaiaUnified.createLayer('dense', { units: 64 }, 'relu');
+        const output = GaiaUnified.createLayer('dense', { units: 10 }, 'softmax');
+        
+        // Connect layers
+        GaiaUnified.connectLayers(input, conv1);
+        GaiaUnified.connectLayers(conv1, pool1);
+        GaiaUnified.connectLayers(pool1, conv2);
+        GaiaUnified.connectLayers(conv2, pool2);
+        GaiaUnified.connectLayers(pool2, flatten);
+        GaiaUnified.connectLayers(flatten, dense1);
+        GaiaUnified.connectLayers(dense1, dense2);
+        GaiaUnified.connectLayers(dense2, output);
+        
+        // Create game state
+        const gameState = {
+          score: 0,
+          running: false
+        };
+        
+        // Add event handlers
+        startButton.element.addEventListener('click', () => {
+          gameState.running = true;
+          scoreLabel.element.textContent = 'Game Started!';
+        });
+        
+        resetButton.element.addEventListener('click', () => {
+          gameState.score = 0;
+          gameState.running = false;
+          scoreLabel.element.textContent = 'Score: 0';
+        });
+        
+        // Start rendering
+        const renderer = GaiaUnified.createRenderer(60);
+        
+        // Add game loop
+        function gameLoop() {
+          if (gameState.running) {
+            mesh.object.rotation.x += 0.01;
+            mesh.object.rotation.y += 0.01;
+            gameState.score += 1;
+            scoreLabel.element.textContent = 'Score: ' + gameState.score;
+          }
+          requestAnimationFrame(gameLoop);
+        }
+        
+        gameLoop();
+      `;
+    }
+  </script>
+</body>
+</html>
