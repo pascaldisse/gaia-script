@@ -39,7 +39,117 @@ impl JsCompiler {
             ASTNode::DataFlow(from, to) => self.compile_data_flow(from, to),
             ASTNode::Loss(loss) => self.compile_loss(loss),
             ASTNode::Expression(nodes) => self.compile_expression(nodes),
+            ASTNode::UIComponent(component) => self.compile_ui_component(component),
+            ASTNode::EventHandler(handler) => self.compile_event_handler(handler),
+            ASTNode::DataBinding(binding) => self.compile_data_binding(binding),
+            ASTNode::ThreeDComponent(component) => self.compile_threed_component(component),
+            ASTNode::Asset(asset) => self.compile_asset(asset),
         }
+    }
+    
+    fn compile_ui_component(&mut self, component: &crate::extensions::ui_extensions::UIComponentNode) -> Result<String, CompilerError> {
+        let component_type = match component.component_type {
+            crate::extensions::ui_extensions::UIComponentType::Canvas => "createCanvas",
+            crate::extensions::ui_extensions::UIComponentType::Panel => "createPanel",
+            crate::extensions::ui_extensions::UIComponentType::Layout => "createLayout",
+            crate::extensions::ui_extensions::UIComponentType::Button => "createButton",
+            crate::extensions::ui_extensions::UIComponentType::Label => "createLabel",
+        };
+        
+        // Generate dimensions
+        let dimensions = if let Some((width, height)) = component.dimensions {
+            format!("{}, {}", width, height)
+        } else {
+            "null, null".to_string()
+        };
+        
+        // Generate properties
+        let properties = self.compile_property_map(&component.properties);
+        
+        // Create component
+        let component_var = self.get_unique_id("ui");
+        let js_code = format!(
+            "const {} = {}({}, {});",
+            component_var, component_type, dimensions, properties
+        );
+        
+        self.js_variables.insert(component_var.clone(), js_code.clone());
+        Ok(js_code)
+    }
+    
+    fn compile_property_map(&self, props: &std::collections::HashMap<String, String>) -> String {
+        // Convert properties to JS object
+        let props_entries: Vec<String> = props
+            .iter()
+            .map(|(k, v)| format!("{}: \"{}\"", k, v))
+            .collect();
+        
+        format!("{{ {} }}", props_entries.join(", "))
+    }
+    
+    fn compile_event_handler(&mut self, handler: &crate::extensions::ui_extensions::EventHandlerNode) -> Result<String, CompilerError> {
+        // Compile the handler body
+        let handler_body = self.compile(&handler.handler)?;
+        
+        // Create event handler function
+        let handler_fn = self.get_unique_id("handler");
+        let js_code = format!(
+            "const {} = function(event) {{\n{}\n}};\n{}.addEventListener('{}', {});",
+            handler_fn, handler_body, handler.source, handler.event_type, handler_fn
+        );
+        
+        self.js_functions.insert(handler_fn.clone(), js_code.clone());
+        Ok(js_code)
+    }
+    
+    fn compile_data_binding(&mut self, binding: &crate::extensions::ui_extensions::DataBindingNode) -> Result<String, CompilerError> {
+        let binding_type = if binding.bidirectional { "bindBidirectional" } else { "bindOneWay" };
+        
+        let js_code = format!(
+            "{}('{}', '{}');",
+            binding_type, binding.target, binding.source
+        );
+        
+        Ok(js_code)
+    }
+    
+    fn compile_threed_component(&mut self, component: &crate::extensions::three_extensions::ThreeDComponentNode) -> Result<String, CompilerError> {
+        let component_type = match component.component_type {
+            crate::extensions::three_extensions::ThreeDComponentType::World3D => "createWorld3D",
+            crate::extensions::three_extensions::ThreeDComponentType::Camera => "createCamera",
+            crate::extensions::three_extensions::ThreeDComponentType::Renderer => "createRenderer",
+            crate::extensions::three_extensions::ThreeDComponentType::Light => "createLight",
+            crate::extensions::three_extensions::ThreeDComponentType::Mesh => "createMesh",
+            crate::extensions::three_extensions::ThreeDComponentType::Texture => "createTexture",
+            crate::extensions::three_extensions::ThreeDComponentType::Material => "createMaterial",
+            crate::extensions::three_extensions::ThreeDComponentType::Shader => "createShader",
+            crate::extensions::three_extensions::ThreeDComponentType::Scene => "createScene",
+            crate::extensions::three_extensions::ThreeDComponentType::Skybox => "createSkybox",
+        };
+        
+        // Generate params
+        let params = self.compile_property_map(&component.params);
+        
+        // Create component
+        let component_var = self.get_unique_id("three");
+        let js_code = format!(
+            "const {} = {}({});",
+            component_var, component_type, params
+        );
+        
+        self.js_variables.insert(component_var.clone(), js_code.clone());
+        Ok(js_code)
+    }
+    
+    fn compile_asset(&mut self, asset: &crate::extensions::three_extensions::AssetNode) -> Result<String, CompilerError> {
+        let asset_var = self.get_unique_id("asset");
+        let js_code = format!(
+            "const {} = loadAsset('{}', '{}');",
+            asset_var, asset.path, asset.asset_type
+        );
+        
+        self.js_variables.insert(asset_var.clone(), js_code.clone());
+        Ok(js_code)
     }
     
     fn get_unique_id(&mut self, prefix: &str) -> String {

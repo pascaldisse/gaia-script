@@ -2,6 +2,12 @@ pub mod ast;
 pub mod parser;
 pub mod interpreter;
 pub mod asm_compiler;
+pub mod compiler;
+pub mod web_server;
+pub mod extensions {
+    pub mod ui_extensions;
+    pub mod three_extensions;
+}
 
 #[cfg(test)]
 mod tests {

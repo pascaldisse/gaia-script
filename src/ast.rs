@@ -12,6 +12,13 @@ pub enum ASTNode {
     DataFlow(Box<ASTNode>, Box<ASTNode>),
     Loss(LossNode),
     Expression(Vec<ASTNode>),
+    // Extended UI components
+    UIComponent(crate::extensions::ui_extensions::UIComponentNode),
+    EventHandler(crate::extensions::ui_extensions::EventHandlerNode),
+    DataBinding(crate::extensions::ui_extensions::DataBindingNode),
+    // Extended 3D components
+    ThreeDComponent(crate::extensions::three_extensions::ThreeDComponentNode),
+    Asset(crate::extensions::three_extensions::AssetNode),
 }
 
 impl fmt::Display for ASTNode {

@@ -1,4 +1,4 @@
-// AOPL Grammar for Pest parser
+// AOPL Grammar for Pest parser - Extended with UI and 3D Components
 
 WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
 COMMENT = _{ "//" ~ (!"\n" ~ ANY)* ~ "\n" }
@@ -61,10 +61,38 @@ custom_op = { "⇝" }
 connect_to = { "⇀" }
 preprocessing = { "⍓" }
 
+// Extended UI Components
+ui_canvas = { "∮" ~ dimension? }
+ui_panel = { "П" }
+ui_layout = { "⊞" ~ dimension? }
+ui_button = { "⌘" ~ string? }
+ui_label = { "⌑" ~ string? }
+
+// Extended Events and Bindings
+event_handler = { "⌘" ~ event_type ~ "→" ~ handler_ref }
+event_type = { "click" | "hover" | "change" | "input" }
+handler_ref = { component_id ~ ("." ~ symbol_ref)* }
+symbol_ref = { "①" | "⓪" | "ς" | identifier }
+data_binding = { "⇄" ~ (identifier | symbol_ref) ~ ("." ~ (identifier | symbol_ref))* }
+
+// Extended 3D Components
+world3d = { "⦿" }
+camera = { "⌖" }
+renderer = { "⟲" ~ number? }
+light = { "☀" }
+mesh3d = { "⊿" }
+texture = { "⍉" }
+material = { "◐" }
+shader = { "⌼" }
+scene = { "⊛" }
+skybox = { "⊠" }
+
 // Basic types
 subscript = @{ ASCII_DIGIT }
 number = @{ ASCII_DIGIT+ }
 dimension = @{ number ~ ("×" ~ number)* }
+string = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+identifier = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
 
 // Component identifier
 component_id = @{ ASCII_ALPHA }
@@ -73,7 +101,7 @@ component_id = @{ ASCII_ALPHA }
 layer_params = { (number | dimension | relu | sigmoid | tanh | softmax)* }
 
 // Network components
-component_def = { component_id ~ ":" ~ network_expr }
+component_def = { component_id ~ ":" ~ extended_network_expr }
 
 // Input specification
 input_spec = { 
@@ -91,19 +119,29 @@ layer_expr = {
     ) ~ layer_params?
 }
 
+// UI expression
+ui_expr = {
+    ui_canvas | ui_panel | ui_layout | ui_button | ui_label
+}
+
+// 3D expression
+threed_expr = {
+    world3d | camera | renderer | light | mesh3d | texture | material | shader | scene | skybox
+}
+
 // Block expression
 block_expr = { 
     block_open ~ 
-    network_expr ~ 
+    extended_network_expr ~ 
     block_close ~ 
     repetition?
 }
 
 // Component reference
-component_ref = { component_id ~ ("(" ~ network_expr ~ ")")? }
+component_ref = { component_id ~ ("(" ~ extended_network_expr ~ ")")? }
 
 // Loss expression
-loss_expr = { network_expr ~ feed_output ~ component_id ~ loss_function ~ (ASCII_ALPHA | ASCII_DIGIT | special_char)+ }
+loss_expr = { extended_network_expr ~ feed_output ~ component_id ~ loss_function ~ (ASCII_ALPHA | ASCII_DIGIT | special_char)+ }
 special_char = { "+" | "-" | "*" | "/" | "=" | "<" | ">" | "|" | "\\" | ":" | ";" | "," | "." | "!" | "?" | "'" | "\"" | "`" | "~" | "@" | "#" | "$" | "%" | "^" | "&" | "_" }
 
 // Network with components
@@ -113,21 +151,28 @@ network_components = {
     grouping_close
 }
 
-// Network expression
-network_expr = { 
+// Extended Network expression
+extended_network_expr = { 
     (
         input_spec |
         layer_expr |
         block_expr |
-        component_ref
+        component_ref |
+        ui_expr |
+        threed_expr |
+        event_handler |
+        data_binding
     ) ~ 
-    (data_flow ~ network_expr)? 
+    (data_flow ~ extended_network_expr)? 
 }
+
+// Network expression (backward compatibility)
+network_expr = { extended_network_expr }
 
 // Network definition - main entry point
 network_def = { 
     network_decl ~ network_components? ~ 
-    network_expr? ~
+    extended_network_expr? ~
     (component_def | loss_expr)*
 }
 
