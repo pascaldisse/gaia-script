@@ -2,11 +2,14 @@
 
 /**
  * GaiaScript CLI - Minimal command line tool for GaiaScript
+ * 
+ * Uses the ultra-compact pkg.gaia format and invokes the universal compiler
  */
 
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const os = require('os');
 
 // Parse arguments
 const args = process.argv.slice(2);
@@ -58,7 +61,7 @@ function loadPackage() {
   }
   
   // Create runtime file
-  const runtimePath = path.join(__dirname, '.gaia-runtime.js');
+  const runtimePath = path.join(os.tmpdir(), `.gaia-runtime-${Date.now()}.js`);
   fs.writeFileSync(runtimePath, runtimeMatch[1]);
   
   // Load runtime
@@ -73,6 +76,56 @@ function loadPackage() {
 }
 
 /**
+ * Ensure the comp directory exists
+ * Extracts it from the package if necessary
+ */
+function ensureCompDir() {
+  const compDir = path.join(__dirname, 'comp');
+  
+  if (!fs.existsSync(compDir)) {
+    console.log('Extracting compiler from package...');
+    const runtime = loadPackage();
+    
+    // Extract to a temp directory first
+    const tempDir = path.join(os.tmpdir(), `gaiascript-${Date.now()}`);
+    runtime.extract(path.join(__dirname, 'pkg.gaia'), tempDir);
+    
+    // Copy the comp directory
+    fs.mkdirSync(compDir, { recursive: true });
+    copyDirectory(path.join(tempDir, 'comp'), compDir);
+    
+    // Clean up
+    try {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    } catch (err) {}
+  }
+  
+  return compDir;
+}
+
+/**
+ * Copy a directory recursively
+ */
+function copyDirectory(src, dest) {
+  if (!fs.existsSync(dest)) {
+    fs.mkdirSync(dest, { recursive: true });
+  }
+  
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+  
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    
+    if (entry.isDirectory()) {
+      copyDirectory(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
+/**
  * Run command
  */
 async function runCommand() {
@@ -84,12 +137,15 @@ async function runCommand() {
         process.exit(1);
       }
       
-      const runtime = loadPackage();
-      const result = runtime.run(inputFile, options);
+      // Ensure compiler is available
+      ensureCompDir();
       
-      if (result && options.execute !== false) {
+      // Compile GaiaScript
+      const buildResult = compileGaiaScript(inputFile, options);
+      
+      if (buildResult && options.execute !== false) {
         // Execute compiled JavaScript
-        const outputPath = options.output || 'gaia-compiled.js';
+        const outputPath = options.output || path.join(process.cwd(), 'build', 'gaia-compiled.js');
         console.log(`Executing ${outputPath}...`);
         
         try {
@@ -108,19 +164,58 @@ async function runCommand() {
         process.exit(1);
       }
       
-      const buildRuntime = loadPackage();
-      buildRuntime.run(inputFile, { ...options, execute: false });
+      // Ensure compiler is available
+      ensureCompDir();
+      
+      // Compile GaiaScript
+      compileGaiaScript(inputFile, { ...options, execute: false });
       break;
       
     case 'extract':
-      const extractRuntime = loadPackage();
-      extractRuntime.extract('./pkg.gaia', inputFile || './extracted');
+      const runtime = loadPackage();
+      const extractDir = inputFile || './extracted';
+      runtime.extract(path.join(__dirname, 'pkg.gaia'), extractDir);
       break;
       
     case 'help':
     default:
       showHelp();
       break;
+  }
+}
+
+/**
+ * Compile GaiaScript file
+ */
+function compileGaiaScript(inputFile, options = {}) {
+  const compDir = ensureCompDir();
+  const buildJs = path.join(compDir, 'build.js');
+  
+  if (!fs.existsSync(buildJs)) {
+    console.error('Error: Compiler not found');
+    process.exit(1);
+  }
+  
+  // Prepare command
+  let cmd = `node ${buildJs} ${inputFile}`;
+  
+  // Add options
+  if (options.output) {
+    cmd += ` --output=${options.output}`;
+  }
+  
+  if (options.platform || options.target) {
+    cmd += ` --platform=${options.platform || options.target}`;
+  }
+  
+  // Run compiler
+  try {
+    console.log(`Running: ${cmd}`);
+    execSync(cmd, { stdio: 'inherit' });
+    return true;
+  } catch (error) {
+    console.error(`Compilation error: ${error.message}`);
+    return false;
   }
 }
 
@@ -141,12 +236,12 @@ Commands:
   help           Show this help
 
 Options:
-  --output=<file>  Output file (default: gaia-compiled.js)
-  --target=<js>    Target platform (currently only JS supported)
+  --output=<file>    Output file (default: build/gaia-compiled.js)
+  --target=<target>  Target platform (macos, windows, linux, ios, android, web)
 
 Examples:
   ./gaia run main.gaia
-  ./gaia build main.gaia --output=app.js
+  ./gaia build main.gaia --output=app.js --target=web
   ./gaia extract ./extracted
 `);
 }
