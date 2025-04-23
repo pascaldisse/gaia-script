@@ -14,6 +14,7 @@ const args = process.argv.slice(2);
 let inputFile = 'main.gaia';
 let outputFile = null;
 let targetPlatform = 'web';
+let noExecute = false;
 
 // Process arguments
 for (let i = 0; i < args.length; i++) {
@@ -25,6 +26,8 @@ for (let i = 0; i < args.length; i++) {
       outputFile = arg.substring(9);
     } else if (arg.startsWith('--platform=')) {
       targetPlatform = arg.substring(11);
+    } else if (arg === '--no-execute') {
+      noExecute = true;
     }
   } else if (!arg.startsWith('-')) {
     // Handle input file
@@ -58,6 +61,15 @@ if (outputFile) {
   }
   
   outputPath = path.join(buildDir, 'gaia-compiled.js');
+}
+
+// Also create an HTML wrapper if target is web
+let htmlOutputPath = null;
+if (targetPlatform === 'web') {
+  htmlOutputPath = outputPath.replace(/\.js$/, '.html');
+  if (htmlOutputPath === outputPath) {
+    htmlOutputPath = outputPath + '.html';
+  }
 }
 
 // Read the GaiaScript file
@@ -132,14 +144,27 @@ function parseGaiaScript(code) {
   return ast;
 }
 
+// Generate a title from the input file
+function generateTitle(inputPath) {
+  const baseName = path.basename(inputPath, path.extname(inputPath));
+  return baseName.charAt(0).toUpperCase() + baseName.slice(1) + ' - GaiaScript';
+}
+
 // GaiaScript compiler
-function compileToJS(ast) {
+function compileToJS(ast, inputPath) {
   let js = '';
   
-  js += `// Generated from GaiaScript\n`;
+  js += `// Generated from GaiaScript: ${path.basename(inputPath)}\n`;
+  
+  // Add environment detection
+  js += `// Environment detection\n`;
+  js += `const isNode = typeof window === 'undefined' && typeof process !== 'undefined';\n`;
+  js += `const isBrowser = typeof window !== 'undefined';\n\n`;
+  
   js += `const gaiaRuntime = {\n`;
   js += `  components: {},\n`;
   js += `  network: null,\n`;
+  js += `  title: "${generateTitle(inputPath)}",\n`;
   js += `  initialize: function() {\n`;
   
   // Add component definitions
@@ -152,13 +177,29 @@ function compileToJS(ast) {
     // Add specific component behavior based on the body
     if (component.body.includes('⌘"▶"⌘ω')) {
       js += `      // UI component with play button\n`;
-      js += `      if (typeof document !== 'undefined') {\n`;
+      js += `      if (isBrowser) {\n`;
+      js += `        const container = document.getElementById('gaia-container') || document.body;\n`;
       js += `        const button = document.createElement('button');\n`;
       js += `        button.textContent = '▶';\n`;
-      js += `        button.style.padding = '8px 16px';\n`;
-      js += `        button.style.margin = '4px';\n`;
+      js += `        button.className = 'gaia-button play-button';\n`;
       js += `        button.onclick = function() { console.log('Play clicked'); };\n`;
-      js += `        document.body.appendChild(button);\n`;
+      js += `        container.appendChild(button);\n`;
+      js += `      } else {\n`;
+      js += `        console.log("[UI] Play button would be displayed in browser");\n`;
+      js += `      }\n`;
+    }
+    
+    if (component.body.includes('⌘"↺"⌘ω')) {
+      js += `      // UI component with reset button\n`;
+      js += `      if (isBrowser) {\n`;
+      js += `        const container = document.getElementById('gaia-container') || document.body;\n`;
+      js += `        const button = document.createElement('button');\n`;
+      js += `        button.textContent = '↺';\n`;
+      js += `        button.className = 'gaia-button reset-button';\n`;
+      js += `        button.onclick = function() { console.log('Reset clicked'); };\n`;
+      js += `        container.appendChild(button);\n`;
+      js += `      } else {\n`;
+      js += `        console.log("[UI] Reset button would be displayed in browser");\n`;
       js += `      }\n`;
     }
     
@@ -193,18 +234,49 @@ function compileToJS(ast) {
   // Add UI initialization for web target
   if (targetPlatform === 'web') {
     js += `  initUI: function() {\n`;
-    js += `    if (typeof document !== 'undefined') {\n`;
+    js += `    if (isBrowser) {\n`;
+    js += `      // Set page title\n`;
+    js += `      document.title = this.title;\n`;
+    js += `      \n`;
     js += `      // Create container\n`;
-    js += `      const container = document.getElementById('gaia-container');\n`;
+    js += `      let container = document.getElementById('gaia-container');\n`;
     js += `      if (!container) {\n`;
-    js += `        const newContainer = document.createElement('div');\n`;
-    js += `        newContainer.id = 'gaia-container';\n`;
-    js += `        newContainer.style.padding = '20px';\n`;
-    js += `        newContainer.style.margin = '10px';\n`;
-    js += `        newContainer.style.border = '1px solid #ccc';\n`;
-    js += `        document.body.appendChild(newContainer);\n`;
+    js += `        container = document.createElement('div');\n`;
+    js += `        container.id = 'gaia-container';\n`;
+    js += `        container.style.padding = '20px';\n`;
+    js += `        container.style.margin = '10px';\n`;
+    js += `        container.style.border = '1px solid #ccc';\n`;
+    js += `        container.style.borderRadius = '8px';\n`;
+    js += `        container.style.backgroundColor = '#f9f9f9';\n`;
+    js += `        document.body.appendChild(container);\n`;
     js += `      }\n`;
+    js += `      \n`;
+    js += `      // Add styles\n`;
+    js += `      const style = document.createElement('style');\n`;
+    js += `      style.textContent = \`\n`;
+    js += `        body { font-family: sans-serif; margin: 0; padding: 20px; }\n`;
+    js += `        .gaia-button { \n`;
+    js += `          padding: 8px 16px; \n`;
+    js += `          margin: 4px; \n`;
+    js += `          border: none; \n`;
+    js += `          border-radius: 4px; \n`;
+    js += `          cursor: pointer; \n`;
+    js += `          font-size: 16px; \n`;
+    js += `          color: white; \n`;
+    js += `          background-color: #4285f4; \n`;
+    js += `        }\n`;
+    js += `        .gaia-button:hover { background-color: #2a75f3; }\n`;
+    js += `        .play-button { background-color: #4caf50; }\n`;
+    js += `        .play-button:hover { background-color: #45a049; }\n`;
+    js += `        .reset-button { background-color: #f44336; }\n`;
+    js += `        .reset-button:hover { background-color: #e53935; }\n`;
+    js += `      \`;\n`;
+    js += `      document.head.appendChild(style);\n`;
+    js += `      \n`;
     js += `      console.log("UI initialized");\n`;
+    js += `    } else {\n`;
+    js += `      console.log("UI initialization skipped (not in browser)");\n`;
+    js += `      console.log("Run in a browser to see the UI, or open the HTML file if generated");\n`;
     js += `    }\n`;
     js += `  },\n`;
   }
@@ -222,27 +294,116 @@ function compileToJS(ast) {
   js += `  }\n`;
   js += `};\n\n`;
   
-  // Create standalone HTML for web target
-  if (targetPlatform === 'web') {
-    js += `// Create HTML document if in browser context\n`;
-    js += `if (typeof window !== 'undefined') {\n`;
-    js += `  document.title = "GaiaScript Application";\n`;
-    js += `  const style = document.createElement('style');\n`;
-    js += `  style.textContent = 'body { font-family: sans-serif; }';\n`;
-    js += `  document.head.appendChild(style);\n`;
-    js += `}\n\n`;
-  }
+  // Export for Node.js
+  js += `// Export for Node.js\n`;
+  js += `if (isNode) {\n`;
+  js += `  module.exports = gaiaRuntime;\n`;
+  js += `}\n\n`;
   
+  // Add auto-run
   js += `// Run the GaiaScript program\n`;
   js += `gaiaRuntime.run();\n`;
   
-  // Export for Node.js
-  js += `\n// Export for Node.js\n`;
-  js += `if (typeof module !== 'undefined') {\n`;
-  js += `  module.exports = gaiaRuntime;\n`;
-  js += `}\n`;
-  
   return js;
+}
+
+// Create HTML wrapper for web target
+function createHtmlWrapper(jsPath, title) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    header {
+      background-color: #4285f4;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    #console {
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      margin-top: 20px;
+      min-height: 200px;
+      max-height: 400px;
+      overflow: auto;
+    }
+    .log-entry {
+      margin: 5px 0;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>${title}</h1>
+  </header>
+  
+  <div id="gaia-container"></div>
+  
+  <div id="console"></div>
+  
+  <script>
+    // Intercept console.log to display in our console element
+    const consoleElement = document.getElementById('console');
+    const originalConsoleLog = console.log;
+    const originalConsoleWarn = console.warn;
+    const originalConsoleError = console.error;
+    
+    console.log = function(...args) {
+      originalConsoleLog.apply(console, args);
+      
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      logEntry.textContent = args.join(' ');
+      consoleElement.appendChild(logEntry);
+      consoleElement.scrollTop = consoleElement.scrollHeight;
+    };
+    
+    console.warn = function(...args) {
+      originalConsoleWarn.apply(console, args);
+      
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      logEntry.style.color = 'orange';
+      logEntry.textContent = '⚠️ ' + args.join(' ');
+      consoleElement.appendChild(logEntry);
+      consoleElement.scrollTop = consoleElement.scrollHeight;
+    };
+    
+    console.error = function(...args) {
+      originalConsoleError.apply(console, args);
+      
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      logEntry.style.color = 'red';
+      logEntry.textContent = '❌ ' + args.join(' ');
+      consoleElement.appendChild(logEntry);
+      consoleElement.scrollTop = consoleElement.scrollHeight;
+    };
+  </script>
+  
+  <!-- GaiaScript Compiled Output -->
+  <script src="${path.basename(jsPath)}"></script>
+</body>
+</html>`;
 }
 
 // Process the GaiaScript code
@@ -251,7 +412,7 @@ try {
   const ast = parseGaiaScript(gaiaCode);
   
   console.log("Compiling to JavaScript...");
-  const js = compileToJS(ast);
+  const js = compileToJS(ast, inputPath);
   
   // Create output directory if needed
   const outputDir = path.dirname(outputPath);
@@ -261,8 +422,21 @@ try {
   
   // Write compiled JavaScript to output path
   fs.writeFileSync(outputPath, js, 'utf8');
-  
   console.log(`GaiaScript compiled successfully to ${outputPath}`);
+  
+  // Create HTML wrapper for web target
+  if (htmlOutputPath) {
+    const html = createHtmlWrapper(outputPath, generateTitle(inputPath));
+    fs.writeFileSync(htmlOutputPath, html, 'utf8');
+    console.log(`HTML wrapper created at ${htmlOutputPath}`);
+  }
+  
+  // Execute if not disabled
+  if (!noExecute && targetPlatform !== 'web') {
+    // For non-web targets, we can execute directly
+    console.log("Executing compiled output...");
+    require(outputPath);
+  }
 } catch (error) {
   console.error("Error during compilation:", error);
   process.exit(1);

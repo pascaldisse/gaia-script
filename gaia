@@ -8,7 +8,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
 const os = require('os');
 
 // Parse arguments
@@ -126,6 +126,36 @@ function copyDirectory(src, dest) {
 }
 
 /**
+ * Open a URL in the default browser
+ */
+function openBrowser(url) {
+  const platform = os.platform();
+  let command;
+  
+  try {
+    switch (platform) {
+      case 'darwin':
+        command = `open "${url}"`;
+        break;
+      case 'win32':
+        command = `start "" "${url}"`;
+        break;
+      case 'linux':
+        command = `xdg-open "${url}"`;
+        break;
+      default:
+        console.log(`Please open the URL in your browser: ${url}`);
+        return;
+    }
+    
+    execSync(command);
+  } catch (error) {
+    console.error(`Failed to open browser: ${error.message}`);
+    console.log(`Please open the URL in your browser: ${url}`);
+  }
+}
+
+/**
  * Run command
  */
 async function runCommand() {
@@ -140,19 +170,38 @@ async function runCommand() {
       // Ensure compiler is available
       ensureCompDir();
       
+      // Automatically use web target if --open is specified
+      if (options.open === true) {
+        options.target = 'web';
+      }
+      
       // Compile GaiaScript
       const buildResult = compileGaiaScript(inputFile, options);
       
       if (buildResult && options.execute !== false) {
-        // Execute compiled JavaScript
         const outputPath = options.output || path.join(process.cwd(), 'build', 'gaia-compiled.js');
-        console.log(`Executing ${outputPath}...`);
         
-        try {
-          execSync(`node ${outputPath}`, { stdio: 'inherit' });
-        } catch (error) {
-          console.error(`Execution error: ${error.message}`);
-          process.exit(1);
+        // For web target, open in browser if requested
+        if (options.target === 'web' || options.platform === 'web') {
+          const htmlPath = outputPath.replace(/\.js$/, '.html');
+          if (fs.existsSync(htmlPath) && options.open === true) {
+            // Convert to file URL
+            const fileUrl = `file://${path.resolve(htmlPath)}`;
+            console.log(`Opening in browser: ${fileUrl}`);
+            openBrowser(fileUrl);
+          } else {
+            console.log(`Web output generated. Open in browser: ${htmlPath}`);
+          }
+        } else {
+          // Execute compiled JavaScript in Node.js
+          console.log(`Executing ${outputPath}...`);
+          
+          try {
+            execSync(`node ${outputPath}`, { stdio: 'inherit' });
+          } catch (error) {
+            console.error(`Execution error: ${error.message}`);
+            process.exit(1);
+          }
         }
       }
       break;
@@ -175,6 +224,73 @@ async function runCommand() {
       const runtime = loadPackage();
       const extractDir = inputFile || './extracted';
       runtime.extract(path.join(__dirname, 'pkg.gaia'), extractDir);
+      break;
+      
+    case 'serve':
+      // Simple HTTP server for testing web output
+      const port = options.port || 8000;
+      const serveDir = inputFile || path.join(process.cwd(), 'build');
+      
+      if (!fs.existsSync(serveDir)) {
+        console.error(`Error: Directory not found: ${serveDir}`);
+        process.exit(1);
+      }
+      
+      console.log(`Starting server on port ${port}...`);
+      console.log(`Serving files from: ${serveDir}`);
+      
+      // Use Node.js's built-in HTTP server
+      const http = require('http');
+      const url = require('url');
+      
+      const server = http.createServer((req, res) => {
+        // Parse URL
+        const parsedUrl = url.parse(req.url);
+        // Extract URL path
+        let pathname = `.${parsedUrl.pathname}`;
+        // Resolve to absolute path
+        const absolute = path.join(serveDir, pathname);
+        
+        // Default to index.html for directory requests
+        if (pathname === './') {
+          pathname = './index.html';
+        }
+        
+        // Attempt to read file
+        fs.readFile(absolute, (err, data) => {
+          if (err) {
+            res.statusCode = 404;
+            res.end(`File ${pathname} not found!`);
+            return;
+          }
+          
+          // Set appropriate MIME type
+          let mimeType = 'text/plain';
+          if (pathname.endsWith('.html')) mimeType = 'text/html';
+          if (pathname.endsWith('.js')) mimeType = 'application/javascript';
+          if (pathname.endsWith('.css')) mimeType = 'text/css';
+          if (pathname.endsWith('.json')) mimeType = 'application/json';
+          if (pathname.endsWith('.png')) mimeType = 'image/png';
+          if (pathname.endsWith('.jpg')) mimeType = 'image/jpg';
+          
+          res.setHeader('Content-type', mimeType);
+          res.end(data);
+        });
+      });
+      
+      // Start the server
+      server.listen(port, () => {
+        console.log(`Server running at http://localhost:${port}/`);
+        
+        // Open in browser if requested
+        if (options.open === true) {
+          openBrowser(`http://localhost:${port}/`);
+        }
+      });
+      
+      // Keep the server running
+      process.stdin.resume();
+      console.log('Press Ctrl+C to stop the server');
       break;
       
     case 'help':
@@ -208,6 +324,10 @@ function compileGaiaScript(inputFile, options = {}) {
     cmd += ` --platform=${options.platform || options.target}`;
   }
   
+  if (options.execute === false) {
+    cmd += ` --no-execute`;
+  }
+  
   // Run compiler
   try {
     console.log(`Running: ${cmd}`);
@@ -230,19 +350,24 @@ Usage:
   ./gaia <command> [options]
 
 Commands:
-  run <file>     Build and run GaiaScript file
-  build <file>   Build GaiaScript file to JavaScript
-  extract [dir]  Extract pkg.gaia to directory
-  help           Show this help
+  run <file>      Build and run GaiaScript file
+  build <file>    Build GaiaScript file to JavaScript
+  extract [dir]   Extract pkg.gaia to directory
+  serve [dir]     Start a web server for GaiaScript web output
+  help            Show this help
 
 Options:
-  --output=<file>    Output file (default: build/gaia-compiled.js)
-  --target=<target>  Target platform (macos, windows, linux, ios, android, web)
+  --output=<file>     Output file (default: build/gaia-compiled.js)
+  --target=<target>   Target platform (macos, windows, linux, ios, android, web)
+  --open              Open web output in browser
+  --port=<number>     Port for web server (default: 8000)
 
 Examples:
-  ./gaia run main.gaia
-  ./gaia build main.gaia --output=app.js --target=web
-  ./gaia extract ./extracted
+  ./gaia run main.gaia                   # Run in Node.js
+  ./gaia run main.gaia --target=web      # Compile for web
+  ./gaia run main.gaia --target=web --open  # Open in browser
+  ./gaia build main.gaia --output=app.js # Just compile
+  ./gaia serve build                     # Serve the build directory
 `);
 }
 
