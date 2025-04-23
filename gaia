@@ -220,6 +220,69 @@ async function runCommand() {
       compileGaiaScript(inputFile, { ...options, execute: false });
       break;
       
+    case 'playground':
+      // Launch the playground interface
+      console.log("Opening GaiaScript Playground...");
+      
+      // Ensure compiler is available
+      ensureCompDir();
+      
+      // Compile the playground interface
+      const playgroundResult = compileGaiaScript('playground', { target: 'web' });
+      
+      if (playgroundResult) {
+        const htmlPath = path.join(process.cwd(), 'build', 'gaia-compiled.html');
+        if (fs.existsSync(htmlPath)) {
+          // Convert to file URL
+          const fileUrl = `file://${path.resolve(htmlPath)}`;
+          console.log(`Opening in browser: ${fileUrl}`);
+          openBrowser(fileUrl);
+        }
+      }
+      break;
+      
+    case 'translator':
+      // Launch the translator interface
+      console.log("Opening GaiaScript Translator...");
+      
+      // Ensure compiler is available
+      ensureCompDir();
+      
+      // Compile the translator interface
+      const translatorResult = compileGaiaScript('translator', { target: 'web' });
+      
+      if (translatorResult) {
+        const htmlPath = path.join(process.cwd(), 'build', 'gaia-compiled.html');
+        if (fs.existsSync(htmlPath)) {
+          // Convert to file URL
+          const fileUrl = `file://${path.resolve(htmlPath)}`;
+          console.log(`Opening in browser: ${fileUrl}`);
+          openBrowser(fileUrl);
+        }
+      }
+      break;
+      
+    case 'unified':
+      // Launch the unified interface with all tools
+      console.log("Opening GaiaScript Unified Interface...");
+      
+      // Ensure compiler is available
+      ensureCompDir();
+      
+      // Compile the unified interface
+      const unifiedResult = compileGaiaScript('unified', { target: 'web' });
+      
+      if (unifiedResult) {
+        const htmlPath = path.join(process.cwd(), 'build', 'gaia-compiled.html');
+        if (fs.existsSync(htmlPath)) {
+          // Convert to file URL
+          const fileUrl = `file://${path.resolve(htmlPath)}`;
+          console.log(`Opening in browser: ${fileUrl}`);
+          openBrowser(fileUrl);
+        }
+      }
+      break;
+      
     case 'extract':
       const runtime = loadPackage();
       const extractDir = inputFile || './extracted';
@@ -354,6 +417,9 @@ Commands:
   build <file>    Build GaiaScript file to JavaScript
   extract [dir]   Extract pkg.gaia to directory
   serve [dir]     Start a web server for GaiaScript web output
+  playground      Open the GaiaScript playground in browser
+  translator      Open the GaiaScript translator in browser
+  unified         Open the unified GaiaScript interface with all tools
   help            Show this help
 
 Options:
@@ -368,6 +434,9 @@ Examples:
   ./gaia run main.gaia --target=web --open  # Open in browser
   ./gaia build main.gaia --output=app.js # Just compile
   ./gaia serve build                     # Serve the build directory
+  ./gaia playground                      # Open the interactive playground
+  ./gaia translator                      # Open the language translator
+  ./gaia unified                         # Open the unified interface with all tools
 `);
 }
 

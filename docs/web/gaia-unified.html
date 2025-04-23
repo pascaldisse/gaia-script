@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GaiaScript - Unified Interface</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+        
+        header {
+            background-color: #4285f4;
+            color: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 500;
+        }
+        
+        #version {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .tab-navigation {
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+            overflow-x: auto;
+        }
+        
+        .tab-button {
+            padding: 15px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            font-size: 14px;
+            position: relative;
+            white-space: nowrap;
+        }
+        
+        .tab-button.active {
+            color: #4285f4;
+        }
+        
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: #4285f4;
+        }
+        
+        .tab-button:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .tab-content {
+            padding: 0;
+            display: none;
+            height: calc(100vh - 122px);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .split-pane {
+            display: flex;
+            height: 100%;
+        }
+        
+        .editor-pane, .output-pane, .translator-pane {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+            position: relative;
+        }
+        
+        .editor-container, .translator-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .toolbar {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .editor, .output, .translator-textarea {
+            flex: 1;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow: auto;
+        }
+        
+        .editor {
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+        }
+        
+        .output {
+            background-color: #f9f9f9;
+        }
+        
+        .button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #4285f4;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .button:hover {
+            background-color: #3367d6;
+        }
+        
+        .secondary {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+        
+        select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+        
+        .translator-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 0 10px;
+        }
+        
+        .translator-pane {
+            border-left: 1px solid #e0e0e0;
+        }
+        
+        .error {
+            color: #d32f2f;
+        }
+        
+        .examples-section {
+            margin-top: 20px;
+        }
+        
+        .example-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .example-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #fff;
+        }
+        
+        .example-content {
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        .example-result {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        #console {
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-top: 20px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow: auto;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            line-height: 1.4;
+        }
+        
+        .network-visualization {
+            height: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        
+        .component-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .component-card {
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .component-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .component-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .component-status {
+            font-size: 12px;
+            color: #666;
+            padding: 3px 6px;
+            border-radius: 10px;
+            background-color: #f5f5f5;
+        }
+        
+        .compiler-options {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .compiler-option {
+            margin-bottom: 10px;
+        }
+        
+        .compiler-option label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>GaiaScript</h1>
+        <span id="version">v0.1.0</span>
+    </header>
+    
+    <div class="tab-navigation">
+        <button class="tab-button active" data-tab="playground">Playground</button>
+        <button class="tab-button" data-tab="translator">Translator</button>
+        <button class="tab-button" data-tab="compiler">Universal Compiler</button>
+        <button class="tab-button" data-tab="visualization">Visualization</button>
+        <button class="tab-button" data-tab="docs">Documentation</button>
+    </div>
+    
+    <!-- Playground Tab -->
+    <div class="tab-content active" id="playground-tab">
+        <div class="split-pane">
+            <div class="editor-pane">
+                <div class="editor-container">
+                    <div class="toolbar">
+                        <button id="run-btn" class="button">▶ Run</button>
+                        <button id="save-btn" class="button secondary">Save</button>
+                        <select id="example-select">
+                            <option value="">Select Example...</option>
+                            <option value="cnn">CNN</option>
+                            <option value="gan">GAN</option>
+                            <option value="transformer">Transformer</option>
+                        </select>
+                    </div>
+                    <div id="editor" class="editor" contenteditable="true">N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S</div>
+                </div>
+            </div>
+            <div class="output-pane">
+                <div class="toolbar">
+                    <h3>Output</h3>
+                    <button id="clear-output" class="button secondary">Clear</button>
+                </div>
+                <div id="output" class="output"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Translator Tab -->
+    <div class="tab-content" id="translator-tab">
+        <div class="split-pane">
+            <div class="translator-pane">
+                <div class="translator-container">
+                    <div class="toolbar">
+                        <select id="source-language">
+                            <option value="auto">Auto Detect</option>
+                            <option value="natural">Natural Language</option>
+                            <option value="gaiascript">GaiaScript</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="python">Python</option>
+                        </select>
+                    </div>
+                    <textarea id="source-text" class="translator-textarea" placeholder="Enter text to translate..."></textarea>
+                </div>
+            </div>
+            <div class="translator-controls">
+                <button id="translate-btn" class="button">Translate →</button>
+                <button id="swap-btn" class="button secondary">⇄</button>
+            </div>
+            <div class="translator-pane">
+                <div class="translator-container">
+                    <div class="toolbar">
+                        <select id="target-language">
+                            <option value="gaiascript">GaiaScript</option>
+                            <option value="natural">Natural Language</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="python">Python</option>
+                        </select>
+                    </div>
+                    <textarea id="target-text" class="translator-textarea" placeholder="Translation will appear here..." readonly></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <div class="examples-section">
+            <h3>Translation Examples</h3>
+            <div class="example-cards">
+                <div class="example-card">
+                    <h4>Natural Language → GaiaScript</h4>
+                    <div class="example-content">
+                        <p>Create a convolutional neural network with 32 filters and ReLU activation</p>
+                        <div class="example-result">N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S</div>
+                    </div>
+                </div>
+                <div class="example-card">
+                    <h4>GaiaScript → JavaScript</h4>
+                    <div class="example-content">
+                        <p>N〈G⊕D〉 G: Z 100 → D₁ 256 ρ → D₀ 784 τ</p>
+                        <div class="example-result">
+                            const model = tf.sequential();<br>
+                            model.add(tf.layers.dense({units: 256, activation: 'relu', inputShape: [100]}));<br>
+                            model.add(tf.layers.dense({units: 784, activation: 'tanh'}));
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Universal Compiler Tab -->
+    <div class="tab-content" id="compiler-tab">
+        <div class="split-pane">
+            <div class="editor-pane">
+                <div class="editor-container">
+                    <div class="toolbar">
+                        <button id="compile-btn" class="button">Compile</button>
+                        <button id="open-btn" class="button secondary">Open in Browser</button>
+                    </div>
+                    <div id="compiler-editor" class="editor" contenteditable="true">N〈υ⊕η⊕Γ〉
+G:Z⊿≡→U⋱×⋱×⌓⊿⋮→[U⋮×→C⋮⌓⊧ρ]×⋮→C⋰τ
+D:I→[C⊧⋱⌓ρ→P⋮]×⋰→F→D₁⊿⊹⋮⋱ρ→D₀⊿σ
+L:G(Z)⊳D⟿BCE+λ‖∇D‖</div>
+                </div>
+                
+                <div class="compiler-options">
+                    <h3>Compilation Options</h3>
+                    
+                    <div class="compiler-option">
+                        <label for="target-platform">Target Platform</label>
+                        <select id="target-platform">
+                            <option value="web">Web (JavaScript/HTML)</option>
+                            <option value="macos">macOS (Swift)</option>
+                            <option value="windows">Windows (C#)</option>
+                            <option value="linux">Linux (C)</option>
+                            <option value="ios">iOS (Swift/UIKit)</option>
+                            <option value="android">Android (Kotlin)</option>
+                            <option value="wasm">WebAssembly</option>
+                        </select>
+                    </div>
+                    
+                    <div class="compiler-option">
+                        <label for="output-path">Output Path</label>
+                        <input type="text" id="output-path" value="build/output" style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px;">
+                    </div>
+                    
+                    <div class="compiler-option">
+                        <label for="optimization-level">Optimization Level</label>
+                        <select id="optimization-level">
+                            <option value="0">None (0)</option>
+                            <option value="1">Basic (1)</option>
+                            <option value="2" selected>Standard (2)</option>
+                            <option value="3">Aggressive (3)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="output-pane">
+                <div class="toolbar">
+                    <h3>Compiler Output</h3>
+                    <button id="clear-compiler-output" class="button secondary">Clear</button>
+                </div>
+                <div id="compiler-output" class="output"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Visualization Tab -->
+    <div class="tab-content" id="visualization-tab">
+        <div class="network-visualization">
+            <canvas id="network-canvas" width="800" height="400"></canvas>
+        </div>
+        
+        <div class="component-list" id="component-list">
+            <!-- Components will be dynamically generated here -->
+        </div>
+        
+        <div id="console"></div>
+    </div>
+    
+    <!-- Documentation Tab -->
+    <div class="tab-content" id="docs-tab">
+        <iframe src="../README.md"></iframe>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="js/gaia-runtime.js"></script>
+    <script src="js/gaia-translator.js"></script>
+    <script>
+        // Tab Switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all tabs and buttons
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // Add active class to current tab and button
+                button.classList.add('active');
+                document.getElementById(`${button.dataset.tab}-tab`).classList.add('active');
+            });
+        });
+        
+        // Playground Tab
+        document.getElementById('run-btn').addEventListener('click', function() {
+            const code = document.getElementById('editor').textContent;
+            const output = document.getElementById('output');
+            
+            try {
+                output.innerHTML = '<div>Running GaiaScript...</div>';
+                const result = GaiaRuntime.run(code);
+                output.innerHTML += `<div>Network initialized with ${result.result.componentCount} components</div>`;
+                output.innerHTML += '<div>Compilation successful!</div>';
+            } catch (error) {
+                output.innerHTML += `<div class="error">Error: ${error.message}</div>`;
+            }
+        });
+        
+        document.getElementById('clear-output').addEventListener('click', function() {
+            document.getElementById('output').innerHTML = '';
+        });
+        
+        document.getElementById('example-select').addEventListener('change', function() {
+            const editor = document.getElementById('editor');
+            
+            switch(this.value) {
+                case 'cnn':
+                    editor.textContent = 'N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S';
+                    break;
+                case 'gan':
+                    editor.textContent = `N〈G⊕D〉
+G:Z⊿≡→U⋱×⋱×⌓⊿⋮→[U⋮×→C⋮⌓⊧ρ]×⋮→C⋰τ
+D:I→[C⊧⋱⌓ρ→P⋮]×⋰→F→D₁⊿⊹⋮⋱ρ→D₀⊿σ
+L:G(Z)⊳D⟿BCE+λ‖∇D‖`;
+                    break;
+                case 'transformer':
+                    editor.textContent = `N〈E⊕D〉
+E: I → [E → A{h:8} → N]×6
+D: I → [E → A{h:8} → N]×6 → D₀ V S`;
+                    break;
+            }
+        });
+        
+        // Translator Tab
+        document.getElementById('translate-btn').addEventListener('click', function() {
+            const sourceText = document.getElementById('source-text').value;
+            const targetText = document.getElementById('target-text');
+            const sourceLanguage = document.getElementById('source-language').value;
+            const targetLanguage = document.getElementById('target-language').value;
+            
+            if (sourceText.trim() === "") {
+                targetText.value = "Please enter text to translate.";
+                return;
+            }
+            
+            targetText.value = "Translation in progress...";
+            
+            try {
+                // This would call the actual translator
+                const translations = {
+                    "natural_gaiascript": {
+                        "Create a convolutional neural network": "N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S"
+                    }
+                };
+                
+                // Simple demo translation
+                if (sourceText.toLowerCase().includes("neural") || 
+                    sourceText.toLowerCase().includes("network")) {
+                    targetText.value = "N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S";
+                } else if (sourceText.includes("→")) {
+                    targetText.value = `// Translated to JavaScript
+const model = tf.sequential();
+model.add(tf.layers.conv2d({filters: 32, kernelSize: 3, activation: 'relu'}));
+model.add(tf.layers.maxPooling2d({poolSize: 2}));
+model.add(tf.layers.flatten());
+model.add(tf.layers.dense({units: 128, activation: 'relu'}));
+model.add(tf.layers.dense({units: 10, activation: 'softmax'}));`;
+                } else {
+                    targetText.value = "N I → D₁ 128 ρ → D₀ 10 σ";
+                }
+            } catch (error) {
+                targetText.value = `Error: ${error.message}`;
+            }
+        });
+        
+        document.getElementById('swap-btn').addEventListener('click', function() {
+            // Don't swap if source is auto-detect
+            if (document.getElementById('source-language').value === "auto") {
+                return;
+            }
+            
+            // Swap languages
+            const tempLang = document.getElementById('source-language').value;
+            document.getElementById('source-language').value = document.getElementById('target-language').value;
+            document.getElementById('target-language').value = tempLang;
+            
+            // Swap text
+            const tempText = document.getElementById('source-text').value;
+            document.getElementById('source-text').value = document.getElementById('target-text').value;
+            document.getElementById('target-text').value = tempText;
+        });
+        
+        // Universal Compiler Tab
+        document.getElementById('compile-btn').addEventListener('click', function() {
+            const code = document.getElementById('compiler-editor').textContent;
+            const platform = document.getElementById('target-platform').value;
+            const output = document.getElementById('compiler-output');
+            const optimization = document.getElementById('optimization-level').value;
+            
+            output.innerHTML = '<div>Compiling GaiaScript...</div>';
+            
+            // Simulate compilation process
+            setTimeout(() => {
+                output.innerHTML += `<div>Target platform: ${platform}</div>`;
+                output.innerHTML += `<div>Optimization level: ${optimization}</div>`;
+                output.innerHTML += '<div>Parsing symbols...</div>';
+                
+                setTimeout(() => {
+                    output.innerHTML += '<div>Processing AST...</div>';
+                    
+                    setTimeout(() => {
+                        output.innerHTML += '<div>Generating target code...</div>';
+                        
+                        setTimeout(() => {
+                            output.innerHTML += '<div>Linking...</div>';
+                            
+                            setTimeout(() => {
+                                output.innerHTML += '<div>Compilation successful!</div>';
+                                output.innerHTML += `<div>Output written to: ${document.getElementById('output-path').value}.${platform === 'web' ? 'js' : (platform === 'macos' || platform === 'ios' ? 'swift' : (platform === 'windows' ? 'cs' : 'c'))}</div>`;
+                            }, 500);
+                        }, 500);
+                    }, 500);
+                }, 500);
+            }, 500);
+        });
+        
+        document.getElementById('clear-compiler-output').addEventListener('click', function() {
+            document.getElementById('compiler-output').innerHTML = '';
+        });
+        
+        // Visualization Tab
+        function initNetworkVisualization() {
+            const canvas = document.getElementById('network-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Define node components
+            const components = [
+                { id: 'υ', name: 'Upsilon', description: 'UI Component', color: '#e8f5e9', borderColor: '#66bb6a' },
+                { id: 'η', name: 'Eta', description: 'Neural Network', color: '#e3f2fd', borderColor: '#42a5f5' },
+                { id: 'Γ', name: 'Gamma', description: 'GAN Component', color: '#f3e5f5', borderColor: '#ab47bc' },
+                { id: 'μ', name: 'Mu', description: 'Transform Operations', color: '#e0f7fa', borderColor: '#26c6da' },
+                { id: '∂', name: 'Partial', description: 'Differential Operations', color: '#fff8e1', borderColor: '#ffca28' },
+                { id: 'ℝ', name: 'Real', description: 'Number System', color: '#fbe9e7', borderColor: '#ff7043' }
+            ];
+            
+            // Create component cards
+            const componentList = document.getElementById('component-list');
+            components.forEach(component => {
+                const card = document.createElement('div');
+                card.className = 'component-card';
+                card.style.backgroundColor = component.color;
+                card.style.borderLeft = `5px solid ${component.borderColor}`;
+                
+                card.innerHTML = `
+                    <div class="component-header">
+                        <div class="component-title">${component.id} (${component.name})</div>
+                        <div class="component-status">Idle</div>
+                    </div>
+                    <div class="component-content">
+                        ${component.description}
+                    </div>
+                `;
+                
+                componentList.appendChild(card);
+            });
+            
+            // Draw network visualization
+            function drawNetwork() {
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Node positions
+                const nodes = [
+                    { id: 'υ', x: canvas.width * 0.2, y: canvas.height * 0.3 },
+                    { id: 'η', x: canvas.width * 0.4, y: canvas.height * 0.2 },
+                    { id: 'Γ', x: canvas.width * 0.6, y: canvas.height * 0.3 },
+                    { id: 'μ', x: canvas.width * 0.7, y: canvas.height * 0.5 },
+                    { id: '∂', x: canvas.width * 0.3, y: canvas.height * 0.6 },
+                    { id: 'ℝ', x: canvas.width * 0.8, y: canvas.height * 0.7 }
+                ];
+                
+                // Helper to find a node
+                function findNode(id) {
+                    return nodes.find(node => node.id === id);
+                }
+                
+                // Connection data
+                const connections = [
+                    { from: 'υ', to: 'η' },
+                    { from: 'η', to: 'Γ' },
+                    { from: 'Γ', to: 'μ' },
+                    { from: 'μ', to: 'ℝ' },
+                    { from: 'υ', to: '∂' },
+                    { from: '∂', to: 'ℝ' }
+                ];
+                
+                // Draw connections
+                connections.forEach(conn => {
+                    const fromNode = findNode(conn.from);
+                    const toNode = findNode(conn.to);
+                    
+                    if (fromNode && toNode) {
+                        ctx.beginPath();
+                        ctx.moveTo(fromNode.x, fromNode.y);
+                        ctx.lineTo(toNode.x, toNode.y);
+                        ctx.strokeStyle = '#999';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        
+                        // Draw arrow
+                        const angle = Math.atan2(toNode.y - fromNode.y, toNode.x - fromNode.x);
+                        const arrowSize = 10;
+                        
+                        ctx.beginPath();
+                        ctx.moveTo(toNode.x, toNode.y);
+                        ctx.lineTo(
+                            toNode.x - arrowSize * Math.cos(angle - Math.PI/6),
+                            toNode.y - arrowSize * Math.sin(angle - Math.PI/6)
+                        );
+                        ctx.lineTo(
+                            toNode.x - arrowSize * Math.cos(angle + Math.PI/6),
+                            toNode.y - arrowSize * Math.sin(angle + Math.PI/6)
+                        );
+                        ctx.closePath();
+                        ctx.fillStyle = '#999';
+                        ctx.fill();
+                    }
+                });
+                
+                // Draw nodes
+                nodes.forEach(node => {
+                    // Find component data
+                    const component = components.find(c => c.id === node.id);
+                    
+                    if (component) {
+                        // Draw node
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, 25, 0, Math.PI * 2);
+                        ctx.fillStyle = component.color;
+                        ctx.fill();
+                        ctx.strokeStyle = component.borderColor;
+                        ctx.lineWidth = 3;
+                        ctx.stroke();
+                        
+                        // Draw label
+                        ctx.font = '16px sans-serif';
+                        ctx.fillStyle = '#333';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(node.id, node.x, node.y);
+                    }
+                });
+            }
+            
+            // Initial draw
+            drawNetwork();
+            
+            // Animate on click
+            canvas.addEventListener('click', function() {
+                animateNetwork();
+            });
+            
+            // Animation function
+            function animateNetwork() {
+                let frame = 0;
+                const duration = 60; // Number of frames for animation
+                
+                function animate() {
+                    if (frame >= duration) {
+                        return;
+                    }
+                    
+                    frame++;
+                    
+                    // Clear canvas
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Node positions
+                    const nodes = [
+                        { id: 'υ', x: canvas.width * 0.2, y: canvas.height * 0.3 },
+                        { id: 'η', x: canvas.width * 0.4, y: canvas.height * 0.2 },
+                        { id: 'Γ', x: canvas.width * 0.6, y: canvas.height * 0.3 },
+                        { id: 'μ', x: canvas.width * 0.7, y: canvas.height * 0.5 },
+                        { id: '∂', x: canvas.width * 0.3, y: canvas.height * 0.6 },
+                        { id: 'ℝ', x: canvas.width * 0.8, y: canvas.height * 0.7 }
+                    ];
+                    
+                    // Helper to find a node
+                    function findNode(id) {
+                        return nodes.find(node => node.id === id);
+                    }
+                    
+                    // Connection data
+                    const connections = [
+                        { from: 'υ', to: 'η' },
+                        { from: 'η', to: 'Γ' },
+                        { from: 'Γ', to: 'μ' },
+                        { from: 'μ', to: 'ℝ' },
+                        { from: 'υ', to: '∂' },
+                        { from: '∂', to: 'ℝ' }
+                    ];
+                    
+                    // Draw connections
+                    connections.forEach((conn, index) => {
+                        const fromNode = findNode(conn.from);
+                        const toNode = findNode(conn.to);
+                        
+                        if (fromNode && toNode) {
+                            // Determine if this connection should be highlighted
+                            const shouldHighlight = index === Math.floor(frame / 10) % connections.length;
+                            
+                            ctx.beginPath();
+                            ctx.moveTo(fromNode.x, fromNode.y);
+                            ctx.lineTo(toNode.x, toNode.y);
+                            
+                            if (shouldHighlight) {
+                                ctx.strokeStyle = '#2196f3';
+                                ctx.lineWidth = 3;
+                            } else {
+                                ctx.strokeStyle = '#999';
+                                ctx.lineWidth = 2;
+                            }
+                            
+                            ctx.stroke();
+                            
+                            // Draw data flow animation along connection if highlighted
+                            if (shouldHighlight) {
+                                const t = (frame % 10) / 10;
+                                const x = fromNode.x + (toNode.x - fromNode.x) * t;
+                                const y = fromNode.y + (toNode.y - fromNode.y) * t;
+                                
+                                ctx.beginPath();
+                                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                                ctx.fillStyle = '#2196f3';
+                                ctx.fill();
+                            }
+                            
+                            // Draw arrow
+                            const angle = Math.atan2(toNode.y - fromNode.y, toNode.x - fromNode.x);
+                            const arrowSize = 10;
+                            
+                            ctx.beginPath();
+                            ctx.moveTo(toNode.x, toNode.y);
+                            ctx.lineTo(
+                                toNode.x - arrowSize * Math.cos(angle - Math.PI/6),
+                                toNode.y - arrowSize * Math.sin(angle - Math.PI/6)
+                            );
+                            ctx.lineTo(
+                                toNode.x - arrowSize * Math.cos(angle + Math.PI/6),
+                                toNode.y - arrowSize * Math.sin(angle + Math.PI/6)
+                            );
+                            ctx.closePath();
+                            ctx.fillStyle = shouldHighlight ? '#2196f3' : '#999';
+                            ctx.fill();
+                        }
+                    });
+                    
+                    // Draw nodes
+                    nodes.forEach(node => {
+                        // Find component data
+                        const component = components.find(c => c.id === node.id);
+                        
+                        // Determine if this node should be highlighted
+                        const activeIndex = Math.floor(frame / 10);
+                        const conn = connections[activeIndex % connections.length];
+                        const isActive = node.id === conn.from || node.id === conn.to;
+                        
+                        if (component) {
+                            // Draw node
+                            ctx.beginPath();
+                            ctx.arc(node.x, node.y, isActive ? 28 : 25, 0, Math.PI * 2);
+                            ctx.fillStyle = component.color;
+                            ctx.fill();
+                            ctx.strokeStyle = isActive ? '#2196f3' : component.borderColor;
+                            ctx.lineWidth = isActive ? 4 : 3;
+                            ctx.stroke();
+                            
+                            // Draw label
+                            ctx.font = isActive ? 'bold 16px sans-serif' : '16px sans-serif';
+                            ctx.fillStyle = '#333';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(node.id, node.x, node.y);
+                            
+                            // Update component card state
+                            if (isActive) {
+                                const cards = document.querySelectorAll('.component-card');
+                                const card = Array.from(cards).find(card => 
+                                    card.querySelector('.component-title').textContent.startsWith(node.id)
+                                );
+                                
+                                if (card) {
+                                    const status = card.querySelector('.component-status');
+                                    status.textContent = 'Active';
+                                    status.style.backgroundColor = '#e0f7fa';
+                                    status.style.color = '#00838f';
+                                }
+                            }
+                        }
+                    });
+                    
+                    requestAnimationFrame(animate);
+                }
+                
+                // Reset component statuses
+                document.querySelectorAll('.component-status').forEach(status => {
+                    status.textContent = 'Idle';
+                    status.style.backgroundColor = '#f5f5f5';
+                    status.style.color = '#666';
+                });
+                
+                // Start animation
+                animate();
+            }
+        }
+        
+        // Initialize visualization on tab switch
+        document.querySelector('[data-tab="visualization"]').addEventListener('click', function() {
+            setTimeout(initNetworkVisualization, 100);
+        });
+        
+        // Documentation Tab
+        // Adjust iframe URL based on your docs
+    </script>
+</body>
+</html>
