@@ -51,7 +51,13 @@ fn handle_connection(mut stream: TcpStream) -> io::Result<()> {
     };
     
     if path == "/" {
-        serve_file(stream, "web/index.html", "text/html")
+        // Redirect to the unified app
+        let response = "HTTP/1.1 302 Found\r\nLocation: /unified/\r\n\r\n";
+        stream.write_all(response.as_bytes())?;
+        Ok(())
+    } else if path == "/main.gaia" {
+        // Serve the single main.gaia file
+        serve_file(stream, "main.gaia", "text/plain")
     } else if path.starts_with("/api/run") {
         // Extract the GaiaScript code from the request body
         let body_start = request.find("\r\n\r\n").unwrap_or(0) + 4;

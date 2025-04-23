@@ -1,51 +1,60 @@
-# GaiaScript: AI-Optimized Programming Language (AOPL)
+# GaiaScript: Ultra-Compact Symbolic Programming
 
-GaiaScript is an implementation of AOPL, a symbolic programming language designed for AI-to-AI communication with minimal token usage and maximum information density. It includes a JavaScript compiler and web-based visualization.
+GaiaScript is an ultra-compact symbolic programming language designed for maximum density and expressiveness. The entire application is contained in a single file with no whitespace or comments.
 
-## Features
+## Core Philosophy
 
-- **Ultra-compact symbolic syntax** for defining neural network architectures
-- **Pipeline-oriented syntax** for data flow operations
-- **Context-aware grammar** where operators derive meaning from position and context
-- **Specialized for AI workloads** with built-in tensor operations and ML concepts
-- **Web visualization** for interactive exploration of neural architectures
-- **JavaScript compiler** for client-side execution
+- **Extreme Terseness**: Uses symbolic notation for maximum information density
+- **Single File**: Entire application (UI, 3D, neural networks) in one file
+- **Symbolic Representation**: Uses mathematical and special symbols for all operations
+- **Cross-Domain**: Unifies UI, 3D graphics, and neural networks in one language
 
-## Examples
+## The File
 
-### CNN Image Classifier
+Everything is contained in `main.gaia`:
 
 ```
-N ⊻ I ⊸ μ σ → C₁ 32 5 ρ → R → P 2 → C₂ 64 3 ρ → R → P 2 → F → D₁ 128 R → D₀ 10 → S
+N〈γ⊕φ⊕δ⊕α〉γ:H→∮800×600→П→⊞3×3→[(⌘"▶"⌘click→φ.①),(⌘"↺"⌘click→φ.⓪),(⌑"§"⇄φ.ς)]φ:⦿→⌖→[T10→L20→P→D32→τ]×3→⟲60δ:I224×224×3→C₁32→P→C₂64→P→F→D₁128→D₂64→D₀10→Sα:⊿→⍉→◐→⌼→☀→⊠→⊛
 ```
 
-### GAN Architecture
+This 89-character file implements:
 
-```
-N〈G⊕D〉
-G: Z 100 → U 4×4×512 → [U 2× → C 256 ρ]×2 → C 3 τ
-D: I → [C 64 5 ρ → P 2]×3 → F → D₁ 1024 ρ → D₀ 1 σ
-L: G(Z)⊳D⟿BCE+λ‖∇D‖
-```
+- UI Components (γ): Panel, Buttons, Layout, Canvas, Labels
+- Game Engine (φ): 3D World, Camera, Neural Network Controller
+- Neural Network (δ): Convolutional layers, Dense layers, Softmax
+- Assets (α): 3D models, textures, materials, shaders
 
-### MorphSphere Game Model
+## Running the App
 
-```
-N〈G⊕W⊕M⊕C〉
-G: I → C 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 7 → S 
-W: Z 512 → U 16×16×32 → C 64 3 ρ → U 2× → C 32 3 ρ → R
-M: Z 128 → D₁ 64 ρ → D₁ 32 ρ → R 4×4×2 → U 2× → C 8 3 ρ
-C: M⊳G⟿MSE
-```
+1. Start the GaiaScript compiler: `cargo run -- serve`
+2. Open a browser to http://localhost:8080/unified/
+3. The symbolic language is compiled and executed at runtime
 
-## Getting Started
+## Working with Symbols
 
-### Prerequisites
+| Component | Symbol |
+|-----------|--------|
+| UI        | γ      |
+| Game      | φ      |
+| Data      | δ      |
+| Assets    | α      |
+| Canvas    | ∮      |
+| Panel     | П      |
+| Grid      | ⊞      |
+| Button    | ⌘      |
+| Label     | ⌑      |
+| 3D World  | ⦿      |
+| Camera    | ⌖      |
+| Renderer  | ⟲      |
+| Event     | ⌘click→|
+| Binding   | ⇄      |
+
+## Prerequisites
 
 - Rust (latest stable version)
 - Web browser with JavaScript enabled
 
-### Installation
+## Installation
 
 ```bash
 git clone https://github.com/yourusername/gaiascript.git
@@ -53,52 +62,12 @@ cd gaiascript
 cargo build --release
 ```
 
-### Usage
+## Extending the Language
 
-#### Run a GaiaScript program
-```bash
-cargo run -- run examples/cnn.gaia
-```
-
-#### Parse and print the AST
-```bash
-cargo run -- parse examples/transformer.gaia
-```
-
-#### Compile to JavaScript
-```bash
-cargo run -- compile examples/morph_game.gaia
-```
-
-#### Start the web server
-```bash
-cargo run -- serve
-```
-Then open http://localhost:8080/gaia-playground.html in your browser.
-
-### Web Visualization
-
-The web playground allows you to:
-1. Write GaiaScript code directly in the browser
-2. Visualize neural network architectures in 3D
-3. Compile GaiaScript to JavaScript
-4. Run a simplified version of the MorphSphere game
-
-## Language Reference
-
-See [INSTRUCTIONS.md](INSTRUCTIONS.md) for the full language specification.
-
-## Web Server
-
-The `serve` command starts a simple web server that provides:
-- The GaiaScript playground UI
-- API endpoints for compiling and running GaiaScript
-- Static file hosting for the web interface
+The compiler can be extended with new symbols by modifying:
+- `src/aopl.pest` - Grammar definitions
+- `src/extensions/` - Implementation of new components
 
 ## License
 
 MIT
-
-## Acknowledgments
-
-This project demonstrates the concept of an AI-optimized programming language that prioritizes computational efficiency and information density for AI-to-AI communication, with visual demonstrations of the concepts through the MorphSphere game.
