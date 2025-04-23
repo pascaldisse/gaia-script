@@ -5,9 +5,20 @@ use std::net::TcpListener;
 
 use gaiascript::parser;
 use gaiascript::interpreter::Interpreter;
+use gaiascript::logger;
 
 fn main() {
+    // Initialize logger
+    if let Err(e) = logger::init("logs/gaiascript.log", true, logger::LogLevel::Info) {
+        eprintln!("Failed to initialize logger: {}", e);
+    }
+    
     let args: Vec<String> = env::args().collect();
+    
+    // Log the command
+    if args.len() > 1 {
+        logger::log_user_input(&args[1], if args.len() > 2 { &args[2..] } else { &[] });
+    }
     
     if args.len() < 2 {
         println!("Usage:");
@@ -16,13 +27,28 @@ fn main() {
         println!("  cargo run -- compile <filename>     # Compile to JavaScript");
         println!("  cargo run -- asm <filename> [arch]  # Compile to assembly (x86_64, arm64, wasm)");
         println!("  cargo run -- serve                  # Start web server");
+        println!("  cargo run -- prompt <type>          # Generate development prompt");
+        logger::error("No command specified");
         return;
     }
     
     match args[1].as_str() {
+        "prompt" => {
+            if args.len() < 3 {
+                println!("Error: Missing prompt type");
+                println!("Available types: refactor, test, feature, performance, feedback");
+                logger::error("Missing prompt type");
+                return;
+            }
+            
+            let prompt = logger::generate_prompt(&args[2]);
+            println!("{}", prompt);
+            logger::info(&format!("Generated {} prompt", args[2]));
+        },
         "parse" => {
             if args.len() < 3 {
                 println!("Error: Missing filename");
+                logger::error("Missing filename for parse command");
                 return;
             }
             
@@ -31,6 +57,7 @@ fn main() {
         "run" => {
             if args.len() < 3 {
                 println!("Error: Missing filename");
+                logger::error("Missing filename for run command");
                 return;
             }
             
@@ -39,6 +66,7 @@ fn main() {
         "compile" => {
             if args.len() < 3 {
                 println!("Error: Missing filename");
+                logger::error("Missing filename for compile command");
                 return;
             }
             
@@ -47,6 +75,7 @@ fn main() {
         "asm" => {
             if args.len() < 3 {
                 println!("Error: Missing filename");
+                logger::error("Missing filename for asm command");
                 return;
             }
             
@@ -58,11 +87,13 @@ fn main() {
                     "wasm" => gaiascript::asm_compiler::AsmTarget::WASM,
                     _ => {
                         println!("Error: Unknown architecture '{}'. Using x86_64.", args[3]);
+                        logger::warning(&format!("Unknown architecture '{}'. Using x86_64.", args[3]));
                         gaiascript::asm_compiler::AsmTarget::X86_64
                     }
                 }
             } else {
                 println!("No architecture specified, using x86_64");
+                logger::info("No architecture specified, using x86_64");
                 gaiascript::asm_compiler::AsmTarget::X86_64
             };
             
@@ -76,6 +107,7 @@ fn main() {
             };
             
             println!("Starting web server on port {}", port);
+            logger::info(&format!("Starting web server on port {}", port));
             
             // Basic web server implementation
             match TcpListener::bind(format!("0.0.0.0:{}", port)) {
@@ -84,6 +116,8 @@ fn main() {
                     println!("Available paths:");
                     println!("  http://localhost:{}/gaia-playground.html - GaiaScript Playground", port);
                     println!("  http://localhost:{}/gaia-morphsphere.html - MorphSphere Game", port);
+                    
+                    logger::info(&format!("Server started at http://localhost:{}", port));
                     
                     for stream in listener.incoming() {
                         match stream {
@@ -117,6 +151,7 @@ fn main() {
                                         let gaia_code = &request[body_start..];
                                         
                                         println!("Compiling GaiaScript code: {}", gaia_code);
+                                        logger::log_api_call("compile", gaia_code);
                                         
                                         // Parse the GaiaScript
                                         let result = match parser::parse(gaia_code) {
@@ -124,10 +159,14 @@ fn main() {
                                                 let js = compile_to_js(&ast);
                                                 // Escape quotes for JSON
                                                 let escaped_js = js.replace("\"", "\\\"").replace("\n", "\\n");
-                                                format!("{{ \"success\": true, \"javascript\": \"{}\" }}", escaped_js)
+                                                let response = format!("{{ \"success\": true, \"javascript\": \"{}\" }}", escaped_js);
+                                                logger::info("Successfully compiled GaiaScript code to JavaScript");
+                                                response
                                             },
                                             Err(err) => {
-                                                format!("{{ \"success\": false, \"error\": \"Parse error: {}\" }}", err)
+                                                let error_msg = format!("Parse error: {}", err);
+                                                logger::error(&error_msg);
+                                                format!("{{ \"success\": false, \"error\": \"{}\" }}", error_msg)
                                             }
                                         };
                                         
@@ -140,24 +179,37 @@ fn main() {
                                         
                                         stream.write_all(response.as_bytes()).unwrap_or(());
                                         println!("Compiled GaiaScript code");
+                                        logger::log_api_response("compile", &result);
                                     } else if api_path.starts_with("run") {
                                         // Extract request body (GaiaScript code)
                                         let body_start = request.find("\r\n\r\n").unwrap_or(0) + 4;
                                         let gaia_code = &request[body_start..];
                                         
                                         println!("Running GaiaScript code: {}", gaia_code);
+                                        logger::log_api_call("run", gaia_code);
                                         
                                         // Parse and run the GaiaScript
                                         let result = match parser::parse(gaia_code) {
                                             Ok(ast) => {
                                                 let mut interpreter = Interpreter::new();
                                                 match interpreter.interpret(&ast) {
-                                                    Ok(value) => format!("{{ \"success\": true, \"result\": \"{:?}\" }}", value),
-                                                    Err(err) => format!("{{ \"success\": false, \"error\": \"Runtime error: {}\" }}", err),
+                                                    Ok(value) => {
+                                                        let result_str = format!("{:?}", value);
+                                                        logger::info(&format!("Successfully ran GaiaScript code with result: {}", result_str));
+                                                        logger::log_execution_result(&result_str);
+                                                        format!("{{ \"success\": true, \"result\": \"{:?}\" }}", value)
+                                                    },
+                                                    Err(err) => {
+                                                        let error_msg = format!("Runtime error: {}", err);
+                                                        logger::error(&error_msg);
+                                                        format!("{{ \"success\": false, \"error\": \"{}\" }}", error_msg)
+                                                    }
                                                 }
                                             },
                                             Err(err) => {
-                                                format!("{{ \"success\": false, \"error\": \"Parse error: {}\" }}", err)
+                                                let error_msg = format!("Parse error: {}", err);
+                                                logger::error(&error_msg);
+                                                format!("{{ \"success\": false, \"error\": \"{}\" }}", error_msg)
                                             }
                                         };
                                         
@@ -170,11 +222,13 @@ fn main() {
                                         
                                         stream.write_all(response.as_bytes()).unwrap_or(());
                                         println!("Ran GaiaScript code");
+                                        logger::log_api_response("run", &result);
                                     } else {
                                         // Unknown API endpoint
                                         let response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nAPI endpoint not found";
                                         stream.write_all(response.as_bytes()).unwrap_or(());
                                         println!("Unknown API endpoint: {}", api_path);
+                                        logger::error(&format!("Unknown API endpoint: {}", api_path));
                                     }
                                 } else {
                                     // Serve the requested file
@@ -230,36 +284,44 @@ fn main() {
                                         stream.write_all(&content).unwrap_or(());
                                         
                                         println!("Served: {}", file_path);
+                                        logger::info(&format!("Served file: {}", file_path));
                                     } else {
                                         // Send 404
                                         let response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nNot Found";
                                         stream.write_all(response.as_bytes()).unwrap_or(());
                                         println!("404: {}", file_path);
+                                        logger::warning(&format!("404 Not Found: {}", file_path));
                                     }
                                 }
                             },
                             Err(e) => {
                                 println!("Connection error: {}", e);
+                                logger::error(&format!("Connection error: {}", e));
                             }
                         }
                     }
                 },
                 Err(e) => {
                     println!("Error starting server: {}", e);
+                    logger::error(&format!("Error starting server: {}", e));
                 }
             }
         },
         _ => {
             println!("Unknown command: {}", args[1]);
+            logger::error(&format!("Unknown command: {}", args[1]));
         }
     }
 }
 
 fn parse_file(filename: &str) {
+    logger::info(&format!("Parsing file: {}", filename));
+    
     let contents = match fs::read_to_string(filename) {
         Ok(c) => c,
         Err(e) => {
             println!("Error reading file: {}", e);
+            logger::error(&format!("Error reading file {}: {}", filename, e));
             return;
         }
     };
@@ -267,18 +329,23 @@ fn parse_file(filename: &str) {
     match parser::parse(&contents) {
         Ok(ast) => {
             println!("AST: {:#?}", ast);
+            logger::info(&format!("Successfully parsed file: {}", filename));
         },
         Err(e) => {
             println!("Parse error: {}", e);
+            logger::error(&format!("Parse error in file {}: {}", filename, e));
         }
     }
 }
 
 fn run_file(filename: &str) {
+    logger::info(&format!("Running file: {}", filename));
+    
     let contents = match fs::read_to_string(filename) {
         Ok(c) => c,
         Err(e) => {
             println!("Error reading file: {}", e);
+            logger::error(&format!("Error reading file {}: {}", filename, e));
             return;
         }
     };
@@ -290,23 +357,31 @@ fn run_file(filename: &str) {
             match interpreter.interpret(&ast) {
                 Ok(result) => {
                     println!("Result: {:?}", result);
+                    let result_str = format!("{:?}", result);
+                    logger::info(&format!("Successfully ran file {} with result: {}", filename, result_str));
+                    logger::log_execution_result(&result_str);
                 },
                 Err(e) => {
                     println!("Runtime error: {}", e);
+                    logger::error(&format!("Runtime error in file {}: {}", filename, e));
                 }
             }
         },
         Err(e) => {
             println!("Parse error: {}", e);
+            logger::error(&format!("Parse error in file {}: {}", filename, e));
         }
     }
 }
 
 fn compile_file(filename: &str) {
+    logger::info(&format!("Compiling file to JavaScript: {}", filename));
+    
     let contents = match fs::read_to_string(filename) {
         Ok(c) => c,
         Err(e) => {
             println!("Error reading file: {}", e);
+            logger::error(&format!("Error reading file {}: {}", filename, e));
             return;
         }
     };
@@ -314,6 +389,7 @@ fn compile_file(filename: &str) {
     match parser::parse(&contents) {
         Ok(ast) => {
             println!("Compiling to JavaScript...");
+            logger::info("Parsing successful, compiling to JavaScript...");
             
             // Generate JavaScript output filename
             let path = Path::new(filename);
@@ -327,36 +403,43 @@ fn compile_file(filename: &str) {
             match fs::write(&js_filename, js_code) {
                 Ok(_) => {
                     println!("Successfully compiled to {}", js_filename);
+                    logger::info(&format!("Successfully compiled {} to {}", filename, js_filename));
                 },
                 Err(e) => {
                     println!("Error writing JavaScript file: {}", e);
+                    logger::error(&format!("Error writing JavaScript file {}: {}", js_filename, e));
                 }
             }
         },
         Err(e) => {
             println!("Parse error: {}", e);
+            logger::error(&format!("Parse error in file {}: {}", filename, e));
         }
     }
 }
 
 fn compile_to_assembly(filename: &str, target: gaiascript::asm_compiler::AsmTarget) {
+    let target_name = match target {
+        gaiascript::asm_compiler::AsmTarget::X86_64 => "x86_64",
+        gaiascript::asm_compiler::AsmTarget::ARM64 => "arm64",
+        gaiascript::asm_compiler::AsmTarget::WASM => "wasm",
+    };
+    
+    logger::info(&format!("Compiling file to {} assembly: {}", target_name, filename));
+    
     let contents = match fs::read_to_string(filename) {
         Ok(c) => c,
         Err(e) => {
             println!("Error reading file: {}", e);
+            logger::error(&format!("Error reading file {}: {}", filename, e));
             return;
         }
     };
     
     match parser::parse(&contents) {
         Ok(ast) => {
-            let target_name = match target {
-                gaiascript::asm_compiler::AsmTarget::X86_64 => "x86_64",
-                gaiascript::asm_compiler::AsmTarget::ARM64 => "arm64",
-                gaiascript::asm_compiler::AsmTarget::WASM => "wasm",
-            };
-            
             println!("Compiling to {} assembly...", target_name);
+            logger::info(&format!("Parsing successful, compiling to {} assembly...", target_name));
             
             // Generate assembly output filename
             let path = Path::new(filename);
@@ -376,29 +459,43 @@ fn compile_to_assembly(filename: &str, target: gaiascript::asm_compiler::AsmTarg
                 Ok(_) => {
                     println!("Successfully compiled to {}", asm_filename);
                     println!("Assembly code is ready to be assembled with appropriate tools.");
+                    logger::info(&format!("Successfully compiled {} to {}", filename, asm_filename));
                     
-                    match target {
+                    let assembly_instructions = match target {
                         gaiascript::asm_compiler::AsmTarget::X86_64 => {
+                            let instructions = format!("To assemble: nasm -f elf64 {} -o {}.o\nTo link: ld {}.o -o {}", 
+                                asm_filename, stem, stem, stem);
                             println!("To assemble: nasm -f elf64 {} -o {}.o", asm_filename, stem);
                             println!("To link: ld {}.o -o {}", stem, stem);
+                            instructions
                         },
                         gaiascript::asm_compiler::AsmTarget::ARM64 => {
+                            let instructions = format!("To assemble: as {} -o {}.o\nTo link: ld {}.o -o {}", 
+                                asm_filename, stem, stem, stem);
                             println!("To assemble: as {} -o {}.o", asm_filename, stem);
                             println!("To link: ld {}.o -o {}", stem, stem);
+                            instructions
                         },
                         gaiascript::asm_compiler::AsmTarget::WASM => {
+                            let instructions = format!("To convert to binary WebAssembly:\nwat2wasm {} -o {}.wasm", 
+                                asm_filename, stem);
                             println!("To convert to binary WebAssembly:");
                             println!("wat2wasm {} -o {}.wasm", asm_filename, stem);
+                            instructions
                         },
-                    }
+                    };
+                    
+                    logger::info(&format!("Assembly instructions: {}", assembly_instructions));
                 },
                 Err(e) => {
                     println!("Error writing assembly file: {}", e);
+                    logger::error(&format!("Error writing assembly file {}: {}", asm_filename, e));
                 }
             }
         },
         Err(e) => {
             println!("Parse error: {}", e);
+            logger::error(&format!("Parse error in file {}: {}", filename, e));
         }
     }
 }

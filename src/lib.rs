@@ -17,7 +17,7 @@ mod tests {
     fn test_parse_simple_network() {
         let input = "N";
         let result = parser::parse(input);
-        assert!(result.is_ok(), "Failed to parse: {:?}", result.err());
+        assert\!(result.is_ok(), "Failed to parse: {:?}", result.err());
     }
     
     #[test]
@@ -27,16 +27,16 @@ mod tests {
         
         // X86_64 compilation
         let x86_asm = asm_compiler::compile_to_asm(&ast, asm_compiler::AsmTarget::X86_64);
-        assert!(x86_asm.contains("section .text"));
-        assert!(x86_asm.contains("global _start"));
+        assert\!(x86_asm.contains("section .text"));
+        assert\!(x86_asm.contains("global _start"));
         
         // ARM64 compilation
         let arm_asm = asm_compiler::compile_to_asm(&ast, asm_compiler::AsmTarget::ARM64);
-        assert!(arm_asm.contains(".global _start"));
+        assert\!(arm_asm.contains(".global _start"));
         
         // WebAssembly compilation
         let wasm_asm = asm_compiler::compile_to_asm(&ast, asm_compiler::AsmTarget::WASM);
-        assert!(wasm_asm.contains("(module"));
-        assert!(wasm_asm.contains("(func (export \"run\")"));
+        assert\!(wasm_asm.contains("(module"));
+        assert\!(wasm_asm.contains("(func (export \"run\")"));
     }
 }

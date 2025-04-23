@@ -1,1 +1,24 @@
-/target
+# Rust build artifacts
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+server*.log
+
+# Backup directory
+backup/
+
+# Generated files
+*.js.map
