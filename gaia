@@ -1,0 +1,158 @@
+#!/usr/bin/env node
+
+/**
+ * GaiaScript CLI - Minimal command line tool for GaiaScript
+ */
+
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+// Parse arguments
+const args = process.argv.slice(2);
+const command = args[0] || 'help';
+const inputFile = args[1];
+const options = parseOptions(args.slice(2));
+
+/**
+ * Parse command line options
+ */
+function parseOptions(args) {
+  const options = {};
+  for (const arg of args) {
+    if (arg.startsWith('--')) {
+      const [key, value] = arg.substring(2).split('=');
+      options[key] = value || true;
+    }
+  }
+  return options;
+}
+
+/**
+ * Load GaiaScript package
+ */
+function loadPackage() {
+  // First, check if pkg.gaia exists
+  const pkgPath = path.join(__dirname, 'pkg.gaia');
+  
+  if (!fs.existsSync(pkgPath)) {
+    console.error('Error: pkg.gaia not found');
+    process.exit(1);
+  }
+  
+  // Load package
+  const pkgContent = fs.readFileSync(pkgPath, 'utf-8');
+  
+  // Validate package
+  if (!pkgContent.startsWith('ℙ⟨')) {
+    console.error('Error: Invalid package format');
+    process.exit(1);
+  }
+  
+  // Extract runtime
+  const runtimeMatch = pkgContent.match(/⚙⟨([\s\S]+?)⟩/);
+  
+  if (!runtimeMatch) {
+    console.error('Error: Invalid package (missing runtime)');
+    process.exit(1);
+  }
+  
+  // Create runtime file
+  const runtimePath = path.join(__dirname, '.gaia-runtime.js');
+  fs.writeFileSync(runtimePath, runtimeMatch[1]);
+  
+  // Load runtime
+  const runtime = require(runtimePath);
+  
+  // Clean up
+  try {
+    fs.unlinkSync(runtimePath);
+  } catch (err) {}
+  
+  return runtime;
+}
+
+/**
+ * Run command
+ */
+async function runCommand() {
+  switch (command) {
+    case 'run':
+      if (!inputFile) {
+        console.error('Error: Input file required');
+        showHelp();
+        process.exit(1);
+      }
+      
+      const runtime = loadPackage();
+      const result = runtime.run(inputFile, options);
+      
+      if (result && options.execute !== false) {
+        // Execute compiled JavaScript
+        const outputPath = options.output || 'gaia-compiled.js';
+        console.log(`Executing ${outputPath}...`);
+        
+        try {
+          execSync(`node ${outputPath}`, { stdio: 'inherit' });
+        } catch (error) {
+          console.error(`Execution error: ${error.message}`);
+          process.exit(1);
+        }
+      }
+      break;
+      
+    case 'build':
+      if (!inputFile) {
+        console.error('Error: Input file required');
+        showHelp();
+        process.exit(1);
+      }
+      
+      const buildRuntime = loadPackage();
+      buildRuntime.run(inputFile, { ...options, execute: false });
+      break;
+      
+    case 'extract':
+      const extractRuntime = loadPackage();
+      extractRuntime.extract('./pkg.gaia', inputFile || './extracted');
+      break;
+      
+    case 'help':
+    default:
+      showHelp();
+      break;
+  }
+}
+
+/**
+ * Show help
+ */
+function showHelp() {
+  console.log(`
+GaiaScript CLI - Ultra-compact symbolic language
+
+Usage:
+  ./gaia <command> [options]
+
+Commands:
+  run <file>     Build and run GaiaScript file
+  build <file>   Build GaiaScript file to JavaScript
+  extract [dir]  Extract pkg.gaia to directory
+  help           Show this help
+
+Options:
+  --output=<file>  Output file (default: gaia-compiled.js)
+  --target=<js>    Target platform (currently only JS supported)
+
+Examples:
+  ./gaia run main.gaia
+  ./gaia build main.gaia --output=app.js
+  ./gaia extract ./extracted
+`);
+}
+
+// Run command
+runCommand().catch(error => {
+  console.error(`Error: ${error.message}`);
+  process.exit(1);
+});
