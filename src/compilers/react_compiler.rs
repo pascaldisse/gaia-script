@@ -198,19 +198,21 @@ function {}(props) {{
         
         // Create a function for the block to be executed multiple times
         let block_id = self.get_unique_id("block");
-        let block_fn = format!("
+        
+        // Using raw strings for format string
+        let block_fn = format!(r#"
 // Function to repeat
-const {}Fn = () => {{
-  {}
+const {0}Fn = () => {{
+  {1}
 }};
 
-// Repeat the block {} times
-{Array.from({{ length: {} }}).map((_, index) => (
+// Repeat the block {2} times
+{{Array.from({{ length: {2} }}).map((_, index) => (
   <React.Fragment key={{index}}>
-    {{{block_id}Fn()}}
+    {{{0}Fn()}}
   </React.Fragment>
-))}
-        ", block_id, content_jsx, block.repetitions, block.repetitions);
+))}}
+        "#, block_id, content_jsx, block.repetitions);
         
         Ok(block_fn)
     }
@@ -379,15 +381,15 @@ const {} = (
             _ => &handler.event_type,
         };
         
-        let jsx_code = format!("
+        let jsx_code = format!(r#"
 // Handler function
-const {} = (event) => {{
-  {}
+const {0} = (event) => {{
+  {1}
 }};
 
 // Add event handler to component
-<{} {...props} {}={{{}}} />
-        ", handler_fn, handler_body, handler.source, event_type, handler_fn);
+<{2} {{...props}} {3}={{{4}}} />
+        "#, handler_fn, handler_body, handler.source, event_type, handler_fn);
         
         Ok(jsx_code)
     }

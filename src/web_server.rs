@@ -269,7 +269,7 @@ fn call_gaia_llm_api(message: &str, context: &str) -> Result<String, String> {
         .arg("-d")
         .arg(format!("@{}", request_file.to_string_lossy()))
         .arg("-o")
-        .arg(&output_path)
+        .arg(&*output_path)
         .status()
         .map_err(|e| format!("Failed to execute curl command: {}", e))?;
     
@@ -350,10 +350,10 @@ fn generate_gaiascript_response(message: &str) -> String {
         let code = "N I → [D₁ 64 ρ]×2 → D₀ 10 → S";
         format!("Here's a simple GaiaScript neural network:\n\n{}\n\nThis is a basic feedforward network with two hidden layers of 64 neurons each using ReLU activation, followed by a 10-neuron output layer with softmax activation.", code_block(code))
     } else if message_lower.contains("explain") && message_lower.contains("symbol") {
-        "GaiaScript uses these symbols for concise neural network notation:\n\n- N: Network definition\n- I: Input layer\n- C: Convolutional layer (C₁, C₂, etc. for different channels)\n- D: Dense/Fully connected layer (D₁ for hidden, D₀ for output)\n- P: Pooling layer\n- F: Flatten operation\n- →: Data flow direction\n- ρ: ReLU activation\n- σ: Sigmoid activation\n- τ: Tanh activation\n- S: Softmax activation\n- R: Regularization\n- [ ]×n: Repeat block n times\n- 〈〉: Component grouping\n- ⊕: Component separation\n\nThis symbolic notation allows complex networks to be expressed in minimal space."
+        "GaiaScript uses these symbols for concise neural network notation:\n\n- N: Network definition\n- I: Input layer\n- C: Convolutional layer (C₁, C₂, etc. for different channels)\n- D: Dense/Fully connected layer (D₁ for hidden, D₀ for output)\n- P: Pooling layer\n- F: Flatten operation\n- →: Data flow direction\n- ρ: ReLU activation\n- σ: Sigmoid activation\n- τ: Tanh activation\n- S: Softmax activation\n- R: Regularization\n- [ ]×n: Repeat block n times\n- 〈〉: Component grouping\n- ⊕: Component separation\n\nThis symbolic notation allows complex networks to be expressed in minimal space.".to_string()
     } else if message_lower.contains("explain") && message_lower.contains("gaiascript") {
-        "GaiaScript is a symbolic language designed for concise representation of neural networks and other AI architectures. It uses Unicode symbols to express complex structures in a minimal, mathematically-inspired notation.\n\nKey benefits:\n1. Density: Express complex networks in a fraction of the space\n2. Readability: Once familiar with the symbols, networks can be understood at a glance\n3. Mathematical clarity: Captures the essence of neural computation\n\nGaiaScript can represent everything from simple feedforward networks to complex architectures like CNNs, RNNs, GANs, and Transformers."
+        "GaiaScript is a symbolic language designed for concise representation of neural networks and other AI architectures. It uses Unicode symbols to express complex structures in a minimal, mathematically-inspired notation.\n\nKey benefits:\n1. Density: Express complex networks in a fraction of the space\n2. Readability: Once familiar with the symbols, networks can be understood at a glance\n3. Mathematical clarity: Captures the essence of neural computation\n\nGaiaScript can represent everything from simple feedforward networks to complex architectures like CNNs, RNNs, GANs, and Transformers.".to_string()
     } else {
-        "I'm the GaiaScript Assistant. I can help you write neural network architectures using GaiaScript notation, explain symbols, or generate example code for different network types like CNNs, GANs, or Transformers.\n\nTry asking me to:\n- Write a CNN for image classification\n- Explain GaiaScript symbols\n- Generate a GAN architecture\n- Write a simple neural network"
+        "I'm the GaiaScript Assistant. I can help you write neural network architectures using GaiaScript notation, explain symbols, or generate example code for different network types like CNNs, GANs, or Transformers.\n\nTry asking me to:\n- Write a CNN for image classification\n- Explain GaiaScript symbols\n- Generate a GAN architecture\n- Write a simple neural network".to_string()
     }
 }

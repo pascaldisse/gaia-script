@@ -39,7 +39,12 @@ impl fmt::Display for ASTNode {
                     write!(f, "{}", node)?;
                 }
                 Ok(())
-            }
+            },
+            ASTNode::UIComponent(_) => write!(f, "UIComponent"),
+            ASTNode::EventHandler(_) => write!(f, "EventHandler"),
+            ASTNode::DataBinding(_) => write!(f, "DataBinding"),
+            ASTNode::ThreeDComponent(_) => write!(f, "ThreeDComponent"),
+            ASTNode::Asset(_) => write!(f, "Asset")
         }
     }
 }

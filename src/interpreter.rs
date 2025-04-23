@@ -57,6 +57,7 @@ pub enum Value {
     Tensor(Tensor),
     Number(f32),
     Model(NetworkModel),
+    Null, // Used for unimplemented features
 }
 
 // Runtime environment
@@ -161,6 +162,12 @@ impl Interpreter {
             ASTNode::DataFlow(from, to) => self.interpret_data_flow(from, to),
             ASTNode::Loss(loss) => self.interpret_loss(loss),
             ASTNode::Expression(nodes) => self.interpret_expression(nodes),
+            // Not implemented yet for non-core components
+            ASTNode::UIComponent(_) => Ok(Value::Null),
+            ASTNode::EventHandler(_) => Ok(Value::Null),
+            ASTNode::DataBinding(_) => Ok(Value::Null),
+            ASTNode::ThreeDComponent(_) => Ok(Value::Null),
+            ASTNode::Asset(_) => Ok(Value::Null),
         }
     }
     

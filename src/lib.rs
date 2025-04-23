@@ -13,6 +13,7 @@ pub mod compilers {
     pub mod react_compiler;
     pub mod flutter_compiler;
     pub mod lynx_compiler;
+    pub mod llvm_compiler;
 }
 
 #[cfg(test)]

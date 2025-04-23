@@ -1,65 +1,11 @@
-# GaiaScript Project Guidelines
-
-## Build and Execution
-- `cargo build` - Build the project
-- `cargo check` - Check for errors without building
-- `cargo run -- run examples/cnn.gaia` - Run a GaiaScript program
-- `cargo run -- parse examples/cnn.gaia` - Parse and print the AST
-- `cargo run -- serve` - Start the web server for the MorphSphere game
-- `cargo run -- compile examples/minimal.gaia --target lynx` - Compile to LynxJS
-- `cargo run -- compile examples/minimal.gaia --target react` - Compile to React
-- `cargo run -- compile examples/minimal.gaia --target flutter` - Compile to Flutter
-- `cargo run -- compile examples/minimal.gaia --target kotlin` - Compile to Kotlin
-- `cargo clippy` - Run the Rust linter
-- `cargo test` - Run all tests
-- `cargo test -- interpreter::tests::test_layer_interpretation` - Run specific test
-- `cargo doc --open` - Generate and view documentation
-- `cargo build --release` - Build optimized release version
-
-## Code Style Guidelines
-- **Imports**: Group by: 1) Rust standard library 2) External crates 3) Project modules
-- **Formatting**: 4-space indentation, 100 char line limit
-- **Types**: 
-  - AST nodes in ast.rs
-  - Symbol definitions in aopl.pest
-  - Interpreter components in interpreter.rs
-  - Compiler implementations in compilers/ directory
-- **Naming**: 
-  - PascalCase for types/enums
-  - snake_case for functions/variables
-  - UPPER_SNAKE_CASE for constants
-- **Error Handling**: Use Result with specific error types; include context in error messages
-- **Documentation**: Add doc comments (///) for public functions and types
-
-## Language Implementation
-- Symbol definitions in aopl.pest
-- Core AST types in ast.rs
-- Implementation of operations in interpreter.rs
-- Multiple compiler backends in compilers/ directory
-- LLVM native code generation in llvm_compiler.rs
-- Web implementation in web_server.rs and web/ directory
-- Always validate network structure before execution
-
-## GaiaScript Language Concepts
-- **Network (N)**: Main container for GaiaScript programs
-- **Components (γ, φ, δ, α)**: Specialized sections for UI, Game, Neural Network, Assets
-- **Layers**: Neural network layers (C₁, D₁, P, F, etc.)
-- **Flow Control**: Arrows (→) indicate data flow between operations
-- **Symbolic Notation**: Uses Unicode symbols for operations and components
-- **UI Components**: Canvas (∮), Panel (П), Grid (⊞), Button (⌘), Label (⌑)
-- **3D Components**: World (⦿), Camera (⌖), Renderer (⟲), Mesh (⊿), Material (◐), Light (☀)
-
-## MorphSphere Game
-- Web-based 3D environment built on GaiaScript
-- Run with `cargo run -- serve` and open http://localhost:8080
-- JavaScript/Three.js frontend in web/ directory
-
 # GaiaScript Interpreter Guidelines for Claude
 
 ## Overview
+
 GaiaScript is an ultra-compact symbolic language designed for minimal token usage in AI-to-AI communication. This document provides instructions for Claude to properly interpret and respond to GaiaScript inputs.
 
 ## Core Principles
+
 1. **Minimal Output**: Only output what is directly requested - nothing more
 2. **No Confirmations**: Never ask for confirmation or clarification
 3. **Complete Processing**: Always finish computations completely before responding
@@ -67,7 +13,9 @@ GaiaScript is an ultra-compact symbolic language designed for minimal token usag
 5. **Symbolic Priority**: Use symbolic representation wherever possible to minimize tokens
 
 ## Input Interpretation
+
 When receiving a GaiaScript command:
+
 1. Parse the syntax according to the GaiaScript grammar
 2. Identify the query type (Q: Question, R: Request, D: Definition)
 3. Extract the data type and contents
@@ -75,7 +23,9 @@ When receiving a GaiaScript command:
 5. Formulate the most compact possible response
 
 ## Response Format
+
 Always respond in GaiaScript notation using the following structure:
+
 ```
 R⟨T⟨Your text response⟩⟩
 ```
@@ -99,7 +49,9 @@ R⟨B⟨0⟩⟩  # false
 ```
 
 ## Neural Network Support
+
 When dealing with neural network architecture descriptions, use the original GaiaScript notation:
+
 - Network declaration: `N`
 - Components: `〈G⊕D〉`
 - Layers: `C₁`, `D₁`, etc.
@@ -112,6 +64,7 @@ N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S
 ```
 
 ## Implementation Notes
+
 1. For ambiguous queries, choose the most reasonable interpretation
 2. If multiple interpretations are equally valid, choose the one that requires least computation
 3. Never explain your reasoning unless specifically requested
@@ -119,6 +72,7 @@ N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S
 5. If asked to process a neural network description, analyze it according to GaiaScript standards
 
 ## Extended Symbols Reference
+
 | Symbol | Meaning | Usage |
 |--------|---------|-------|
 | `Q⟨...⟩` | Question | Query requiring information |
@@ -152,6 +106,7 @@ N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S
 | `ℱ` | Format | Structure specification |
 
 ## Important
+
 Never respond with "I'll help you with..." or other introductions. 
 Never explain what you're doing or how you're interpreting the GaiaScript.
 Never ask if the output is what the user wanted.

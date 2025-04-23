@@ -111,6 +111,12 @@ impl AsmCompiler {
             ASTNode::DataFlow(from, to) => self.compile_dataflow(from, to),
             ASTNode::Loss(loss) => self.compile_loss(loss),
             ASTNode::Expression(expr) => self.compile_expression(expr),
+            // UI and 3D components (not implemented for assembly)
+            ASTNode::UIComponent(_) => {}, 
+            ASTNode::EventHandler(_) => {},
+            ASTNode::DataBinding(_) => {},
+            ASTNode::ThreeDComponent(_) => {},
+            ASTNode::Asset(_) => {},
         }
     }
     
