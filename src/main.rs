@@ -10,6 +10,8 @@ use gaiascript::compilers::kotlin_compiler::KotlinCompiler;
 use gaiascript::compilers::react_compiler::ReactCompiler;
 use gaiascript::compilers::flutter_compiler::FlutterCompiler;
 use gaiascript::compilers::lynx_compiler::LynxCompiler;
+use gaiascript::compilers::llvm_compiler::LLVMCompiler;
+use gaiascript::ast::SymbolTable;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -20,13 +22,34 @@ fn main() {
         println!("  cargo run -- run <filename>            # Run GaiaScript program");
         println!("  cargo run -- compile <filename>        # Compile to JavaScript");
         println!("  cargo run -- target <filename> <plat>  # Compile to target platform");
-        println!("    Platforms: js, kotlin, react, flutter, lynx, wasm, x86_64, arm64");
+        println!("    Platforms: js, kotlin, react, flutter, lynx, wasm, x86_64, arm64, llvm");
         println!("  cargo run -- asm <filename> [arch]     # Compile to assembly (x86_64, arm64, wasm)");
         println!("  cargo run -- serve                     # Start web server");
+        println!("  cargo run -- llvm <filename> [output]  # Compile to native code using LLVM");
         return;
     }
     
     match args[1].as_str() {
+        "llvm" => {
+            if args.len() < 3 {
+                println!("Error: Missing filename");
+                return;
+            }
+            
+            let filename = &args[2];
+            let output_name = if args.len() >= 4 {
+                &args[3]
+            } else {
+                // Default output name based on input filename
+                let path = Path::new(filename);
+                path.file_stem().unwrap().to_str().unwrap()
+            };
+            
+            let show_ir = args.iter().any(|arg| arg == "--show-ir");
+            
+            // Compile the file to native code using LLVM
+            compile_with_llvm(filename, output_name, show_ir);
+        },
         "parse" => {
             if args.len() < 3 {
                 println!("Error: Missing filename");
@@ -431,6 +454,63 @@ fn compile_to_js(ast: &gaiascript::ast::ASTNode) -> String {
     }
 }
 
+fn compile_with_llvm(filename: &str, output_name: &str, show_ir: bool) {
+    let contents = match fs::read_to_string(filename) {
+        Ok(c) => c,
+        Err(e) => {
+            println!("Error reading file: {}", e);
+            return;
+        }
+    };
+    
+    match parser::parse(&contents) {
+        Ok(ast) => {
+            println!("Compiling to native code using LLVM...");
+            
+            // Create an LLVM compiler
+            let mut compiler = LLVMCompiler::new("gaiascript_module");
+            let mut symbol_table = SymbolTable::new();
+            
+            // Compile the AST to LLVM IR
+            match compiler.compile(&ast, &mut symbol_table) {
+                Ok(_) => {
+                    // Create a main function
+                    match compiler.create_main_function() {
+                        Ok(_) => {
+                            // Show the generated LLVM IR if requested
+                            if show_ir {
+                                println!("Generated LLVM IR:");
+                                println!("{}", compiler.print_ir());
+                            }
+                            
+                            // Write the compiled code to an executable file
+                            match compiler.write_to_file(output_name) {
+                                Ok(_) => {
+                                    println!("Successfully compiled to '{}'", output_name);
+                                    println!("You can run the executable with: ./{}", output_name);
+                                },
+                                Err(e) => println!("Error generating executable: {}", e),
+                            }
+                        },
+                        Err(e) => println!("Error creating main function: {}", e),
+                    }
+                },
+                Err(e) => {
+                    println!("Compilation error: {}", e);
+                    println!("Note: LLVM support is currently disabled. To enable it:");
+                    println!("1. Install LLVM 14.0 (brew install llvm@14)");
+                    println!("2. Set LLVM_SYS_140_PREFIX environment variable (export LLVM_SYS_140_PREFIX=$(brew --prefix llvm@14))");
+                    println!("3. Uncomment inkwell dependency in Cargo.toml");
+                    println!("4. Restore LLVM compiler implementation in src/compilers/llvm_compiler.rs");
+                },
+            }
+        },
+        Err(e) => {
+            println!("Parse error: {}", e);
+        }
+    }
+}
+
 fn compile_to_target(filename: &str, platform: &str) {
     let contents = match fs::read_to_string(filename) {
         Ok(c) => c,
@@ -508,9 +588,14 @@ fn compile_to_target(filename: &str, platform: &str) {
                 "arm64" => {
                     (gaiascript::asm_compiler::compile_to_asm(&ast, gaiascript::asm_compiler::AsmTarget::ARM64), "s".to_string())
                 },
+                "llvm" => {
+                    // Just add a placeholder here, we'll handle actual LLVM compilation 
+                    // in the specific llvm command path
+                    ("// LLVM compilation requires the 'llvm' command.".to_string(), "ll".to_string())
+                },
                 _ => {
                     println!("Unknown platform: {}", platform);
-                    println!("Supported platforms: js, kotlin, react, flutter, lynx, wasm, x86_64, arm64");
+                    println!("Supported platforms: js, kotlin, react, flutter, lynx, wasm, x86_64, arm64, llvm");
                     return;
                 }
             };
