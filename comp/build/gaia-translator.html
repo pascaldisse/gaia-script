@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GaiaScript Translator</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    header {
+      background-color: #4285f4;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .translator-container {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .translator-pane {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .translator-controls {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 15px;
+    }
+    .translator-header {
+      padding: 10px;
+      background-color: #f0f0f0;
+      border-bottom: 1px solid #ddd;
+    }
+    select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: white;
+      font-size: 14px;
+    }
+    .translator-textarea {
+      width: 100%;
+      min-height: 300px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      border: none;
+      resize: none;
+      font-size: 14px;
+      line-height: 1.5;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background-color: #4285f4;
+      color: white;
+      font-size: 16px;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #3367d6;
+    }
+    .button-swap {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      padding: 0;
+      background-color: #f5f5f5;
+      color: #4285f4;
+      border: 1px solid #4285f4;
+    }
+    .button-swap:hover {
+      background-color: #e6e6e6;
+    }
+    .examples-section {
+      margin-top: 40px;
+    }
+    .example-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .example-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .example-title {
+      font-size: 18px;
+      margin: 0 0 15px 0;
+      color: #4285f4;
+    }
+    .example-content {
+      margin-top: 15px;
+    }
+    .example-source, .example-result {
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+      margin-top: 10px;
+      font-family: 'Courier New', monospace;
+      white-space: pre-wrap;
+      font-size: 12px;
+    }
+    .example-result {
+      margin-top: 10px;
+      background-color: #e8f0fe;
+    }
+    #console {
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      margin-top: 20px;
+      height: 200px;
+      overflow: auto;
+    }
+    .log-entry {
+      margin: 5px 0;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>GaiaScript Translator</h1>
+  </header>
+  
+  <div class="translator-container">
+    <div class="translator-pane">
+      <div class="translator-header">
+        <select id="source-language">
+          <option value="auto">Auto Detect</option>
+          <option value="natural">Natural Language</option>
+          <option value="gaiascript">GaiaScript</option>
+          <option value="javascript">JavaScript</option>
+          <option value="python">Python</option>
+        </select>
+      </div>
+      <textarea id="source-text" class="translator-textarea" placeholder="Enter text to translate..."></textarea>
+    </div>
+    
+    <div class="translator-controls">
+      <button id="translate-btn">Translate →</button>
+      <button id="swap-btn" class="button-swap">⇄</button>
+    </div>
+    
+    <div class="translator-pane">
+      <div class="translator-header">
+        <select id="target-language">
+          <option value="gaiascript">GaiaScript</option>
+          <option value="natural">Natural Language</option>
+          <option value="javascript">JavaScript</option>
+          <option value="python">Python</option>
+        </select>
+      </div>
+      <textarea id="target-text" class="translator-textarea" placeholder="Translation will appear here..." readonly></textarea>
+    </div>
+  </div>
+  
+  <div class="examples-section">
+    <h2>Translation Examples</h2>
+    <div class="example-cards">
+      <div class="example-card">
+        <h3 class="example-title">Natural Language → GaiaScript</h3>
+        <div class="example-content">
+          <p>Input:</p>
+          <div class="example-source">Create a neural network with an input layer, convolutional layer with 32 filters and ReLU activation, followed by pooling and a dense layer with 10 outputs</div>
+          <p>Output:</p>
+          <div class="example-result">N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S</div>
+        </div>
+      </div>
+      
+      <div class="example-card">
+        <h3 class="example-title">GaiaScript → JavaScript</h3>
+        <div class="example-content">
+          <p>Input:</p>
+          <div class="example-source">N〈G⊕D〉 
+G: Z 100 → D₁ 256 ρ → D₀ 784 τ</div>
+          <p>Output:</p>
+          <div class="example-result">const model = tf.sequential();
+model.add(tf.layers.dense({units: 256, activation: 'relu', inputShape: [100]}));
+model.add(tf.layers.dense({units: 784, activation: 'tanh'}));</div>
+        </div>
+      </div>
+      
+      <div class="example-card">
+        <h3 class="example-title">JavaScript → GaiaScript</h3>
+        <div class="example-content">
+          <p>Input:</p>
+          <div class="example-source">const generator = tf.sequential();
+generator.add(tf.layers.dense({units: 256, inputShape: [100]}));
+generator.add(tf.layers.leakyReLU());
+generator.add(tf.layers.dense({units: 512}));
+generator.add(tf.layers.leakyReLU());
+generator.add(tf.layers.dense({units: 784, activation: 'tanh'}));</div>
+          <p>Output:</p>
+          <div class="example-result">N〈G〉
+G: Z 100 → D₁ 256 → LR → D₁ 512 → LR → D₀ 784 τ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="console"></div>
+  
+  <script>
+    // Intercept console.log to display in our console element
+    const consoleElement = document.getElementById('console');
+    const originalConsoleLog = console.log;
+    const originalConsoleWarn = console.warn;
+    const originalConsoleError = console.error;
+    
+    console.log = function(...args) {
+      originalConsoleLog.apply(console, args);
+      
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      logEntry.textContent = args.join(' ');
+      consoleElement.appendChild(logEntry);
+      consoleElement.scrollTop = consoleElement.scrollHeight;
+    };
+    
+    console.warn = function(...args) {
+      originalConsoleWarn.apply(console, args);
+      
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      logEntry.style.color = 'orange';
+      logEntry.textContent = '⚠️ ' + args.join(' ');
+      consoleElement.appendChild(logEntry);
+      consoleElement.scrollTop = consoleElement.scrollHeight;
+    };
+    
+    console.error = function(...args) {
+      originalConsoleError.apply(console, args);
+      
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      logEntry.style.color = 'red';
+      logEntry.textContent = '❌ ' + args.join(' ');
+      consoleElement.appendChild(logEntry);
+      consoleElement.scrollTop = consoleElement.scrollHeight;
+    };
+    
+    // Set up translation functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const sourceText = document.getElementById('source-text');
+      const targetText = document.getElementById('target-text');
+      const sourceLanguage = document.getElementById('source-language');
+      const targetLanguage = document.getElementById('target-language');
+      const translateBtn = document.getElementById('translate-btn');
+      const swapBtn = document.getElementById('swap-btn');
+      
+      // Sample translations for examples
+      const translations = {
+        'natural-gaiascript': {
+          'Create a neural network with an input layer, convolutional layer with 32 filters and ReLU activation, followed by pooling and a dense layer with 10 outputs': 
+            'N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S',
+          'Make a generative model that takes latent vectors of size 100 and outputs images of size 28x28': 
+            'N〈G〉\nG: Z 100 → D₁ 256 ρ → D₁ 512 ρ → D₀ 784 τ'
+        },
+        'gaiascript-javascript': {
+          'N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S': 
+            `const model = tf.sequential();
+model.add(tf.layers.conv2d({
+  filters: 32, 
+  kernelSize: 3, 
+  activation: 'relu',
+  inputShape: [28, 28, 1]
+}));
+model.add(tf.layers.maxPooling2d({poolSize: 2}));
+model.add(tf.layers.flatten());
+model.add(tf.layers.dense({units: 128, activation: 'relu'}));
+model.add(tf.layers.dense({units: 10, activation: 'softmax'}));`,
+          'N〈G⊕D〉 \nG: Z 100 → D₁ 256 ρ → D₀ 784 τ': 
+            `const model = tf.sequential();
+model.add(tf.layers.dense({units: 256, activation: 'relu', inputShape: [100]}));
+model.add(tf.layers.dense({units: 784, activation: 'tanh'}));`
+        },
+        'gaiascript-python': {
+          'N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S': 
+            `import tensorflow as tf
+
+model = tf.keras.Sequential([
+    tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
+    tf.keras.layers.MaxPooling2D((2, 2)),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(10, activation='softmax')
+])`
+        }
+      };
+      
+      // Translation functionality
+      translateBtn.addEventListener('click', function() {
+        const source = sourceText.value;
+        const fromLang = sourceLanguage.value;
+        const toLang = targetLanguage.value;
+        
+        if (!source) {
+          console.warn('Please enter text to translate');
+          return;
+        }
+        
+        console.log(`Translating from ${fromLang} to ${toLang}...`);
+        
+        // Simulate translation delay
+        targetText.value = 'Translating...';
+        
+        setTimeout(() => {
+          // Simple lookup-based translation (in a real implementation, this would use AI)
+          const translationKey = `${fromLang}-${toLang}`;
+          
+          if (translations[translationKey] && translations[translationKey][source]) {
+            targetText.value = translations[translationKey][source];
+          } else {
+            // Generate a mock translation
+            if (toLang === 'gaiascript') {
+              targetText.value = 'N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S';
+            } else if (toLang === 'javascript') {
+              targetText.value = 'const model = tf.sequential();\nmodel.add(tf.layers.dense({units: 128, activation: "relu"}));\nmodel.add(tf.layers.dense({units: 10, activation: "softmax"}));';
+            } else if (toLang === 'python') {
+              targetText.value = 'import tensorflow as tf\n\nmodel = tf.keras.Sequential([\n    tf.keras.layers.Dense(128, activation="relu"),\n    tf.keras.layers.Dense(10, activation="softmax")\n])';
+            } else {
+              targetText.value = 'A neural network with an input layer, a hidden layer with 128 neurons and ReLU activation, and an output layer with 10 neurons and softmax activation.';
+            }
+          }
+          
+          console.log('Translation completed');
+        }, 1000);
+      });
+      
+      // Handle language swap
+      swapBtn.addEventListener('click', function() {
+        const tempLang = sourceLanguage.value;
+        const tempText = sourceText.value;
+        
+        sourceLanguage.value = targetLanguage.value;
+        sourceText.value = targetText.value;
+        targetLanguage.value = tempLang;
+        targetText.value = tempText;
+        
+        console.log('Languages swapped');
+      });
+      
+      // Handle example cards
+      document.querySelectorAll('.example-card').forEach(card => {
+        card.addEventListener('click', function() {
+          const exampleSource = this.querySelector('.example-source').textContent;
+          const exampleResult = this.querySelector('.example-result').textContent;
+          const titleText = this.querySelector('.example-title').textContent;
+          
+          // Set the appropriate languages based on the example title
+          if (titleText.includes('Natural Language → GaiaScript')) {
+            sourceLanguage.value = 'natural';
+            targetLanguage.value = 'gaiascript';
+          } else if (titleText.includes('GaiaScript → JavaScript')) {
+            sourceLanguage.value = 'gaiascript';
+            targetLanguage.value = 'javascript';
+          } else if (titleText.includes('JavaScript → GaiaScript')) {
+            sourceLanguage.value = 'javascript';
+            targetLanguage.value = 'gaiascript';
+          }
+          
+          // Set the source and target text
+          sourceText.value = exampleSource;
+          targetText.value = exampleResult;
+          
+          console.log(`Example loaded: ${titleText}`);
+        });
+      });
+    });
+  </script>
+  
+  <!-- GaiaScript Runtime -->
+  <script src="gaia-compiled.js"></script>
+</body>
+</html>

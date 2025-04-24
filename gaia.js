@@ -11,6 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync, spawn } = require('child_process');
 const zlib = require('zlib');
+const os = require('os');
 
 // Constants for GaiaPkg format
 const GAIAPKG_HEADER = 'Ğ⟨';

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Main - GaiaScript</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    header {
+      background-color: #4285f4;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    #console {
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      margin-top: 20px;
+      min-height: 200px;
+      max-height: 400px;
+      overflow: auto;
+    }
+    .log-entry {
+      margin: 5px 0;
+      line-height: 1.4;
+    }
+    
+  </style>
+  
+</head>
+<body>
+  <header>
+    <h1>Main - GaiaScript</h1>
+    <div class="navbar">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="gaia-playground.html">Playground</a></li>
+        <li><a href="gaia-translator.html">Translator</a></li>
+        <li><a href="gaia-demo.html">Demo</a></li>
+      </ul>
+    </div>
+  </header>
+  
+  
+  
+  <div id="gaia-container"></div>
+  
+  <div id="console"></div>
+  
+  <script>
+    // Intercept console.log to display in our console element
+    const consoleElement = document.getElementById('console');
+    const originalConsoleLog = console.log;
+    const originalConsoleWarn = console.warn;
+    const originalConsoleError = console.error;
+    
+    console.log = function(...args) {
+      originalConsoleLog.apply(console, args);
+      
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      logEntry.textContent = args.join(' ');
+      consoleElement.appendChild(logEntry);
+      consoleElement.scrollTop = consoleElement.scrollHeight;
+    };
+    
+    console.warn = function(...args) {
+      originalConsoleWarn.apply(console, args);
+      
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      logEntry.style.color = 'orange';
+      logEntry.textContent = '⚠️ ' + args.join(' ');
+      consoleElement.appendChild(logEntry);
+      consoleElement.scrollTop = consoleElement.scrollHeight;
+    };
+    
+    console.error = function(...args) {
+      originalConsoleError.apply(console, args);
+      
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      logEntry.style.color = 'red';
+      logEntry.textContent = '❌ ' + args.join(' ');
+      consoleElement.appendChild(logEntry);
+      consoleElement.scrollTop = consoleElement.scrollHeight;
+    };
+  </script>
+  
+  <!-- GaiaScript Compiled Output -->
+  <script src="gaia-compiled.js"></script>
+</body>
+</html>

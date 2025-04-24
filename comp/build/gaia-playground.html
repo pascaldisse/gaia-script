@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GaiaScript Playground</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    header {
+      background-color: #4285f4;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .editor-container {
+      display: flex;
+      height: 500px;
+      margin-top: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .editor-pane {
+      flex: 1;
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .output-pane {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: #fff;
+      border-left: 1px solid #ddd;
+    }
+    .button-row {
+      padding: 10px;
+      background-color: #252526;
+      border-bottom: 1px solid #333;
+      display: flex;
+    }
+    button {
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 8px;
+    }
+    button:hover {
+      background-color: #2a75f3;
+    }
+    .code-area {
+      flex: 1;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      white-space: pre;
+      overflow: auto;
+      line-height: 1.5;
+      font-size: 16px;
+    }
+    .output-header {
+      padding: 10px;
+      background-color: #f0f0f0;
+      border-bottom: 1px solid #ddd;
+      font-weight: bold;
+    }
+    .output-content {
+      flex: 1;
+      padding: 15px;
+      overflow: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+    #console {
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      margin-top: 20px;
+      height: 200px;
+      overflow: auto;
+    }
+    .log-entry {
+      margin: 5px 0;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>GaiaScript Playground</h1>
+  </header>
+  
+  <div class="editor-container">
+    <div class="editor-pane">
+      <div class="button-row">
+        <button id="run-btn">Run</button>
+        <button id="save-btn">Save</button>
+        <button id="clear-btn">Clear</button>
+      </div>
+      <div id="editor" class="code-area" contenteditable="true">N I → C₁ 32 → D₁ 10</div>
+    </div>
+    <div class="output-pane">
+      <div class="output-header">
+        Output
+      </div>
+      <div id="output" class="output-content"></div>
+    </div>
+  </div>
+  
+  <div id="console"></div>
+  
+  <script>
+    // Intercept console.log to display in our console element
+    const consoleElement = document.getElementById('console');
+    const originalConsoleLog = console.log;
+    const originalConsoleWarn = console.warn;
+    const originalConsoleError = console.error;
+    
+    console.log = function(...args) {
+      originalConsoleLog.apply(console, args);
+      
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      logEntry.textContent = args.join(' ');
+      consoleElement.appendChild(logEntry);
+      consoleElement.scrollTop = consoleElement.scrollHeight;
+    };
+    
+    console.warn = function(...args) {
+      originalConsoleWarn.apply(console, args);
+      
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      logEntry.style.color = 'orange';
+      logEntry.textContent = '⚠️ ' + args.join(' ');
+      consoleElement.appendChild(logEntry);
+      consoleElement.scrollTop = consoleElement.scrollHeight;
+    };
+    
+    console.error = function(...args) {
+      originalConsoleError.apply(console, args);
+      
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      logEntry.style.color = 'red';
+      logEntry.textContent = '❌ ' + args.join(' ');
+      consoleElement.appendChild(logEntry);
+      consoleElement.scrollTop = consoleElement.scrollHeight;
+    };
+    
+    // Set up UI interactions
+    document.addEventListener('DOMContentLoaded', function() {
+      const editor = document.getElementById('editor');
+      const output = document.getElementById('output');
+      const runBtn = document.getElementById('run-btn');
+      const saveBtn = document.getElementById('save-btn');
+      const clearBtn = document.getElementById('clear-btn');
+      
+      // Run button
+      runBtn.addEventListener('click', function() {
+        const code = editor.textContent;
+        console.log('Running GaiaScript code:', code);
+        
+        output.innerHTML = '';
+        output.innerHTML += '<div class="output-line">Running GaiaScript...</div>';
+        
+        try {
+          // Create a script element to execute the compiled code
+          const scriptElement = document.createElement('script');
+          scriptElement.src = 'gaia-compiled.js';
+          scriptElement.onload = function() {
+            output.innerHTML += '<div class="output-line success">Execution completed!</div>';
+          };
+          scriptElement.onerror = function() {
+            output.innerHTML += '<div class="output-line error">Error loading script</div>';
+          };
+          document.body.appendChild(scriptElement);
+        } catch (error) {
+          output.innerHTML += `<div class="output-line error">Error: ${error.message}</div>`;
+          console.error('Error running GaiaScript:', error);
+        }
+      });
+      
+      // Save button
+      saveBtn.addEventListener('click', function() {
+        const code = editor.textContent;
+        const blob = new Blob([code], {type: 'text/plain'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'program.gaia';
+        a.click();
+        console.log('Code saved to program.gaia');
+      });
+      
+      // Clear button
+      clearBtn.addEventListener('click', function() {
+        if (confirm('Clear the editor content?')) {
+          editor.textContent = '';
+          console.log('Editor cleared');
+        }
+      });
+    });
+  </script>
+  
+  <!-- GaiaScript Runtime -->
+  <script src="gaia-compiled.js"></script>
+</body>
+</html>

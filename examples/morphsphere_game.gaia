@@ -1,6 +1,0 @@
-// MorphSphere Game - GaiaScript Definition
-
-N
-
-// Game Neural Network - Full Morph AI
-I 3 64 64 -> C 32 3 -> P -> C 64 3 -> P -> F -> D 128 -> D 64 -> D 32 -> D 8

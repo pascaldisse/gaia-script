@@ -20,10 +20,10 @@ cp "$SCRIPT_DIR/main.gaia" "$BUILD_DIR/"
 # Skip Rust compilation during refactoring
 echo "Skipping Rust compilation during refactoring..."
 
-# Build JavaScript components
-cd "$BUILD_DIR"
+# Build JavaScript components using our Node.js compiler
 echo "Compiling GaiaScript to JavaScript..."
-node js/build.js --single-file
+cd "$SCRIPT_DIR/gaiascript/comp"
+node build.js
 cd "$SCRIPT_DIR"
 
 # Define output file paths

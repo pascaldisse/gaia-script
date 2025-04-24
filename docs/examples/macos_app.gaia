@@ -1,0 +1,80 @@
+// GaiaScript example for macOS native compilation
+// A simple counter application with SwiftUI interface
+
+// UI Component
+UI⟨ CounterApp
+    // State properties
+    count: 0,
+    name: "GaiaScript Counter"
+⟩
+    // UI Structure 
+    ⟨div style={backgroundColor: "#f0f0f0", padding: 20}
+        ⟨text style={fontSize: 24, color: "#333", textAlign: "center"}⟩${name}⟨/text⟩
+        
+        ⟨div style={margin: "20px 0", padding: 20, backgroundColor: "#fff", borderRadius: 8}
+            ⟨text style={fontSize: 40, textAlign: "center", margin: "10px 0"}⟩${count}⟨/text⟩
+            
+            ⟨div style={display: "flex", justifyContent: "center", margin: "20px 0"}
+                ⟨button 
+                    text="-" 
+                    onClick={decrementCount}
+                    style={
+                        backgroundColor: "#336699", 
+                        color: "#fff",
+                        borderRadius: 25,
+                        width: 50,
+                        height: 50,
+                        margin: "0 10px",
+                        fontSize: 20
+                    }
+                ⟩⟨/button⟩
+                
+                ⟨button 
+                    text="+" 
+                    onClick={incrementCount}
+                    style={
+                        backgroundColor: "#336699", 
+                        color: "#fff",
+                        borderRadius: 25,
+                        width: 50,
+                        height: 50,
+                        margin: "0 10px",
+                        fontSize: 20
+                    }
+                ⟩⟨/button⟩
+            ⟨/div⟩
+            
+            ⟨button 
+                text="Reset" 
+                onClick={resetCount}
+                style={
+                    backgroundColor: "#999",
+                    color: "#fff",
+                    borderRadius: 4,
+                    padding: "8px 16px",
+                    margin: "10px 0",
+                    width: 120
+                }
+            ⟩⟨/button⟩
+        ⟨/div⟩
+        
+        ⟨text style={fontSize: 12, color: "#666", textAlign: "center"}⟩
+            Built with GaiaScript macOS Compiler
+        ⟨/text⟩
+    ⟨/div⟩
+    
+    // Event handlers
+    function incrementCount() {
+        count = count + 1;
+    }
+    
+    function decrementCount() {
+        if (count > 0) {
+            count = count - 1;
+        }
+    }
+    
+    function resetCount() {
+        count = 0;
+    }
+⟨/UI⟩
