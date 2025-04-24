@@ -11,13 +11,9 @@ lsof -ti:8080 | xargs kill -9 2>/dev/null || true
 # Clean and build the Rust components
 cd "$(dirname "$0")"
 cargo clean
-cargo build
+cargo build --release
 
-# Build JavaScript components
-cd ../build
-node js/main.js compile main.gaia
-
-# Run the application server
-node js/main.js serve &
+# Run with Rust compiler
+cargo run --release -- ../main.gaia
 
 echo "GaiaScript restarted successfully!"
