@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GaiaScript Tools</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    header {
+      background-color: #4285f4;
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+    .tools-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .tool-card {
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .tool-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+    .tool-header {
+      background-color: #1a73e8;
+      color: white;
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .tool-content {
+      padding: 20px;
+    }
+    .tool-description {
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .tool-link {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4285f4;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: background-color 0.2s;
+    }
+    .tool-link:hover {
+      background-color: #2a75f3;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>GaiaScript Tools</h1>
+  </header>
+  
+  <div class="tools-container">
+    <div class="tool-card">
+      <div class="tool-header">AIBrowser</div>
+      <div class="tool-content">
+        <div class="tool-description">
+          An AI-powered browser interface that lets you interact with web content using GaiaScript neural networks.
+        </div>
+        <a href="aibrowser-app.html" class="tool-link">Launch AIBrowser</a>
+      </div>
+    </div>
+    
+    <div class="tool-card">
+      <div class="tool-header">GaiaScript Playground</div>
+      <div class="tool-content">
+        <div class="tool-description">
+          Write and test GaiaScript code in an interactive environment. Perfect for learning and experimentation.
+        </div>
+        <a href="gaia-playground.html" class="tool-link">Open Playground</a>
+      </div>
+    </div>
+    
+    <div class="tool-card">
+      <div class="tool-header">GaiaScript Translator</div>
+      <div class="tool-content">
+        <div class="tool-description">
+          Translate between natural language, GaiaScript, JavaScript, Python, and other programming languages.
+        </div>
+        <a href="gaia-translator.html" class="tool-link">Use Translator</a>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    console.log('GaiaScript Tools Index Page Loaded');
+  </script>
+</body>
+</html>
