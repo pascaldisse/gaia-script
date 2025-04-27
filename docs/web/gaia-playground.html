@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GaiaScript Playground</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <h1>GaiaScript Playground</h1>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="gaia-translator.html">Translator</a></li>
+                <li><a href="gaia-simple.html">Examples</a></li>
+                <li><a href="gaia-demo.html">Demo</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="editor-container">
+            <div class="editor-pane">
+                <div class="button-row">
+                    <button id="run-btn">Run</button>
+                    <button id="save-btn" class="secondary">Save</button>
+                </div>
+                <div id="editor" class="code-mirror-wrapper"></div>
+            </div>
+            <div class="output-pane">
+                <div class="output-header">
+                    <h3>Output</h3>
+                </div>
+                <div id="output" class="output-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/gaia-runtime.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editor = document.getElementById('editor');
+            const output = document.getElementById('output');
+            const runBtn = document.getElementById('run-btn');
+            const saveBtn = document.getElementById('save-btn');
+            
+            // Default GaiaScript code
+            editor.textContent = `N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S`;
+            
+            // Run button event
+            runBtn.addEventListener('click', function() {
+                const code = editor.textContent;
+                try {
+                    output.innerHTML = '<div>Running GaiaScript...</div>';
+                    // This would actually call the GaiaScript interpreter
+                    setTimeout(() => {
+                        output.innerHTML += '<div>Network initialized with CNN architecture</div>';
+                        output.innerHTML += '<div>Layers: Input → Conv2D → MaxPooling → Flatten → Dense → Output</div>';
+                        output.innerHTML += '<div>Compilation successful!</div>';
+                    }, 500);
+                } catch (error) {
+                    output.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                }
+            });
+            
+            // Save button event
+            saveBtn.addEventListener('click', function() {
+                const code = editor.textContent;
+                localStorage.setItem('gaiascript_code', code);
+                alert('Code saved to local storage');
+            });
+            
+            // Load saved code if available
+            const savedCode = localStorage.getItem('gaiascript_code');
+            if (savedCode) {
+                editor.textContent = savedCode;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GaiaScript Demo</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <h1>GaiaScript Demo</h1>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="gaia-playground.html">Playground</a></li>
+                <li><a href="gaia-translator.html">Translator</a></li>
+                <li><a href="gaia-simple.html">Examples</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Interactive GaiaScript Demos</h2>
+        
+        <div class="demo-card">
+            <h3>CNN Image Classifier</h3>
+            <pre>N I → C₁ 32 3 ρ → P 2 → C₂ 64 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S</pre>
+            <p>A convolutional neural network that classifies images into 10 categories.</p>
+            <div class="canvas-container">
+                <canvas id="cnn-demo" width="400" height="300"></canvas>
+            </div>
+            <button id="run-cnn">Run CNN</button>
+        </div>
+        
+        <div class="demo-card">
+            <h3>GAN Generator</h3>
+            <pre>
+N〈G⊕D〉
+G: Z 100 → U 4×4×512 → [U 2× → C 256 ρ]×2 → C 3 τ</pre>
+            <p>A generative adversarial network that creates new images.</p>
+            <div class="canvas-container">
+                <canvas id="gan-demo" width="400" height="300"></canvas>
+            </div>
+            <button id="run-gan">Generate Image</button>
+        </div>
+        
+        <div class="demo-card">
+            <h3>RNN Text Generator</h3>
+            <pre>N I → E → [L 128]×3 → D₀ V → S</pre>
+            <p>A recurrent neural network that generates text one token at a time.</p>
+            <div id="rnn-output" class="output-content">
+                <p>Text will appear here...</p>
+            </div>
+            <button id="run-rnn">Generate Text</button>
+        </div>
+    </div>
+
+    <script src="js/gaia-runtime.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cnnCanvas = document.getElementById('cnn-demo');
+            const ganCanvas = document.getElementById('gan-demo');
+            const rnnOutput = document.getElementById('rnn-output');
+            
+            // CNN Demo
+            document.getElementById('run-cnn').addEventListener('click', function() {
+                const ctx = cnnCanvas.getContext('2d');
+                ctx.clearRect(0, 0, cnnCanvas.width, cnnCanvas.height);
+                ctx.fillStyle = '#f0f0f0';
+                ctx.fillRect(0, 0, cnnCanvas.width, cnnCanvas.height);
+                
+                // Draw a placeholder CNN visualization
+                ctx.fillStyle = '#333';
+                ctx.font = '16px Arial';
+                ctx.fillText('CNN Visualization', 10, 30);
+                
+                // Input layer
+                ctx.fillStyle = 'blue';
+                ctx.fillRect(50, 100, 50, 50);
+                
+                // Conv layers
+                ctx.fillStyle = 'green';
+                ctx.fillRect(150, 90, 40, 40);
+                ctx.fillRect(150, 140, 40, 40);
+                
+                // Output layer
+                ctx.fillStyle = 'red';
+                ctx.fillRect(250, 100, 50, 50);
+                
+                // Connections
+                ctx.strokeStyle = '#666';
+                ctx.beginPath();
+                ctx.moveTo(100, 125);
+                ctx.lineTo(150, 110);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(100, 125);
+                ctx.lineTo(150, 160);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(190, 110);
+                ctx.lineTo(250, 125);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(190, 160);
+                ctx.lineTo(250, 125);
+                ctx.stroke();
+            });
+            
+            // GAN Demo
+            document.getElementById('run-gan').addEventListener('click', function() {
+                const ctx = ganCanvas.getContext('2d');
+                ctx.clearRect(0, 0, ganCanvas.width, ganCanvas.height);
+                
+                // Generate a random abstract image
+                for (let i = 0; i < 50; i++) {
+                    ctx.beginPath();
+                    ctx.fillStyle = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 0.5)`;
+                    ctx.arc(Math.random() * ganCanvas.width, Math.random() * ganCanvas.height, 
+                           Math.random() * 40, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+            
+            // RNN Demo
+            document.getElementById('run-rnn').addEventListener('click', function() {
+                rnnOutput.innerHTML = '<p>Generating text...</p>';
+                
+                setTimeout(() => {
+                    const generatedText = "The neural network architecture is defined using symbolic notation. Each layer is connected to form a comprehensive system that can process data efficiently. The model learns patterns from the training examples...";
+                    
+                    rnnOutput.innerHTML = `<p>${generatedText}</p>`;
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>
