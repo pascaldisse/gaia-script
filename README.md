@@ -1,7 +1,11 @@
 # GaiaScript: Universal Symbolic Language
 
+> **🌏 GaiaScript (地本) is written entirely in Chinese characters, Greek letters, and mathematical symbols - NO English keywords!**
+
 ## Overview
-GaiaScript is an ultra-compact symbolic language designed for minimal token usage in AI-to-AI communication. It uses Unicode symbols, kanji, and emojis to represent complex operations, neural network architectures, and programming constructs efficiently. The language is platform-agnostic, with a universal compiler targeting multiple platforms.
+GaiaScript is an ultra-compact symbolic language designed for minimal token usage in AI-to-AI communication. It uses Chinese characters (kanji/hanzi), Unicode mathematical symbols, Greek letters, and emojis to represent complex operations, neural network architectures, and programming constructs efficiently. The language is platform-agnostic, with a universal compiler targeting multiple platforms.
+
+**Core Design**: The entire language uses symbolic notation - no English keywords or traditional syntax.
 
 **Current Version**: v0.1.0 (June 2025)
 **Primary Target**: Web (JavaScript)
@@ -54,17 +58,58 @@ GaiaScript is an ultra-compact symbolic language designed for minimal token usag
    - Chat App: http://localhost:8081/gaia-app.html
    - Playground: http://localhost:8081/gaia-playground.html
 
-## Encoding Table
-The encoding table (encoding_table.csv) defines the language's symbols:
+## Real GaiaScript Example
+Here's actual GaiaScript code from `main.gaia`:
 
-- **Data Types**: 📝 (Text), 🔢 (Number), ✅ (Boolean), 📋 (List), 📦 (Object)
-- **Operations**: ⊕ (Concatenation), → (Flow), ⊗ (Transform), λ (Function)
-- **Cultural Concepts**: 木 (Tree), 山 (Mountain), 川 (River), 人 (Person), 愛 (Love)
-- **Emotions**: 😀 (Happy), 😢 (Sad), 😡 (Angry)
-- **Actions**: 💡 (Idea), 🔍 (Search), 💾 (Save)
-- **Programming**: r0 (fn), c0 (class), f0 (Widget), re0 (Component)
-- **English**: w0 (the), w1 (be)
-- **Programming Languages**: 地本 (GaiaScript), 鉤本 (JavaScript), 蛇本 (Python), 原子 (React)
+```gaiascript
+N〈υ⊕η⊕Γ⊕μ⊕∂⊕ℝ〉
+⊛⟪ℝ⟫ℝΘ⊛⟪/ℝ⟫
+ℝ〈Þ⊕¢⊕Ħ〉
+Þ:{⊹:0,⊿:1,⋮:2,⋰:3,⋱:4,⌓:5,⌗:6,⊥:7,⊢:8,⊧:9}
+γ:⟨{ϖ,ϖł,ϱ}⟩→∮⌗≡×⊧≡→П→⊞⋰×⋰→[(⌘"▶"⌘ω→φ.①),(⌘"↺"⌘ω→φ.⓪)]
+δ:⟨{ϖ:⟨ℵ:⊹⟩,ϖł:⟨ϕ:⟨ρ:⋮⊹ξ,λ:ς,δ:φ,φΔ:ϕ⟩⟩}⟩
+Ñ:I⋮≡×⋮≡×⋰→C₁⋰⋮→P→C₂⊧⋱→P→F→D₁⊿⋮⌗→D₂⊧⋱→D₀⊿⊹→S
+```
+
+As you can see, GaiaScript uses:
+- **Greek letters**: υ, η, Γ, μ, ∂, ℝ, Θ, ω, φ, ρ, λ, ς, δ, ξ
+- **Mathematical symbols**: ⊕, ⟪⟫, ⊛, ∮, ≡, ⊞, →, ⇄
+- **Special Unicode**: ⌘ (command), ⌑ (label), П (panel), ⌗ (hash)
+- **Chinese/Japanese influence**: Structure inspired by ideographic languages
+- **Numbers**: ⊹=0, ⊿=1, ⋮=2, ⋰=3, ⋱=4, ⌓=5, ⌗=6, ⊥=7, ⊢=8, ⊧=9
+
+## Encoding System
+The encoding system uses multiple approaches:
+
+### 1. Chinese Characters (Kanji/Hanzi)
+- **地本** (dì běn) - GaiaScript ("Earth Script")
+- **鉤本** (gōu běn) - JavaScript ("Hook Script") 
+- **蛇本** (shé běn) - Python ("Snake Script")
+- **原子** (yuán zǐ) - React ("Atom/Atomic")
+- **脚本** (jiǎo běn) - Script/Code
+- **函数** (hán shù) - Function
+- **変数** (biàn shù) - Variable
+
+### 2. Greek Letters for Components
+- **υ** (upsilon) - UI components
+- **η** (eta) - Neural networks  
+- **Γ** (gamma) - Game systems
+- **μ** (mu) - Transformations
+- **∂** (partial) - Differential operations
+- **ℝ** (real) - Number systems
+- **Θ** (theta) - State/configuration
+- **Ω** (omega) - Termination/completion
+
+### 3. Mathematical & Unicode Symbols
+- **⊕** - Concatenation/composition
+- **→** - Flow/transformation
+- **⟨⟩** - Grouping/containers
+- **⟪⟫** - Metadata blocks
+- **∮** - Canvas/circular integration
+- **П** - Panel/UI container
+- **⊞** - Grid layout
+- **⌘** - Button/command
+- **⌑** - Label/text display
 
 ## GaiaScript Symbolic Notation
 For machine learning operations, GaiaScript uses a compact symbolic notation:
@@ -83,6 +128,17 @@ For machine learning operations, GaiaScript uses a compact symbolic notation:
 - `⊕` - Network composition
 - `〈...〉` - Group notation
 
+### 4. Word & Phrase Encoding System
+The system encodes common words and phrases with compact codes:
+- **w₀** = "the", **w₁** = "of", **w₂** = "and", **w₃** = "to"
+- **w₂₅** = "code", **w₃₁** = "system", **w₄₁** = "network"
+- **s₀** = "The system is running"
+- **s₂₅** = "ALWAYS USE GAIASCRIPT"
+
+This allows expressions like:
+- `w₀ w₃₁ w₁ w₂₅` = "the system of code"
+- `s₂₆` = "Compiler Location: The GaiaScript compiler is located at..."
+
 ## Ultra-Compact Encoding
 The system includes an even more compact encoding for certain elements:
 
@@ -94,10 +150,27 @@ The system includes an even more compact encoding for certain elements:
 - UI: `UI⟨✱⟩...⟨/UI⟩` - Main UI application
 - Styles: `□{...}⟦...⟧` - Styled UI elements
 
-## Example
-A convolutional neural network in GaiaScript:
+## More Examples
+
+### UI Counter Component
+```gaiascript
+δ:⟨{
+  ϖ:⟨ℵ:⊹⟩,  // state: count = 0
+  ϱ:⟨
+    П→⊞⋰×⊿→[  // Panel → Grid 3×1
+      (⌘"−"⌘ω→ℵ⊝),      // Button "-" click → count--
+      (⌑"ℵ:${ℵ}"⇄ℵ),    // Label bound to count
+      (⌘"⊿"⌘ω→ℵ⊕)       // Button "+" click → count++
+    ]
+  ⟩
+}⟩
 ```
-N I → C₁ 32 3 ρ → P 2 → F → D₁ 128 ρ → D₀ 10 → S
+
+### Neural Network (CNN)
+```gaiascript
+Ñ:I⋮≡×⋮≡×⋰→C₁⋰⋮→P→C₂⊧⋱→P→F→D₁⊿⋮⌗→D₂⊧⋱→D₀⊿⊹→S
+// Input 224×224×3 → Conv 32 → Pool → Conv 64 → Pool → 
+// Flatten → Dense 128 → Dense 64 → Dense 10 → Softmax
 ```
 
 A GAN architecture:
