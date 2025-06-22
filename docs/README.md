@@ -20,27 +20,34 @@ Key features:
 
 1. Clone the repository:
 ```
-git clone https://github.com/yourusername/gaiascript.git
-cd gaiascript
+git clone https://github.com/pascaldisse/gaia-script.git
+cd gaia-script/.gaia
 ```
 
-2. Build the compiler:
-```
-node comp/build.js
-```
+2. Ensure dependencies:
+   - Rust toolchain (for compiler)
+   - Node.js (for runtime)
+   - Python 3 (for web server)
 
 ### Running a GaiaScript Program
 
-To compile and run a GaiaScript program:
+The easiest way to run GaiaScript:
 
-```
-node comp/build.js path/to/your/script.gaia
+```bash
+./restart.sh
 ```
 
-To compile and automatically open in a browser:
+This will:
+- Compile main.gaia using the Rust compiler
+- Start a web server on port 8081
+- Open the application in your browser
 
-```
-node comp/build.js path/to/your/script.gaia --open
+### Manual compilation:
+
+```bash
+# Using the Rust compiler directly
+cd comp && cargo build --release
+./target/release/gaia-universal-compiler ../main.gaia --output=../build/output.js
 ```
 
 ### Writing GaiaScript
@@ -83,13 +90,13 @@ Components are the building blocks of GaiaScript programs:
 
 ## Compilation Targets
 
-GaiaScript can be compiled to:
+Current compiler targets:
+- **JavaScript (web)** - Primary target, fully implemented
+- **WebAssembly** - Planned
+- **Native code** - Planned via LLVM
+- **Mobile platforms** - Planned (Flutter/React Native)
 
-- JavaScript (web)
-- WebAssembly
-- Native code (via LLVM)
-- Flutter
-- React Native
+The universal compiler is written in Rust and located in the `comp/` directory.
 
 ## Testing and Optimization
 
@@ -109,7 +116,20 @@ GaiaScript includes tools for:
 
 ## Examples
 
-See the `docs/examples/` directory for more examples of GaiaScript programs.
+See the `docs/examples/` directory for example GaiaScript programs.
+
+For interactive examples, visit:
+- http://localhost:8081/main-app.html - Main application
+- http://localhost:8081/gaia-app.html - Chat application
+- http://localhost:8081/gaia-playground.html - Interactive playground
+
+## Documentation
+
+- `gaiascript_reference.md` - Complete language reference
+- `token_efficiency.md` - Token usage optimization guide
+- `macos_compiler.md` - Compiler documentation
+- `test-environment.md` - Testing guide
+- `ai_agent_prompt.md` - AI integration guide
 
 ## Contributing
 

@@ -3,20 +3,56 @@
 ## Overview
 GaiaScript is an ultra-compact symbolic language designed for minimal token usage in AI-to-AI communication. It uses Unicode symbols, kanji, and emojis to represent complex operations, neural network architectures, and programming constructs efficiently. The language is platform-agnostic, with a universal compiler targeting multiple platforms.
 
+**Current Version**: v0.1.0 (June 2025)
+**Primary Target**: Web (JavaScript)
+**Build Status**: ✅ Working
+
 ## Project Structure
 - **docs/**: Documentation and examples
-- **comp/**: Universal compiler (Rust/JS)
+  - `web/`: Web interface and runtime files
+  - `gaiascript_reference.md`: Complete language reference
+- **comp/**: Universal compiler (Rust implementation)
+  - `Cargo.toml`: Rust project configuration
+  - `src/`: Compiler source code
+  - `target/`: Compilation artifacts
 - **build/**: Build artifacts
+  - `gaia-compiled.js`: Compiled JavaScript output
 - **test/**: Testing environment
-- **gaia-translator/**: Translation tools between GaiaScript and other languages
+- **ext/**: Extension system for encoding
+- **main.gaia**: Main GaiaScript application
+- **restart.sh**: Build and deployment script
 
 ## Features
-- **Universal Compiler**: Targets JavaScript, WebAssembly, macOS, Windows, Linux, iOS, Android
-- **Compact Representation**: Expresses complex ideas with minimal tokens
+- **Universal Compiler**: Written in Rust, currently targets JavaScript/Web
+- **Compact Representation**: Expresses complex ideas with minimal tokens (~40% reduction)
 - **Native ML Support**: Built-in neural networks, transformers, GANs
 - **Component-based Design**: Reusable symbolic components
-- **Interactive Tools**: Playground and translator interfaces
+- **Web Interface**: Interactive playground and applications
 - **Translation System**: Convert between GaiaScript, natural languages, and programming languages
+- **Base64 Number Encoding**: Efficient number representation system
+- **Extension System**: Dynamically loadable encoding extensions
+
+## Quick Start
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/pascaldisse/gaia-script.git
+   cd gaia-script/.gaia
+   ```
+
+2. **Build and run**:
+   ```bash
+   ./restart.sh
+   ```
+   This will:
+   - Compile main.gaia to JavaScript
+   - Start a web server on port 8081
+   - Open the application in your browser
+
+3. **Access the web interface**:
+   - Main App: http://localhost:8081/main-app.html
+   - Chat App: http://localhost:8081/gaia-app.html
+   - Playground: http://localhost:8081/gaia-playground.html
 
 ## Encoding Table
 The encoding table (encoding_table.csv) defines the language's symbols:

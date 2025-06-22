@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GaiaScript Chat App</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .chat-app-container {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            padding: 20px;
+            background-color: white;
+        }
+        
+        .app-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #3f51b5;
+        }
+        
+        .chat-info {
+            background-color: #f5f7fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3f51b5;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <h1>GaiaScript Chat</h1>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="gaia-app.html" class="active">Chat App</a></li>
+                <li><a href="gaia-playground.html">Playground</a></li>
+            </ul>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="chat-app-container">
+            <h2 class="app-title">GaiaScript Chat Application</h2>
+            
+            <div class="chat-info">
+                <p>This is a GaiaScript Chat application with optimized encoding using symbols, kanji, and emojis.</p>
+                <p>The chat interface demonstrates token-efficient symbolic notation with improved AI interaction.</p>
+            </div>
+            
+            <div id="chat-container">
+                <!-- Chat GaiaScript App will render here -->
+            </div>
+        </div>
+        
+        <div id="console" style="margin-top: 20px; background: #1e1e1e; color: #f0f0f0; padding: 10px; border-radius: 4px; min-height: 200px; overflow: auto; font-family: monospace;">
+            <!-- Console output -->
+        </div>
+    </div>
+    
+    <script>
+        // Intercept console.log to display in our console element
+        const consoleElement = document.getElementById('console');
+        const originalConsoleLog = console.log;
+        const originalConsoleWarn = console.warn;
+        const originalConsoleError = console.error;
+        
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.textContent = args.join(' ');
+            consoleElement.appendChild(logEntry);
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        };
+        
+        console.warn = function(...args) {
+            originalConsoleWarn.apply(console, args);
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.style.color = 'orange';
+            logEntry.textContent = '⚠️ ' + args.join(' ');
+            consoleElement.appendChild(logEntry);
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        };
+        
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.style.color = 'red';
+            logEntry.textContent = '❌ ' + args.join(' ');
+            consoleElement.appendChild(logEntry);
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        };
+        
+        console.log("GaiaScript Chat App starting up...");
+        console.log("Loading fully encoded chat.gaia with kanji, emoji, and symbol patterns");
+    </script>
+    
+    <!-- Chat GaiaScript Runtime -->
+    <script src="js/chat-runtime.js"></script>
+</body>
+</html>

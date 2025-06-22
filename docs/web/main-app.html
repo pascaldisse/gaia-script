@@ -1,0 +1,109 @@
+<\!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GaiaScript Main App</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .app-container {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            padding: 20px;
+            background-color: white;
+        }
+        
+        .app-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #3f51b5;
+        }
+        
+        .app-info {
+            background-color: #f5f7fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3f51b5;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <h1>GaiaScript System</h1>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="main-app.html" class="active">Main App</a></li>
+                <li><a href="gaia-app.html">Chat App</a></li>
+            </ul>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="app-container">
+            <h2 class="app-title">GaiaScript Main Application</h2>
+            
+            <div class="app-info">
+                <p>This is the main GaiaScript application.</p>
+                <p>The main.gaia file is a symbolic mathematical language for minimizing token usage.</p>
+            </div>
+            
+            <div id="gaia-container">
+                <\!-- Main GaiaScript App will render here -->
+            </div>
+        </div>
+        
+        <div id="console" style="margin-top: 20px; background: #1e1e1e; color: #f0f0f0; padding: 10px; border-radius: 4px; min-height: 200px; overflow: auto; font-family: monospace;">
+            <\!-- Console output -->
+        </div>
+    </div>
+    
+    <script>
+        // Intercept console.log to display in our console element
+        const consoleElement = document.getElementById('console');
+        const originalConsoleLog = console.log;
+        const originalConsoleWarn = console.warn;
+        const originalConsoleError = console.error;
+        
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.textContent = args.join(' ');
+            consoleElement.appendChild(logEntry);
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        };
+        
+        console.warn = function(...args) {
+            originalConsoleWarn.apply(console, args);
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.style.color = 'orange';
+            logEntry.textContent = '⚠️ ' + args.join(' ');
+            consoleElement.appendChild(logEntry);
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        };
+        
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.style.color = 'red';
+            logEntry.textContent = '❌ ' + args.join(' ');
+            consoleElement.appendChild(logEntry);
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        };
+        
+        console.log("GaiaScript Main App starting up...");
+    </script>
+    
+    <\!-- Main GaiaScript Runtime -->
+    <script src="js/gaia-runtime.js"></script>
+</body>
+</html>

@@ -1,15 +1,33 @@
 # GaiaScript Project Guidelines
 
+## Project Status (Updated: June 22, 2025)
+- **Working Directory**: `/Users/pascaldisse/gaia/.gaia`
+- **Git Branch**: update (up to date with origin/update)
+- **Platform**: macOS (Darwin 24.0.0)
+- **Compiler**: Universal compiler written in Rust (gaia-universal-compiler v0.1.0)
+- **Build System**: Multiple compilation methods supported via restart.sh
+
 ## Build/Execution Commands
-- Build GaiaScript compiler: `cd comp && node build.js`
-- Run GaiaScript: `./gaia build main.gaia --output=build/output.js --target=web`
-- Test examples: `cd test && node run.js test --file=examples/test-file.gaia`
-- Run test suite: `cd test && node run.js test --suite=basic`
-- Run all tests: `cd test && npm test`
+- **Primary Build**: `./restart.sh` - Compiles main.gaia and starts web server on port 8081
+- **Rust Compiler**: Located at `comp/` directory, uses Cargo build system
+- **Web Server**: Python HTTP server serves docs at http://localhost:8081
+- **Compiler Methods** (tried in order):
+  1. Compiler wrapper (gaia_compiler_wrapper.js)
+  2. Traditional compilation (comp/build.js)
+  3. Rust GaiaScript compiler (gaiascript.bak/gaia/gaia)
+
+## Current Implementation
+- **Main Application**: `main.gaia` - Pure symbolic GaiaScript implementation
+- **Web Interface**: Multiple HTML pages (main-app.html, gaia-app.html, gaia-playground.html)
+- **Runtime Files**: 
+  - `docs/web/js/gaia-runtime.js` - Main runtime
+  - `docs/web/js/chat-runtime.js` - Chat-specific runtime
+- **Build Output**: `build/gaia-compiled.js`
 
 ## GaiaScript Language Requirements
 - **Symbolic Syntax**: Use GaiaScript's symbolic notation for maximum efficiency
-- **Compiler Location**: The GaiaScript compiler is located at `/Users/pascaldisse/gaia/.gaia/gaia/gaia`
+- **Encoding System**: Extended with kanji, emoji, and base64 number encoding
+- **Compiler Target**: Web (JavaScript output)
 
 ## Code Style Guidelines
 - **Imports**: Use `N⟨UI, Utils, JsSystem⟩` namespace imports pattern
