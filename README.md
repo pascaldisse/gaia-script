@@ -129,15 +129,35 @@ For machine learning operations, GaiaScript uses a compact symbolic notation:
 - `〈...〉` - Group notation
 
 ### 4. Word & Phrase Encoding System
-The system encodes common words and phrases with compact codes:
-- **w₀** = "the", **w₁** = "of", **w₂** = "and", **w₃** = "to"
-- **w₂₅** = "code", **w₃₁** = "system", **w₄₁** = "network"
-- **s₀** = "The system is running"
-- **s₂₅** = "ALWAYS USE GAIASCRIPT"
+The system encodes both English and Chinese words:
 
-This allows expressions like:
-- `w₀ w₃₁ w₁ w₂₅` = "the system of code"
-- `s₂₆` = "Compiler Location: The GaiaScript compiler is located at..."
+**Chinese Character Encoding:**
+- **的** (w₀) = "the" / possessive particle
+- **之** (w₁) = "of" 
+- **和** (w₂) = "and"
+- **至** (w₃) = "to"
+- **在** (w₅) = "in"
+- **是** (w₆) = "is"
+- **你** (w₇) = "you"
+
+**Programming Languages in Chinese:**
+- **l₀** = 脚本 (JavaScript)
+- **l₁** = 迅 (Swift)
+- **l₂** = 蟒 (Python)  
+- **l₃** = 蓋 (GaiaScript)
+- **l₄** = 錆 (Rust)
+- **l₅** = 尖 (C#)
+- **l₆** = 基 (C)
+- **l₇** = 科 (Kotlin)
+
+**Example Usage:**
+```gaiascript
+// "The system is in GaiaScript"
+T⟨的 系統 是 在 蓋⟩
+
+// Using encoded forms
+T⟨w₀ w₃₁ w₆ w₅ l₃⟩
+```
 
 ## Ultra-Compact Encoding
 The system includes an even more compact encoding for certain elements:
@@ -150,27 +170,58 @@ The system includes an even more compact encoding for certain elements:
 - UI: `UI⟨✱⟩...⟨/UI⟩` - Main UI application
 - Styles: `□{...}⟦...⟧` - Styled UI elements
 
-## More Examples
+## More Examples with Chinese Characters
 
-### UI Counter Component
+### GaiaScript Project Names (蓋 Projects)
 ```gaiascript
-δ:⟨{
-  ϖ:⟨ℵ:⊹⟩,  // state: count = 0
-  ϱ:⟨
-    П→⊞⋰×⊿→[  // Panel → Grid 3×1
-      (⌘"−"⌘ω→ℵ⊝),      // Button "-" click → count--
-      (⌑"ℵ:${ℵ}"⇄ℵ),    // Label bound to count
-      (⌘"⊿"⌘ω→ℵ⊕)       // Button "+" click → count++
-    ]
-  ⟩
-}⟩
+// Project definitions using Chinese character 蓋 (gài) for "Gaia"
+P⟨蓋-chat⟩     // Gaia Chat application
+P⟨蓋-matrix⟩   // Gaia Matrix game engine  
+P⟨蓋-os⟩       // Gaia Operating System
+P⟨蓋-space⟩    // Gaia Space collaboration
+
+// UI with Chinese labels
+UI⟨✱⟩
+  □{標題}⟦T⟨系統狀態⟩⟧      // System Status
+  □{按鈕}⟦⌘"瀏覽"⟧         // Browse button
+  □{標籤}⟦⌑"記憶體使用率"⟧   // Memory usage label
+⟨/UI⟩
 ```
 
-### Neural Network (CNN)
+### Function Names with Chinese Characters
 ```gaiascript
-Ñ:I⋮≡×⋮≡×⋰→C₁⋰⋮→P→C₂⊧⋱→P→F→D₁⊿⋮⌗→D₂⊧⋱→D₀⊿⊹→S
-// Input 224×224×3 → Conv 32 → Pool → Conv 64 → Pool → 
-// Flatten → Dense 128 → Dense 64 → Dense 10 → Softmax
+// Error handling function
+F⟨處理錯誤, 錯誤⟩
+  ∇(錯誤.類型 = "網絡") {
+    顯示("網絡連接失敗")
+  } ⊘ {
+    記錄(錯誤.信息)
+  }
+⟨/F⟩
+
+// Load project function  
+F⟨加載項目, 項目名⟩
+  讀取(項目名) → 解析 → 顯示窗口
+⟨/F⟩
+```
+
+### System Components with Chinese Terms
+```gaiascript
+// Define system metrics
+S⟨
+  項目總數: ⊿⋮⌗,        // Total projects: 128
+  活躍用戶: ⋰⋱⌓,        // Active users: 345  
+  平均加載時間: ⋮.⌓秒,   // Avg load time: 2.5s
+  構建數量: ⊧⊧          // Build count: 99
+⟩
+
+// Language encoding
+L⟨
+  地本: "GaiaScript",   // Earth script
+  鉤本: "JavaScript",   // Hook script
+  蛇本: "Python",       // Snake script
+  原子: "React"         // Atomic (React)
+⟩
 ```
 
 A GAN architecture:
