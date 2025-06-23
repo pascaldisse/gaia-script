@@ -1,1 +1,68 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+build/
+dist/
+*.tsbuildinfo
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# TypeScript compiler (do not track)
+TypeScript/
+
+# Runtime and temporary files
+*.log
+*.tmp
+*.temp
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Package manager files
+package-lock.json
+yarn.lock
+
+# Compiled binaries
+*.exe
+*.out
+*.app
+
+# Rust build artifacts (if any remain)
+target/
+Cargo.lock
+
+# Previous build systems
+comp/
+ext/
+gaiascript.bak/
+typescript-compiler/
+
+# Web artifacts
+docs/web/
+docs/demo.js
+
+# Translation tools
+translate.js
+translate
+encoding.csv
