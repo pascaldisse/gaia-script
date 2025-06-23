@@ -1,0 +1,134 @@
+#!/usr/bin/env node
+
+/**
+ * GaiaScript Native Compiler CLI
+ * Production-ready compiler using TypeScript infrastructure
+ */
+
+const { GaiaMinimalCompiler } = require('./compiler-minimal.js');
+const fs = require('fs');
+const path = require('path');
+
+// Parse command line arguments
+const args = process.argv.slice(2);
+if (args.length === 0) {
+    console.log('Usage: gaia-compile <input.gaia> [options]');
+    console.log('Options:');
+    console.log('  --output, -o <file>    Output file path');
+    console.log('  --target, -t <target>  Target language (typescript|javascript|go)');
+    console.log('  --debug, -d            Enable debug output');
+    console.log('  --watch, -w            Watch mode');
+    process.exit(1);
+}
+
+const inputFile = args[0];
+let outputFile = inputFile.replace(/\.gaia$/, '.js');
+let target = 'javascript';
+let debug = false;
+let watch = false;
+
+// Parse options
+for (let i = 1; i < args.length; i++) {
+    switch (args[i]) {
+        case '--output':
+        case '-o':
+            outputFile = args[++i];
+            break;
+        case '--target':
+        case '-t':
+            target = args[++i];
+            break;
+        case '--debug':
+        case '-d':
+            debug = true;
+            break;
+        case '--watch':
+        case '-w':
+            watch = true;
+            break;
+    }
+}
+
+// Compile function
+function compile() {
+    console.log(`🌸 GaiaScript Native Compiler`);
+    console.log(`📄 Input: ${inputFile}`);
+    console.log(`🎯 Target: ${target}`);
+    console.log(`📦 Output: ${outputFile}\n`);
+
+    try {
+        // Read source file
+        const source = fs.readFileSync(inputFile, 'utf8');
+        
+        // Create compiler instance
+        const compiler = new GaiaMinimalCompiler();
+        
+        // Compile
+        console.log('⚡ Compiling...');
+        const result = compiler.compile(source, {
+            target: target,
+            debug: debug,
+            sourceMap: true
+        });
+        
+        if (result.success) {
+            // Write output based on target
+            let output = '';
+            let ext = '.js';
+            
+            switch (target) {
+                case 'typescript':
+                    output = result.typescript || '';
+                    ext = '.ts';
+                    break;
+                case 'go':
+                    output = result.go || '';
+                    ext = '.go';
+                    break;
+                case 'javascript':
+                default:
+                    output = result.javascript || '';
+                    ext = '.js';
+                    break;
+            }
+            
+            // Update output file extension if not specified
+            if (!args.includes('--output') && !args.includes('-o')) {
+                outputFile = inputFile.replace(/\.gaia$/, ext);
+            }
+            
+            fs.writeFileSync(outputFile, output);
+            console.log(`✅ Compilation successful!`);
+            console.log(`📝 Output written to: ${outputFile}`);
+            
+            if (debug && result.diagnostics) {
+                console.log('\n📊 Diagnostics:');
+                result.diagnostics.forEach(d => console.log(`  ${d}`));
+            }
+        } else {
+            console.error('❌ Compilation failed!');
+            if (result.diagnostics) {
+                result.diagnostics.forEach(d => console.error(`  ${d}`));
+            }
+            process.exit(1);
+        }
+    } catch (error) {
+        console.error('❌ Error:', error.message);
+        if (debug) {
+            console.error(error.stack);
+        }
+        process.exit(1);
+    }
+}
+
+// Initial compile
+compile();
+
+// Watch mode
+if (watch) {
+    console.log('\n👁️  Watching for changes...');
+    fs.watchFile(inputFile, { interval: 1000 }, () => {
+        console.log('\n🔄 File changed, recompiling...');
+        compile();
+    });
+}

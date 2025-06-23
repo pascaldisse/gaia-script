@@ -4,7 +4,7 @@
  */
 
 import * as ts from "../TypeScript/src/compiler/types";
-import { encodingMap } from "./encoding/character-map";
+import { encodingMap } from "./encoding/character-map-simple";
 
 export enum GaiaTokenKind {
     // Chinese Character Tokens

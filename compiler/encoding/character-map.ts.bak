@@ -10,6 +10,7 @@ export interface ΨMap {
     ρ: Record<string, string>;     // mathematical CSS properties
     Ξ: Record<string, string>;     // mathematical operations
     𝔸: Record<string, number>;     // unicode numeric encoding
+    ⃝: Record<string, string>;     // combining character modifiers
 }
 
 export const ψMap: ΨMap = {
@@ -283,6 +284,52 @@ export const ψMap: ΨMap = {
         
         // Negative numbers via vector negation
         '⊗⁻α': -1, '⊗⁻β': -2, '⊗⁻γ': -3, '⊗⁻δ': -4, '⊗⁻ε': -5,
+    },
+    
+    // Unicode Combining Characters for Advanced Type Notation
+    // Revolutionary compositional symbol building for maximum efficiency
+    ⃝: {
+        // Type modifiers (combining diacritics)
+        'typed': '\u0301',      // ́  (acute accent - strongly typed)
+        'nullable': '\u0300',   // ̀  (grave accent - nullable/optional)
+        'array': '\u0302',      // ̂  (circumflex - array type)
+        'async': '\u0303',      // ̃  (tilde - async operation)
+        'static': '\u0304',     // ̄  (macron - static/immutable)
+        'mutable': '\u0307',    // ̇  (dot - mutable state)
+        'tuple': '\u0308',      // ̈  (diaeresis - tuple type)
+        'reactive': '\u030A',   // ̊  (ring - reactive/observable)
+        'validated': '\u030C',  // ̌  (caron - validated/checked)
+        'volatile': '\u0306',   // ̆  (breve - volatile/transient)
+        'reference': '\u030D',  // ̍  (vertical line - reference type)
+        'pure': '\u030E',       // ̎  (double vertical - pure function)
+        'generic': '\u030F',    // ̏  (double grave - generic type)
+        'partial': '\u0310',    // ̐  (chandrabindu - partial type)
+        'required': '\u0311',   // ̑  (inverted breve - required field)
+        
+        // Mathematical accents for numeric types
+        'vector': '\u20D7',     // ⃗  (vector arrow)
+        'matrix': '\u20DD',     // ⃝  (enclosing circle)
+        'tensor': '\u20DE',     // ⃞  (enclosing square)
+        'scalar': '\u20DF',     // ⃟  (enclosing diamond)
+        'complex': '\u20E1',    // ⃡  (left-right arrow)
+        
+        // Behavioral modifiers
+        'lazy': '\u0323',       // ̣  (dot below - lazy evaluation)
+        'eager': '\u0324',      // ̤  (diaeresis below - eager evaluation)
+        'cached': '\u0325',     // ̥  (ring below - cached/memoized)
+        'deprecated': '\u0336', // ̶  (long stroke - deprecated)
+        'experimental': '\u0337', // ̷  (short stroke - experimental)
+        'internal': '\u0338',   // ̸  (long slash - internal/private)
+        
+        // Compound type builders
+        'function': 'λ',        // base function
+        'state': 'Σ',          // base state
+        'component': '∆',      // base component
+        'number': 'ℝ',         // base number
+        'string': '𝕊',         // base string
+        'array': '𝔸',          // base array
+        'object': '𝕆',         // base object
+        'boolean': '𝔹',        // base boolean
     }
 };
 
@@ -293,7 +340,8 @@ export const φMap = {
     ∇: Object.fromEntries(Object.entries(ψMap.∇).map(([k, v]) => [v, k])),
     ρ: Object.fromEntries(Object.entries(ψMap.ρ).map(([k, v]) => [v, k])),
     Ξ: Object.fromEntries(Object.entries(ψMap.Ξ).map(([k, v]) => [v, k])),
-    𝔸: Object.fromEntries(Object.entries(ψMap.𝔸).map(([k, v]) => [v.toString(), k]))
+    𝔸: Object.fromEntries(Object.entries(ψMap.𝔸).map(([k, v]) => [v.toString(), k])),
+    ⃝: Object.fromEntries(Object.entries(ψMap.⃝).map(([k, v]) => [v, k]))
 };
 
 // Vector-based numeric encoder - Revolutionary LLM efficiency
@@ -504,6 +552,98 @@ export function ψText(text: string): string {
     for (const [math, chinese] of Object.entries(φMap.λ)) {
         result = result.replace(new RegExp(chinese, 'g'), math);
     }
+    
+    return result;
+}
+
+// Advanced Type Notation with Combining Characters
+export function χType(baseSymbol: string, modifiers: string[]): string {
+    let result = baseSymbol;
+    
+    // Apply combining character modifiers
+    for (const modifier of modifiers) {
+        if (modifier in ψMap.⃝) {
+            result += ψMap.⃝[modifier];
+        }
+    }
+    
+    return result;
+}
+
+// Decode typed symbol back to components
+export function ωType(typedSymbol: string): { base: string; modifiers: string[] } {
+    // Base symbol is the first character
+    const base = typedSymbol[0];
+    const modifiers: string[] = [];
+    
+    // Extract combining characters
+    for (let i = 1; i < typedSymbol.length; i++) {
+        const char = typedSymbol[i];
+        // Check if it's a combining character
+        for (const [name, combiner] of Object.entries(ψMap.⃝)) {
+            if (char === combiner) {
+                modifiers.push(name);
+                break;
+            }
+        }
+    }
+    
+    return { base, modifiers };
+}
+
+// Create typed function notation
+export function λTyped(name: string, params: Array<{name: string; type: string; modifiers?: string[]}>, returnType?: {type: string; modifiers?: string[]}): string {
+    let result = 'λ';
+    
+    // Add function modifiers if any
+    if (returnType?.modifiers?.includes('async')) {
+        result += ψMap.⃝.async;
+    }
+    if (returnType?.modifiers?.includes('pure')) {
+        result += ψMap.⃝.pure;
+    }
+    
+    result += `⟨${name}`;
+    
+    // Add typed parameters
+    for (const param of params) {
+        let paramType = param.type;
+        if (param.modifiers) {
+            paramType = χType(param.type, param.modifiers);
+        }
+        result += `, ${param.name}: ${paramType}`;
+    }
+    
+    result += '⟩';
+    
+    return result;
+}
+
+// Create typed state notation
+export function ΣTyped(fields: Array<{name: string; type: string; modifiers?: string[]; initial?: string}>): string {
+    let result = 'Σ';
+    
+    // Check for reactive state
+    const hasReactive = fields.some(f => f.modifiers?.includes('reactive'));
+    if (hasReactive) {
+        result += ψMap.⃝.reactive;
+    }
+    
+    result += '⟨\n';
+    
+    for (const field of fields) {
+        let fieldType = field.type;
+        if (field.modifiers) {
+            fieldType = χType(field.type, field.modifiers);
+        }
+        result += `  ${field.name}: ${fieldType}`;
+        if (field.initial) {
+            result += ` = ${field.initial}`;
+        }
+        result += ',\n';
+    }
+    
+    result += '⟩';
     
     return result;
 }

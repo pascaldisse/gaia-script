@@ -5,8 +5,8 @@
 
 import { GaiaScanner } from "./scanner";
 import { GaiaParser } from "./parser";
-import { GaiaTransformer } from "./transformer";
-import { GaiaEmitter, EmitResult } from "./emitter";
+import { GaiaTransformer } from "./transformer-simple";
+import { GaiaEmitter, EmitResult } from "./emitter-simple";
 
 export interface CompileOptions {
     target?: 'typescript' | 'go' | 'javascript';
@@ -161,7 +161,7 @@ export { GaiaScanner, GaiaTokenKind, type GaiaToken } from "./scanner";
 export { GaiaParser, type GaiaASTNode } from "./parser";
 export { GaiaTransformer } from "./transformer";
 export { GaiaEmitter, type EmitResult } from "./emitter";
-export { encodingMap, expandChineseText, compressToChineseText } from "./encoding/character-map";
+export { encodingMap, expandText as expandChineseText, compressText as compressToChineseText } from "./encoding/character-map-simple";
 
 // Default export
 export default GaiaCompiler;

@@ -5,7 +5,7 @@
 
 import * as ts from "../TypeScript/src/compiler/types";
 import { GaiaToken, GaiaTokenKind, GaiaScanner } from "./scanner";
-import { expandChineseText } from "./encoding/character-map";
+import { expandText as expandChineseText } from "./encoding/character-map-simple";
 
 export interface GaiaASTNode {
     kind: string;

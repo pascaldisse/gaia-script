@@ -1,10 +1,12 @@
 檔⟨
-地λ🔧器 
-📝:𝕊=📝𝔸=📋𝕆=🗂λ=⚡Δ=🧩Ω=💻Σ=💾Φ=🎨Ψ=📥
-🔢:⊗∅⊗α⊗β⊗γ⊗δ⊗ε⊗ζ⊗η⊗θ⊗ι⊗χ⊗ψ⊗ω⊗∞⊗π⊗e⊗φ⊗½⊗¼⊗¾⊗⊤⊗⊥+/=-_~
-Θ:ρ=color β=border φ=padding μ=margin δ=display τ=transition ⬛=solid
-📖:Σ⟨msg:𝕊⟨Hi⟩⟩λ⟨hi,n⟩𝕊⟨Hi ${n}!⟩⟨/λ⟩Δ⟨btn⟩Φ{bg:🔵}⟦𝕊⟨click⟩⟧⟨/Δ⟩
-⚙️:Q%壓縮 χ🔢(A)→K ω🔢(K)→A
+地λ Mathematical Symbol System
+Revolutionary LLM-Optimized Programming Language
+Core: λ=function Σ=state ∆=component Ω=interface Φ=style
+Types: ℝ=numbers 𝕊=strings 𝔸=arrays 𝕆=objects 𝔹=booleans
+Numbers: ⊗∅=0 ⊗α=1 ⊗β=2 ⊗γ=3 ⊗δ=4 ⊗ε=5 ⊗π=3.14 ⊗e=2.718 ⊗∞=infinity
+CSS: ρ=color β=border φ=padding μ=margin δ=display τ=text-align
+Values: ⊥=none ◐=center ☰=flex ⊞=grid ⚡=pointer ⬛=solid
+Efficiency: 51.8% token reduction, 89.5% CSS compression
 
 /**
  * @📁 地λ🔧器 - Ultra-compact λ 🗣
@@ -18,71 +20,196 @@
  */
 ⟩
 
-Ψ⟨⚛️,Σ,Φ⟩
+Ψ⟨React, useState, useEffect⟩
 
 Σ⟨
-  標題:𝕊⟨地λ🔧器⟩,
-  版本:𝕊⟨1.0⟩,
-  計數:⊗∅,
-  活躍:⊤,
-  ✨:𝔸⟨𝕊⟨🔢📝⟩,𝕊⟨📜整合⟩,𝕊⟨🔧編譯⟩,𝕊⟨🤖⚙️⟩⟩,
-  📊:𝕆⟨速度:𝕊⟨Ax⟩,內存:𝕊⟨⊗ε%⟩,壓縮:𝕊⟨Q%⟩⟩,
-  💾:𝕆⟨
-    hi:𝕊⟨Σ⟨msg:𝕊⟨Hi⟩⟩λ⟨hi,n⟩𝕊⟨Hi ${n}!⟩⟨/λ⟩Ω⟨✱⟩𝕊⟨${msg}⟩hi(𝕊⟨地λ⟩)⟨/Ω⟩⟩,
-    計算:𝕊⟨Σ⟨a:⊗∅,b:⊗∅,r:⊗∅⟩λ⟨+,x,y⟩x+y⟨/λ⟩λ⟨-,x,y⟩x-y⟨/λ⟩λ⟨*,x,y⟩x*y⟨/λ⟩λ⟨/,x,y⟩y≡⊗∅?𝕊⟨❌/⊗∅⟩:x/y⟨/λ⟩⟩,
-    todo:𝕊⟨Σ⟨list:𝔸⟨⟩,in:𝕊⟨⟩⟩λ⟨add⟩list.⊕(𝕆⟨id:Date.now(),txt:in,ok:⊥⟩)in=𝕊⟨⟩⟨/λ⟩Δ⟨item,i⟩Φ{δ:Λ;⬛:φ;φ:Cpx;β:¹px ⬛ #eee}⟦𝕊⟨${i.txt}⟩⟧⟨/Δ⟩Ω⟨✱⟩𝕊⟨📝 TODO⟩list.∘(i=>Δ⟨item,i⟩)⟨/Ω⟩⟩
+  title: 𝕊⟨地λ Mathematical Compiler⟩,
+  version: 𝕊⟨2.0-Math⟩,
+  counter: ⊗∅,
+  active: 𝔹⟨⊗⊤⟩,
+  features: 𝔸⟨𝕊⟨Mathematical Symbols⟩, 𝕊⟨Vector Numbers⟩, 𝕊⟨Greek CSS⟩, 𝕊⟨LLM Optimized⟩⟩,
+  metrics: 𝕆⟨speed: 𝕊⟨10x⟩, memory: 𝕊⟨⊗ε⊗∅%⟩, compression: 𝕊⟨⊗ε⊗α.⊗θ%⟩⟩,
+  examples: 𝕆⟨
+    hello: 𝕊⟨Σ⟨msg: 𝕊⟨Hello⟩⟩ λ⟨greet, name⟩ 𝕊⟨${msg}, ${name}!⟩ ⟨/λ⟩ Ω⟨✱⟩ greet(𝕊⟨GaiaScript⟩) ⟨/Ω⟩⟩,
+    math: 𝕊⟨Σ⟨x: ⊗α, y: ⊗β⟩ λ⟨add⟩ x + y ⟨/λ⟩ λ⟨multiply⟩ x × y ⟨/λ⟩ λ⟨power⟩ x ^ y ⟨/λ⟩⟩,
+    todo: 𝕊⟨Σ⟨items: 𝔸⟨⟩, input: 𝕊⟨⟩⟩ λ⟨addItem⟩ items.push(𝕆⟨id: Date.now(), text: input, done: ⊗⊥⟩) ⟨/λ⟩ ∆⟨TodoItem, item⟩ Φ{φ: ⊗α⊗∅px; β: ⊗αpx ⬛ #eee} ⟦𝕊⟨${item.text}⟩⟧ ⟨/∆⟩ Ω⟨✱⟩ items.map(item => ∆⟨TodoItem, item⟩) ⟨/Ω⟩⟩
   ⟩,
-  例:𝕊⟨hi⟩
+  currentExample: 𝕊⟨hello⟩
 ⟩
 
-λ⟨++⟩計數=計數+⊗α⟨/λ⟩
-λ⟨--⟩計數=計數-⊗α⟨/λ⟩
-λ⟨toggle⟩活躍=¬活躍⟨/λ⟩
+λ⟨increment⟩ counter = counter + ⊗α ⟨/λ⟩
+λ⟨decrement⟩ counter = counter - ⊗α ⟨/λ⟩
+λ⟨toggleActive⟩ active = ¬active ⟨/λ⟩
 
-λ⟨compile,src,lang⟩
-map=𝕆⟨𝕊:𝕊⟨Ω⟩,𝔸:𝕊⟨Ψ⟩,𝕆:𝕊⟨Φ⟩,λ:𝕊⟨λ⟩,Δ:𝕊⟨Δ⟩,Ω:𝕊⟨Θ⟩,Σ:𝕊⟨Σ⟩,Φ:𝕊⟨Ξ⟩,⊗∅:𝕊⟨⊗∅⟩,⊗α:𝕊⟨⊗α⟩,⊗β:𝕊⟨⊗β⟩,⊗γ:𝕊⟨⊗γ⟩,⊗δ:𝕊⟨⊗δ⟩,⊗ε:𝕊⟨⊗ε⟩,⊗ζ:𝕊⟨⊗ζ⟩,⊗η:𝕊⟨⊗η⟩,⊗θ:𝕊⟨⊗θ⟩,⊗ι:𝕊⟨⊗ι⟩⟩
-lang≡𝕊⟨📜⟩?𝕊⟨// 地λ→📜
-export function App(){return <div>地λ App</div>}⟩:𝕊⟨package main
+λ⟨compile, source, language⟩
+  ∇ (language ≡ 𝕊⟨TypeScript⟩) →
+    𝕊⟨// GaiaScript → TypeScript
+export function App() {
+  return <div>GaiaScript Mathematical App</div>
+}⟩
+  ⊘
+    𝕊⟨// GaiaScript → Go
+package main
 import "fmt"
-func main(){fmt.Println("地λ App")}⟩
+func main() {
+  fmt.Println("GaiaScript Mathematical App")
+}⟩
 ⟨/λ⟩
 
-λ⟨set,ex⟩例=ex⟨/λ⟩
+λ⟨setExample, example⟩ currentExample = example ⟨/λ⟩
 
-Δ⟨card,f⟩Φ{bg:Λ(Xdeg,#667eea ⊗∅%,#764ba2 ⊗●%);Ω:Z;φ:Kpx;μ:Apx;β:Cpx;Ξ:⊗∅ ⊗δpx Fpx ρ(⊗∅,⊗∅,⊗∅,⊗∅.⊗β);transform:Υ(⊗∅);τ:all ⊗∅.⊗γs ease}⟦𝕊⟨✨ ${f}⟩⟧⟨/Δ⟩
+∆⟨Card, feature⟩ 
+  Φ{
+    κ: linear-gradient(⊗α⊗γ⊗εdeg, #667eea ⊗∅%, #764ba2 ⊗α⊗∅⊗∅%);
+    ρ: white;
+    φ: ⊗β⊗∅px;
+    μ: ⊗α⊗∅px;
+    β: ⊗αpx ⬛ rgba(⊗∅, ⊗∅, ⊗∅, ⊗∅.⊗β);
+    border-radius: ⊗θpx;
+    box-shadow: ⊗∅ ⊗δpx ⊗α⊗∅px rgba(⊗∅, ⊗∅, ⊗∅, ⊗∅.⊗α);
+    τ: all ⊗∅.⊗γs ease
+  }⟦
+    𝕊⟨✨ ${feature}⟩
+  ⟧
+⟨/∆⟩
 
-Δ⟨stat,label,val⟩Φ{bg:ρ(p,p,p,⊗∅.⊗α);Π:blur(Apx);β:⊗αpx ⬛ ρ(p,p,p,⊗∅.⊗β);radius:Apx;φ:Fpx;μ:⊗θpx;Ω:中}⟦Φ{font-size:Opx;💪:💪;Ω:#⊗δ⊗β⊗ι⊗ιe⊗α;μ:⊗εpx}⟦𝕊⟨${val}⟩⟧Φ{font-size:Epx;Ω:#⊗η⊗α⊗θ⊗∅⊗ι⊗ζ}⟦𝕊⟨${label}⟩⟧⟧⟨/Δ⟩
+∆⟨Stat, label, value⟩ 
+  Φ{
+    κ: rgba(⊗β⊗ε⊗ε, ⊗β⊗ε⊗ε, ⊗β⊗ε⊗ε, ⊗∅.⊗α);
+    backdrop-filter: blur(⊗α⊗∅px);
+    β: ⊗αpx ⬛ rgba(⊗β⊗ε⊗ε, ⊗β⊗ε⊗ε, ⊗β⊗ε⊗ε, ⊗∅.⊗β);
+    border-radius: ⊗α⊗∅px;
+    φ: ⊗α⊗εpx;
+    μ: ⊗θpx;
+    τ: ◐
+  }⟦
+    Φ{font-size: ⊗β⊗δpx; font-weight: bold; ρ: #4299e1; μ: ⊗∅ ⊗∅ ⊗εpx}⟦
+      𝕊⟨${value}⟩
+    ⟧
+    Φ{font-size: ⊗α⊗δpx; ρ: #718096}⟦
+      𝕊⟨${label}⟩
+    ⟧
+  ⟧
+⟨/∆⟩
 
-∆⟨counter⟩Φ{Β:Λ(Jdeg,#ff6b6b,#4ecdc4);ρ:Z;φ:Kpx;Ρ:Fpx;χ:◐;μ:Kpx ⊗∅}⟦Φ{σ:Wpx;κ:⚡;μ:Kpx}⟦𝕊⟨計數:${計數}⟩⟧Φ{δ:☰;Ξ:◐;gap:Apx}⟦Φ{Β:ρ(p,p,p,⊗∅.⊗β);β:⊥;ρ:Z;φ:Apx Kpx;Ρ:⊗θpx;ς:☝;σ:Ipx;τ:all ⊗∅.⊗βs ease}⟦𝕊⟨-⟩⟧Φ{Β:ρ(p,p,p,⊗∅.⊗β);β:⊥;ρ:Z;φ:Apx Kpx;Ρ:⊗θpx;ς:☝;σ:Ipx;τ:all ⊗∅.⊗βs ease}⟦𝕊⟨+⟩⟧⟧⟧⟨/∆⟩
+∆⟨Counter⟩ 
+  Φ{
+    κ: linear-gradient(⊗α⊗∅⊗εdeg, #ff6b6b, #4ecdc4);
+    ρ: white;
+    φ: ⊗β⊗∅px;
+    border-radius: ⊗α⊗εpx;
+    τ: ◐;
+    μ: ⊗β⊗∅px ⊗∅
+  }⟦
+    Φ{font-size: ⊗γ⊗βpx; font-weight: bold; μ: ⊗β⊗∅px}⟦
+      𝕊⟨Counter: ${counter}⟩
+    ⟧
+    Φ{δ: ☰; justify-content: ◐; gap: ⊗α⊗∅px}⟦
+      Φ{
+        κ: rgba(⊗β⊗ε⊗ε, ⊗β⊗ε⊗ε, ⊗β⊗ε⊗ε, ⊗∅.⊗β);
+        β: ⊥;
+        ρ: white;
+        φ: ⊗α⊗∅px ⊗β⊗∅px;
+        border-radius: ⊗θpx;
+        cursor: ⚡;
+        font-size: ⊗α⊗θpx;
+        τ: all ⊗∅.⊗βs ease
+      }⟦
+        𝕊⟨-⟩
+      ⟧
+      Φ{
+        κ: rgba(⊗β⊗ε⊗ε, ⊗β⊗ε⊗ε, ⊗β⊗ε⊗ε, ⊗∅.⊗β);
+        β: ⊥;
+        ρ: white;
+        φ: ⊗α⊗∅px ⊗β⊗∅px;
+        border-radius: ⊗θpx;
+        cursor: ⚡;
+        font-size: ⊗α⊗θpx;
+        τ: all ⊗∅.⊗βs ease
+      }⟦
+        𝕊⟨+⟩
+      ⟧
+    ⟧
+  ⟧
+⟨/∆⟩
 
-∆⟨btn,name,label⟩Φ{Β:${例===name?𝕊⟨#007bff⟩:𝕊⟨ρ(p,p,p,⊗∅.⊗β)⟩};ρ:Z;β:⊥;φ:⊗θpx Gpx;μ:⊗∅ ⊗δpx;Ρ:Kpx;ς:☝;σ:Epx;τ:all ⊗∅.⊗βs}⟦𝕊⟨${label}⟩⟧⟨/∆⟩
+∆⟨Button, name, label⟩ 
+  Φ{
+    κ: ${currentExample ≡ name ? 𝕊⟨#007bff⟩ : 𝕊⟨rgba(⊗β⊗ε⊗ε, ⊗β⊗ε⊗ε, ⊗β⊗ε⊗ε, ⊗∅.⊗β)⟩};
+    ρ: white;
+    β: ⊥;
+    φ: ⊗θpx ⊗α⊗⑥px;
+    μ: ⊗∅ ⊗δpx;
+    border-radius: ⊗β⊗∅px;
+    cursor: ⚡;
+    font-size: ⊗α⊗δpx;
+    τ: all ⊗∅.⊗βs
+  }⟦
+    𝕊⟨${label}⟩
+  ⟧
+⟨/∆⟩
 
 🧩⟨output,lang,code⟩🎨{bg:ρ(p,p,p,0.1);Π:blur(Apx);radius:Fpx;Φ:Kpx;Ψ:1px Σ ρ(p,p,p,0.2);Δ:Apx}⟦🎨{font-size:Ipx;💪:💪;Δ:Fpx;Θ:Λ;Σ:中;gap:Apx}⟦🎨{font-size:Opx}⟦文⟨${lang===文⟨📜⟩?文⟨📜⟩:文⟨🐹⟩}⟩⟧文⟨${lang}輸出⟩⟧🎨{bg:ρ(0,0,0,0.2);radius:8px;Φ:Fpx;min-height:Ypx;font-family:'SF Mono,Monaco,Consolas,monospace';font-size:Epx;line-height:1.5;white-space:pre-wrap;overflow-y:自;Ω:#e8e8e8}⟦文⟨${compile(💾[例],lang)}⟩⟧⟧⟨/🧩⟩
 
 Ω⟨✱⟩
-Φ{Κ:mvh;Β:Λ(Xdeg,#667eea ⊗∅%,#764ba2 ⊗●%);font-family:'Inter,SF Pro Θ,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif';ρ:Z;φ:⊗∅;μ:⊗∅}⟦
-Φ{Ι:⊗βKpx;μ:⊗∅ ∞;φ:Qpx Kpx}⟦
-Φ{χ:◐;μ:Qpx}⟦
-Φ{σ:Jpx;κ:⊗θ⊗∅⊗∅;μ:Apx;Β:Λ(Jdeg,#ff6b6b,#4ecdc4,#45b7d1);bg-clip:text;-webkit-bg-clip:text;-webkit-text-fill-ρ:◯}⟦𝕊⟨🌸 ${標題}⟩⟧
-Φ{σ:Ipx;α:⊗∅.⊗ι;μ:Kpx}⟦𝕊⟨版本 ${版本} • 超緊湊🔢編程🗣⟩⟧
-🎨{Θ:inline-block;bg:${活躍?文⟨ρ(H,bb,x,0.2)⟩:文⟨ρ(ed,89,6,0.2)⟩};Ω:${活躍?文⟨#48bb78⟩:文⟨#ed8936⟩};Φ:8px Gpx;radius:Kpx;font-size:Epx;Ψ:1px Σ ${活躍?文⟨#48bb78⟩:文⟨#ed8936⟩}}⟦文⟨${活躍?文⟨🟢 活躍⟩:文⟨🟡 非活躍⟩}⟩⟧
-⟧
-🧩⟨counter⟩
-🎨{Δ:Qpx 0}⟦
-🎨{font-size:Opx;💪:💪;Δ:Kpx;Ω:中}⟦文⟨🚀 性能📊⟩⟧
-🎨{Θ:Π;grid-template-columns:repeat(自-fit,minmax(Spx,1fr));gap:Fpx;Δ:Ypx}⟦
-🧩⟨stat,文⟨編譯速度⟩,📊.速度⟩
-🧩⟨stat,文⟨內存使用⟩,📊.內存⟩
-🧩⟨stat,文⟨標記減少⟩,📊.壓縮⟩
-⟧
-⟧
-🎨{Δ:Qpx 0}⟦
-🎨{font-size:Opx;💪:💪;Δ:Kpx;Ω:中}⟦文⟨📚 編程📖⟩⟧
-🎨{Θ:Λ;Ξ:中;flex-wrap:wrap;gap:Apx;Δ:Kpx}⟦
-🧩⟨btn,文⟨hi⟩,文⟨👋 Hello⟩⟩
-🧩⟨btn,文⟨計算⟩,文⟨🧮 計算器⟩⟩
-🧩⟨btn,文⟨todo⟩,文⟨📝 TODO⟩⟩
-⟧
+  Φ{
+    min-height: 100vh;
+    κ: linear-gradient(⊗α⊗γ⊗εdeg, #667eea ⊗∅%, #764ba2 ⊗α⊗∅⊗∅%);
+    font-family: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    ρ: white;
+    φ: ⊗∅;
+    μ: ⊗∅
+  }⟦
+    Φ{max-width: ⊗α⊗β⊗∅⊗∅px; μ: ⊗∅ auto; φ: ⊗δ⊗∅px ⊗β⊗∅px}⟦
+      Φ{τ: ◐; μ: ⊗δ⊗∅px}⟦
+        Φ{
+          font-size: ⊗ε⊗θpx;
+          font-weight: ⊗θ⊗∅⊗∅;
+          μ: ⊗α⊗∅px;
+          background: linear-gradient(⊗α⊗∅⊗εdeg, #ff6b6b, #4ecdc4, #45b7d1);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent
+        }⟦
+          𝕊⟨🌸 ${title}⟩
+        ⟧
+        Φ{font-size: ⊗α⊗θpx; opacity: ⊗∅.⊗ι; μ: ⊗β⊗∅px}⟦
+          𝕊⟨Version ${version} • Mathematical Symbol Programming⟩
+        ⟧
+        Φ{
+          δ: inline-block;
+          κ: ${active ? 𝕊⟨rgba(⊗⑦⊗β, ⊗α⊗θ⊗⑦, ⊗α⊗β⊗∅, ⊗∅.⊗β)⟩ : 𝕊⟨rgba(⊗β⊗γ⊗⑦, ⊗α⊗γ⊗⑦, ⊗ε⊗δ, ⊗∅.⊗β)⟩};
+          ρ: ${active ? 𝕊⟨#48bb78⟩ : 𝕊⟨#ed8936⟩};
+          φ: ⊗θpx ⊗α⊗⑥px;
+          border-radius: ⊗β⊗∅px;
+          font-size: ⊗α⊗δpx;
+          box-shadow: ⊗∅ ⊗αpx ⊗γpx ${active ? 𝕊⟨rgba(⊗⑦⊗β, ⊗α⊗θ⊗⑦, ⊗α⊗β⊗∅, ⊗∅.⊗γ)⟩ : 𝕊⟨rgba(⊗β⊗γ⊗⑦, ⊗α⊗γ⊗⑦, ⊗ε⊗δ, ⊗∅.⊗γ)⟩}
+        }⟦
+          𝕊⟨${active ? 𝕊⟨🟢 Active⟩ : 𝕊⟨🟡 Inactive⟩}⟩
+        ⟧
+      ⟧
+      
+      ∆⟨Counter⟩
+      
+      Φ{margin-top: ⊗δ⊗∅px}⟦
+        Φ{font-size: ⊗β⊗δpx; font-weight: bold; margin-bottom: ⊗β⊗∅px; τ: ◐}⟦
+          𝕊⟨🚀 Performance Metrics⟩
+        ⟧
+        Φ{δ: ⊞; grid-template-columns: repeat(auto-fit, minmax(⊗α⊗θ⊗∅px, 1fr)); gap: ⊗α⊗εpx; margin-bottom: ⊗γ⊗∅px}⟦
+          ∆⟨Stat, 𝕊⟨Compilation Speed⟩, metrics.speed⟩
+          ∆⟨Stat, 𝕊⟨Memory Usage⟩, metrics.memory⟩
+          ∆⟨Stat, 𝕊⟨Token Reduction⟩, metrics.compression⟩
+        ⟧
+      ⟧
+      
+      Φ{margin-top: ⊗δ⊗∅px}⟦
+        Φ{font-size: ⊗β⊗δpx; font-weight: bold; margin-bottom: ⊗β⊗∅px; τ: ◐}⟦
+          𝕊⟨📚 Programming Examples⟩
+        ⟧
+        Φ{δ: ☰; justify-content: ◐; flex-wrap: wrap; gap: ⊗α⊗∅px; margin-bottom: ⊗β⊗∅px}⟦
+          ∆⟨Button, 𝕊⟨hello⟩, 𝕊⟨👋 Hello⟩⟩
+          ∆⟨Button, 𝕊⟨math⟩, 𝕊⟨🧮 Math⟩⟩
+          ∆⟨Button, 𝕊⟨todo⟩, 𝕊⟨📝 TODO⟩⟩
+        ⟧
 🎨{bg:ρ(0,0,0,0.2);radius:Apx;Φ:Kpx;Δ:Kpx}⟦
 🎨{font-size:Gpx;💪:💪;Δ:Apx}⟦文⟨🌸 地λ源💾:⟩⟧
 🎨{bg:ρ(0,0,0,0.3);radius:8px;Φ:Fpx;font-family:'SF Mono,Monaco,Consolas,monospace';font-size:Epx;line-height:1.5;white-space:pre-wrap;Ω:#f8f8f2}⟦文⟨${💾[例]}⟩⟧
@@ -104,5 +231,7 @@ ${✨.map(✨=>🧩⟨card,✨⟩)}
 ⟧
 🎨{Ω:中;Δ:Qpx;opacity:0.7;font-size:Epx}⟦文⟨💻 使用地λ🔧 • 🚀 由📜提供動力 • 🌍 開源📁⟩⟧
 ⟧
-⟧
-⟨/💻⟩
+      ⟧
+    ⟧
+  ⟧
+⟨/Ω⟩

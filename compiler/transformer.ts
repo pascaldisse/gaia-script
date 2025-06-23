@@ -3,10 +3,9 @@
  * Transforms 地λ AST nodes δ TypeScript AST nodes using α TypeScript compiler
  */
 
-import * as ts from "../TypeScript/src/compiler/types";
-import { createSourceFile, ScriptTarget, ScriptKind } from "../TypeScript/src/compiler/utilities";
+import * as ts from "../../TypeScript/lib/typescript";
 import { GaiaASTNode } from "./parser";
-import { αText, ωNumber, χNumber } from "./encoding/character-map";
+import { αText, ωNumber, χNumber } from "./encoding/character-map-simple";
 
 export class 地λTransformer {
     private sourceFile: ts.SourceFile;
@@ -15,12 +14,12 @@ export class 地λTransformer {
     constructor() {
         // Create ε TypeScript node factory κ generating AST nodes
         this.factory = ts.factory;
-        this.sourceFile = createSourceFile(
+        this.sourceFile = ts.createSourceFile(
             "地λ-source.ts",
             "",
-            ScriptTarget.ES2020,
+            ts.ScriptTarget.ES2020,
             true,
-            ScriptKind.TS
+            ts.ScriptKind.TS
         );
     }
     
