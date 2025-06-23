@@ -1,246 +1,108 @@
 檔⟨
-  GaiaScript Native TypeScript Compiler Demo
-  Demonstrates the core features of the Chinese character-based language
+地λ🔧器 
+📝:𝕊=📝𝔸=📋𝕆=🗂λ=⚡Δ=🧩Ω=💻Σ=💾Φ=🎨Ψ=📥
+🔢:⊗∅⊗α⊗β⊗γ⊗δ⊗ε⊗ζ⊗η⊗θ⊗ι⊗χ⊗ψ⊗ω⊗∞⊗π⊗e⊗φ⊗½⊗¼⊗¾⊗⊤⊗⊥+/=-_~
+Θ:ρ=color β=border φ=padding μ=margin δ=display τ=transition ⬛=solid
+📖:Σ⟨msg:𝕊⟨Hi⟩⟩λ⟨hi,n⟩𝕊⟨Hi ${n}!⟩⟨/λ⟩Δ⟨btn⟩Φ{bg:🔵}⟦𝕊⟨click⟩⟧⟨/Δ⟩
+⚙️:Q%壓縮 χ🔢(A)→K ω🔢(K)→A
+
+/**
+ * @📁 地λ🔧器 - Ultra-compact λ 🗣
+ * @🏷 1.0
+ * @👥 地λ Team  
+ * @📝 Base68 📝 🔗 with symbolic programming
+ * @📖 
+ * ```地λ
+ * Σ⟨x:A⟩ λ⟨inc⟩x=x+¹⟨/λ⟩ 
+ * ```
+ */
 ⟩
 
-導⟨React, useState, useEffect⟩
+Ψ⟨⚛️,Σ,Φ⟩
 
-狀⟨
-  title: 文⟨GaiaScript TypeScript Compiler⟩,
-  version: 文⟨1.0.0⟩,
-  count: 零,
-  isActive: true,
-  features: 列⟨
-    文⟨Chinese Character Encoding⟩,
-    文⟨TypeScript Integration⟩, 
-    文⟨Native Binary Compilation⟩,
-    文⟨AI Token Efficiency⟩
+Σ⟨
+  標題:𝕊⟨地λ🔧器⟩,
+  版本:𝕊⟨1.0⟩,
+  計數:⊗∅,
+  活躍:⊤,
+  ✨:𝔸⟨𝕊⟨🔢📝⟩,𝕊⟨📜整合⟩,𝕊⟨🔧編譯⟩,𝕊⟨🤖⚙️⟩⟩,
+  📊:𝕆⟨速度:𝕊⟨Ax⟩,內存:𝕊⟨⊗ε%⟩,壓縮:𝕊⟨Q%⟩⟩,
+  💾:𝕆⟨
+    hi:𝕊⟨Σ⟨msg:𝕊⟨Hi⟩⟩λ⟨hi,n⟩𝕊⟨Hi ${n}!⟩⟨/λ⟩Ω⟨✱⟩𝕊⟨${msg}⟩hi(𝕊⟨地λ⟩)⟨/Ω⟩⟩,
+    計算:𝕊⟨Σ⟨a:⊗∅,b:⊗∅,r:⊗∅⟩λ⟨+,x,y⟩x+y⟨/λ⟩λ⟨-,x,y⟩x-y⟨/λ⟩λ⟨*,x,y⟩x*y⟨/λ⟩λ⟨/,x,y⟩y≡⊗∅?𝕊⟨❌/⊗∅⟩:x/y⟨/λ⟩⟩,
+    todo:𝕊⟨Σ⟨list:𝔸⟨⟩,in:𝕊⟨⟩⟩λ⟨add⟩list.⊕(𝕆⟨id:Date.now(),txt:in,ok:⊥⟩)in=𝕊⟨⟩⟨/λ⟩Δ⟨item,i⟩Φ{δ:Λ;⬛:φ;φ:Cpx;β:¹px ⬛ #eee}⟦𝕊⟨${i.txt}⟩⟧⟨/Δ⟩Ω⟨✱⟩𝕊⟨📝 TODO⟩list.∘(i=>Δ⟨item,i⟩)⟨/Ω⟩⟩
   ⟩,
-  stats: 物⟨
-    compilationSpeed: 文⟨10x faster⟩,
-    memoryUsage: 文⟨50% less⟩,
-    tokenReduction: 文⟨40% compression⟩
-  ⟩
+  例:𝕊⟨hi⟩
 ⟩
 
-函⟨increment⟩
-  count = count + 一
-⟨/函⟩
+λ⟨++⟩計數=計數+⊗α⟨/λ⟩
+λ⟨--⟩計數=計數-⊗α⟨/λ⟩
+λ⟨toggle⟩活躍=¬活躍⟨/λ⟩
 
-函⟨decrement⟩
-  count = count - 一
-⟨/函⟩
+λ⟨compile,src,lang⟩
+map=𝕆⟨𝕊:𝕊⟨Ω⟩,𝔸:𝕊⟨Ψ⟩,𝕆:𝕊⟨Φ⟩,λ:𝕊⟨λ⟩,Δ:𝕊⟨Δ⟩,Ω:𝕊⟨Θ⟩,Σ:𝕊⟨Σ⟩,Φ:𝕊⟨Ξ⟩,⊗∅:𝕊⟨⊗∅⟩,⊗α:𝕊⟨⊗α⟩,⊗β:𝕊⟨⊗β⟩,⊗γ:𝕊⟨⊗γ⟩,⊗δ:𝕊⟨⊗δ⟩,⊗ε:𝕊⟨⊗ε⟩,⊗ζ:𝕊⟨⊗ζ⟩,⊗η:𝕊⟨⊗η⟩,⊗θ:𝕊⟨⊗θ⟩,⊗ι:𝕊⟨⊗ι⟩⟩
+lang≡𝕊⟨📜⟩?𝕊⟨// 地λ→📜
+export function App(){return <div>地λ App</div>}⟩:𝕊⟨package main
+import "fmt"
+func main(){fmt.Println("地λ App")}⟩
+⟨/λ⟩
 
-函⟨toggleActive⟩
-  isActive = !isActive
-⟨/函⟩
+λ⟨set,ex⟩例=ex⟨/λ⟩
 
-組⟨FeatureCard, feature⟩
-  樣{
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 20px;
-    margin: 10px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    transform: translateY(0);
-    transition: all 0.3s ease;
-  }⟦
-    文⟨✨ ${feature}⟩
-  ⟧
-⟨/組⟩
+Δ⟨card,f⟩Φ{bg:Λ(Xdeg,#667eea ⊗∅%,#764ba2 ⊗●%);Ω:Z;φ:Kpx;μ:Apx;β:Cpx;Ξ:⊗∅ ⊗δpx Fpx ρ(⊗∅,⊗∅,⊗∅,⊗∅.⊗β);transform:Υ(⊗∅);τ:all ⊗∅.⊗γs ease}⟦𝕊⟨✨ ${f}⟩⟧⟨/Δ⟩
 
-組⟨StatCard, label, value⟩
-  樣{
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 10px;
-    padding: 15px;
-    margin: 8px;
-    text-align: center;
-  }⟦
-    樣{
-      font-size: 24px;
-      font-weight: bold;
-      color: #4299e1;
-      margin-bottom: 5px;
-    }⟦文⟨${value}⟩⟧
-    
-    樣{
-      font-size: 14px;
-      color: #718096;
-    }⟦文⟨${label}⟩⟧
-  ⟧
-⟨/組⟩
+Δ⟨stat,label,val⟩Φ{bg:ρ(p,p,p,⊗∅.⊗α);Π:blur(Apx);β:⊗αpx ⬛ ρ(p,p,p,⊗∅.⊗β);radius:Apx;φ:Fpx;μ:⊗θpx;Ω:中}⟦Φ{font-size:Opx;💪:💪;Ω:#⊗δ⊗β⊗ι⊗ιe⊗α;μ:⊗εpx}⟦𝕊⟨${val}⟩⟧Φ{font-size:Epx;Ω:#⊗η⊗α⊗θ⊗∅⊗ι⊗ζ}⟦𝕊⟨${label}⟩⟧⟧⟨/Δ⟩
 
-組⟨Counter⟩
-  樣{
-    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-    color: white;
-    padding: 20px;
-    border-radius: 15px;
-    text-align: center;
-    margin: 20px 0;
-  }⟦
-    樣{
-      font-size: 32px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }⟦文⟨Count: ${count}⟩⟧
-    
-    樣{
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-    }⟦
-      樣{
-        background: rgba(255,255,255,0.2);
-        border: none;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 18px;
-        transition: all 0.2s ease;
-      }⟦文⟨-⟩⟧
-      
-      樣{
-        background: rgba(255,255,255,0.2);
-        border: none;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 18px;
-        transition: all 0.2s ease;
-      }⟦文⟨+⟩⟧
-    ⟧
-  ⟧
-⟨/組⟩
+∆⟨counter⟩Φ{Β:Λ(Jdeg,#ff6b6b,#4ecdc4);ρ:Z;φ:Kpx;Ρ:Fpx;χ:◐;μ:Kpx ⊗∅}⟦Φ{σ:Wpx;κ:⚡;μ:Kpx}⟦𝕊⟨計數:${計數}⟩⟧Φ{δ:☰;Ξ:◐;gap:Apx}⟦Φ{Β:ρ(p,p,p,⊗∅.⊗β);β:⊥;ρ:Z;φ:Apx Kpx;Ρ:⊗θpx;ς:☝;σ:Ipx;τ:all ⊗∅.⊗βs ease}⟦𝕊⟨-⟩⟧Φ{Β:ρ(p,p,p,⊗∅.⊗β);β:⊥;ρ:Z;φ:Apx Kpx;Ρ:⊗θpx;ς:☝;σ:Ipx;τ:all ⊗∅.⊗βs ease}⟦𝕊⟨+⟩⟧⟧⟧⟨/∆⟩
 
-界⟨✱⟩
-  樣{
-    min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: white;
-    padding: 0;
-    margin: 0;
-  }⟦
-    樣{
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }⟦
-      樣{
-        text-align: center;
-        margin-bottom: 40px;
-      }⟦
-        樣{
-          font-size: 48px;
-          font-weight: 800;
-          margin-bottom: 10px;
-          background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
-          background-clip: text;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }⟦文⟨${title}⟩⟧
-        
-        樣{
-          font-size: 18px;
-          opacity: 0.9;
-          margin-bottom: 20px;
-        }⟦文⟨Version ${version} • Ultra-compact Chinese-character programming⟩⟧
-        
-        樣{
-          display: inline-block;
-          background: ${isActive ? 'rgba(72, 187, 120, 0.2)' : 'rgba(237, 137, 54, 0.2)'};
-          color: ${isActive ? '#48bb78' : '#ed8936'};
-          padding: 8px 16px;
-          border-radius: 20px;
-          font-size: 14px;
-          border: 1px solid ${isActive ? '#48bb78' : '#ed8936'};
-        }⟦文⟨${isActive ? '🟢 Active' : '🟡 Inactive'}⟩⟧
-      ⟧
-      
-      組⟨Counter⟩
-      
-      樣{
-        margin: 40px 0;
-      }⟦
-        樣{
-          font-size: 24px;
-          font-weight: bold;
-          margin-bottom: 20px;
-          text-align: center;
-        }⟦文⟨🚀 Performance Statistics⟩⟧
-        
-        樣{
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 15px;
-          margin-bottom: 30px;
-        }⟦
-          組⟨StatCard, "Compilation Speed", stats.compilationSpeed⟩
-          組⟨StatCard, "Memory Usage", stats.memoryUsage⟩
-          組⟨StatCard, "Token Reduction", stats.tokenReduction⟩
-        ⟧
-      ⟧
-      
-      樣{
-        margin: 40px 0;
-      }⟦
-        樣{
-          font-size: 24px;
-          font-weight: bold;
-          margin-bottom: 20px;
-          text-align: center;
-        }⟦文⟨✨ Key Features⟩⟧
-        
-        樣{
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 15px;
-        }⟦
-          ${features.map(feature => 組⟨FeatureCard, feature⟩)}
-        ⟧
-      ⟧
-      
-      樣{
-        background: rgba(255,255,255,0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 15px;
-        padding: 30px;
-        margin: 40px 0;
-        text-align: center;
-      }⟦
-        樣{
-          font-size: 20px;
-          font-weight: bold;
-          margin-bottom: 15px;
-        }⟦文⟨🌟 About GaiaScript⟩⟧
-        
-        樣{
-          font-size: 16px;
-          line-height: 1.6;
-          opacity: 0.9;
-        }⟦文⟨
-          GaiaScript is a revolutionary programming language that uses Chinese characters 
-          and symbols to achieve maximum token efficiency for AI communication. It compiles 
-          to TypeScript and native binaries, leveraging the Microsoft TypeScript compiler 
-          infrastructure for production-ready code generation.
-        ⟩⟧
-      ⟧
-      
-      樣{
-        text-align: center;
-        margin-top: 40px;
-        opacity: 0.7;
-        font-size: 14px;
-      }⟦文⟨
-        💻 Built with GaiaScript • 🚀 Powered by TypeScript • 🌍 Open Source
-      ⟩⟧
-    ⟧
-  ⟧
-⟨/界⟩
+∆⟨btn,name,label⟩Φ{Β:${例===name?𝕊⟨#007bff⟩:𝕊⟨ρ(p,p,p,⊗∅.⊗β)⟩};ρ:Z;β:⊥;φ:⊗θpx Gpx;μ:⊗∅ ⊗δpx;Ρ:Kpx;ς:☝;σ:Epx;τ:all ⊗∅.⊗βs}⟦𝕊⟨${label}⟩⟧⟨/∆⟩
+
+🧩⟨output,lang,code⟩🎨{bg:ρ(p,p,p,0.1);Π:blur(Apx);radius:Fpx;Φ:Kpx;Ψ:1px Σ ρ(p,p,p,0.2);Δ:Apx}⟦🎨{font-size:Ipx;💪:💪;Δ:Fpx;Θ:Λ;Σ:中;gap:Apx}⟦🎨{font-size:Opx}⟦文⟨${lang===文⟨📜⟩?文⟨📜⟩:文⟨🐹⟩}⟩⟧文⟨${lang}輸出⟩⟧🎨{bg:ρ(0,0,0,0.2);radius:8px;Φ:Fpx;min-height:Ypx;font-family:'SF Mono,Monaco,Consolas,monospace';font-size:Epx;line-height:1.5;white-space:pre-wrap;overflow-y:自;Ω:#e8e8e8}⟦文⟨${compile(💾[例],lang)}⟩⟧⟧⟨/🧩⟩
+
+Ω⟨✱⟩
+Φ{Κ:mvh;Β:Λ(Xdeg,#667eea ⊗∅%,#764ba2 ⊗●%);font-family:'Inter,SF Pro Θ,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif';ρ:Z;φ:⊗∅;μ:⊗∅}⟦
+Φ{Ι:⊗βKpx;μ:⊗∅ ∞;φ:Qpx Kpx}⟦
+Φ{χ:◐;μ:Qpx}⟦
+Φ{σ:Jpx;κ:⊗θ⊗∅⊗∅;μ:Apx;Β:Λ(Jdeg,#ff6b6b,#4ecdc4,#45b7d1);bg-clip:text;-webkit-bg-clip:text;-webkit-text-fill-ρ:◯}⟦𝕊⟨🌸 ${標題}⟩⟧
+Φ{σ:Ipx;α:⊗∅.⊗ι;μ:Kpx}⟦𝕊⟨版本 ${版本} • 超緊湊🔢編程🗣⟩⟧
+🎨{Θ:inline-block;bg:${活躍?文⟨ρ(H,bb,x,0.2)⟩:文⟨ρ(ed,89,6,0.2)⟩};Ω:${活躍?文⟨#48bb78⟩:文⟨#ed8936⟩};Φ:8px Gpx;radius:Kpx;font-size:Epx;Ψ:1px Σ ${活躍?文⟨#48bb78⟩:文⟨#ed8936⟩}}⟦文⟨${活躍?文⟨🟢 活躍⟩:文⟨🟡 非活躍⟩}⟩⟧
+⟧
+🧩⟨counter⟩
+🎨{Δ:Qpx 0}⟦
+🎨{font-size:Opx;💪:💪;Δ:Kpx;Ω:中}⟦文⟨🚀 性能📊⟩⟧
+🎨{Θ:Π;grid-template-columns:repeat(自-fit,minmax(Spx,1fr));gap:Fpx;Δ:Ypx}⟦
+🧩⟨stat,文⟨編譯速度⟩,📊.速度⟩
+🧩⟨stat,文⟨內存使用⟩,📊.內存⟩
+🧩⟨stat,文⟨標記減少⟩,📊.壓縮⟩
+⟧
+⟧
+🎨{Δ:Qpx 0}⟦
+🎨{font-size:Opx;💪:💪;Δ:Kpx;Ω:中}⟦文⟨📚 編程📖⟩⟧
+🎨{Θ:Λ;Ξ:中;flex-wrap:wrap;gap:Apx;Δ:Kpx}⟦
+🧩⟨btn,文⟨hi⟩,文⟨👋 Hello⟩⟩
+🧩⟨btn,文⟨計算⟩,文⟨🧮 計算器⟩⟩
+🧩⟨btn,文⟨todo⟩,文⟨📝 TODO⟩⟩
+⟧
+🎨{bg:ρ(0,0,0,0.2);radius:Apx;Φ:Kpx;Δ:Kpx}⟦
+🎨{font-size:Gpx;💪:💪;Δ:Apx}⟦文⟨🌸 地λ源💾:⟩⟧
+🎨{bg:ρ(0,0,0,0.3);radius:8px;Φ:Fpx;font-family:'SF Mono,Monaco,Consolas,monospace';font-size:Epx;line-height:1.5;white-space:pre-wrap;Ω:#f8f8f2}⟦文⟨${💾[例]}⟩⟧
+⟧
+🎨{Θ:Π;grid-template-columns:1fr 1fr;gap:Kpx}⟦
+🧩⟨output,文⟨📜⟩,💾[例]⟩
+🧩⟨output,文⟨Go⟩,💾[例]⟩
+⟧
+⟧
+🎨{Δ:Qpx 0}⟦
+🎨{font-size:Opx;💪:💪;Δ:Kpx;Ω:中}⟦文⟨✨ 核心✨⟩⟧
+🎨{Θ:Π;grid-template-columns:repeat(自-fit,minmax(Tpx,1fr));gap:Fpx}⟦
+${✨.map(✨=>🧩⟨card,✨⟩)}
+⟧
+⟧
+🎨{bg:ρ(p,p,p,0.1);Π:blur(Apx);radius:Fpx;Φ:Ypx;Δ:Qpx 0;Ω:中}⟦
+🎨{font-size:Kpx;💪:💪;Δ:Fpx}⟦文⟨🌟 關於地λ⟩⟧
+🎨{font-size:Gpx;line-height:1.6;opacity:0.9}⟦文⟨地λ是革命性編程🗣，使用🔢和符號實現AI通信的最大標記⚙️。編譯為📜和本土二進制文件，利用微軟📜🔧器基礎設施進行生產就緒的💾生成。採用🔢📝🔗，實現Q%標記壓縮，為AI模型處理和生成而優化。⟩⟧
+⟧
+🎨{Ω:中;Δ:Qpx;opacity:0.7;font-size:Epx}⟦文⟨💻 使用地λ🔧 • 🚀 由📜提供動力 • 🌍 開源📁⟩⟧
+⟧
+⟧
+⟨/💻⟩

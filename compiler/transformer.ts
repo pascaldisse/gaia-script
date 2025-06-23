@@ -1,22 +1,22 @@
 /**
- * GaiaScript Transformer - GaiaScript to TypeScript AST
- * Transforms GaiaScript AST nodes to TypeScript AST nodes using the TypeScript compiler
+ * 地λ Transformer - 地λ δ TypeScript AST
+ * Transforms 地λ AST nodes δ TypeScript AST nodes using α TypeScript compiler
  */
 
 import * as ts from "../TypeScript/src/compiler/types";
 import { createSourceFile, ScriptTarget, ScriptKind } from "../TypeScript/src/compiler/utilities";
 import { GaiaASTNode } from "./parser";
-import { expandChineseText } from "./encoding/character-map";
+import { αText, ωNumber, χNumber } from "./encoding/character-map";
 
-export class GaiaTransformer {
+export class 地λTransformer {
     private sourceFile: ts.SourceFile;
     private factory: ts.NodeFactory;
     
     constructor() {
-        // Create a TypeScript node factory for generating AST nodes
+        // Create ε TypeScript node factory κ generating AST nodes
         this.factory = ts.factory;
         this.sourceFile = createSourceFile(
-            "gaia-source.ts",
+            "地λ-source.ts",
             "",
             ScriptTarget.ES2020,
             true,
@@ -24,8 +24,11 @@ export class GaiaTransformer {
         );
     }
     
-    transform(gaiaAST: GaiaASTNode): ts.SourceFile {
-        const statements = this.transformProgram(gaiaAST);
+    transform(地λAST: GaiaASTNode): ts.SourceFile {
+        // Pre-process mathematical symbols in the AST
+        this.preprocessMathematicalSymbols(地λAST);
+        
+        const statements = this.transformProgram(地λAST);
         
         return this.factory.createSourceFile(
             statements,
@@ -109,8 +112,8 @@ export class GaiaTransformer {
             this.factory.createNamedImports(importSpecifiers)
         );
         
-        // Default to importing from a standard library
-        const moduleSpecifier = this.factory.createStringLiteral("@gaia/runtime");
+        // Default δ importing from ε standard library
+        const moduleSpecifier = this.factory.createStringLiteral("@地λ/runtime");
         
         return this.factory.createImportDeclaration(
             undefined,
@@ -173,20 +176,20 @@ export class GaiaTransformer {
             }
         }
         
-        // Components are React functional components
+        // Components ι ⚛️ functional components
         return this.factory.createFunctionDeclaration(
             undefined,
             undefined,
             name,
             undefined,
-            [], // No parameters for now
+            [], // 無 parameters κ now
             this.factory.createTypeReferenceNode("JSX.Element"),
             body
         );
     }
     
     private transformUIInterfaceDeclaration(node: GaiaASTNode): ts.FunctionDeclaration {
-        // UI Interface is the main app component
+        // UI Interface η α main app component
         const body = node.children?.[0] ? this.transformInterfaceBody(node.children[0]) : undefined;
         
         return this.factory.createFunctionDeclaration(
@@ -213,7 +216,7 @@ export class GaiaTransformer {
                         }
                         break;
                     case "InterfaceBody":
-                        // Transform interface body to type elements
+                        // Transform interface body δ type elements
                         break;
                 }
             }
@@ -310,7 +313,7 @@ export class GaiaTransformer {
     
     private transformDocumentation(node: GaiaASTNode): ts.JSDocComment {
         const content = node.expandedText || node.text || "";
-        // TypeScript's JSDoc handling is complex, for now return a simple comment
+        // TypeScript's JSDoc handling η complex, κ now return ε simple comment
         return {
             kind: ts.SyntaxKind.JSDocComment,
             comment: content,
@@ -319,7 +322,7 @@ export class GaiaTransformer {
     }
     
     private transformStyledElement(node: GaiaASTNode): ts.CallExpression {
-        // Transform styled elements to styled-components or similar
+        // Transform styled elements δ styled-components σ similar
         let styles = "";
         let content: ts.Expression[] = [];
         
@@ -343,7 +346,7 @@ export class GaiaTransformer {
             }
         }
         
-        // Create a styled component call
+        // Create ε styled component call
         return this.factory.createCallExpression(
             this.factory.createPropertyAccessExpression(
                 this.factory.createIdentifier("styled"),
@@ -365,8 +368,22 @@ export class GaiaTransformer {
     }
     
     private transformNumericLiteral(node: GaiaASTNode): ts.NumericLiteral {
-        const value = node.expandedText || node.text || "0";
-        return this.factory.createNumericLiteral(value);
+        const rawValue = node.expandedText || node.text || "0";
+        
+        // Handle vector numbers (⊗ system)
+        if (rawValue.startsWith('⊗')) {
+            try {
+                const decodedValue = ωNumber(rawValue);
+                return this.factory.createNumericLiteral(decodedValue.toString());
+            } catch (error) {
+                // Fall back to raw value if decoding fails
+                console.warn(`Failed to decode vector number ${rawValue}:`, error);
+                return this.factory.createNumericLiteral("0");
+            }
+        }
+        
+        // Handle traditional numbers
+        return this.factory.createNumericLiteral(rawValue);
     }
     
     private transformIdentifier(node: GaiaASTNode): ts.Identifier {
@@ -375,7 +392,9 @@ export class GaiaTransformer {
     
     private transformWord(node: GaiaASTNode): ts.Identifier {
         const expanded = node.expandedText || node.text || "";
-        return this.factory.createIdentifier(expanded);
+        // Apply mathematical symbol expansion
+        const mathematicalExpanded = αText(expanded);
+        return this.factory.createIdentifier(mathematicalExpanded);
     }
     
     private transformParameterList(node: GaiaASTNode): ts.ParameterDeclaration[] {
@@ -451,5 +470,34 @@ export class GaiaTransformer {
     
     private transformInterfaceBody(node: GaiaASTNode): ts.Block {
         return this.transformComponentBody(node);
+    }
+    
+    /**
+     * Preprocesses mathematical symbols throughout the AST
+     * Converts mathematical symbols to their expanded forms recursively
+     */
+    private preprocessMathematicalSymbols(node: GaiaASTNode): void {
+        // Expand mathematical symbols in text content
+        if (node.text) {
+            node.expandedText = αText(node.text);
+        }
+        
+        // Handle vector numbers
+        if (node.kind === "NumericLiteral" && node.text?.startsWith('⊗')) {
+            try {
+                const decodedValue = ωNumber(node.text);
+                node.expandedText = decodedValue.toString();
+            } catch (error) {
+                console.warn(`Failed to decode vector number ${node.text}:`, error);
+                node.expandedText = "0";
+            }
+        }
+        
+        // Recursively process children
+        if (node.children) {
+            for (const child of node.children) {
+                this.preprocessMathematicalSymbols(child);
+            }
+        }
     }
 }
